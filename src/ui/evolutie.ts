@@ -1,5 +1,7 @@
 import type { Meting, ParameterSamenvatting } from "../data/types.js";
-import { NORMEN, type Normenset } from "../data/normen.js";
+import type { LaagId } from "../lagen/types.js";
+import { normVoor, type Normenset } from "../data/normen.js";
+import { STOFBRONNEN, stofprofiel } from "../data/stoffen.js";
 import {
   bepaalMaxGat,
   bouwPad,
@@ -28,6 +30,8 @@ export interface EvolutieGegevens {
   metingen: Meting[];
   /** Tegen welke normenset de lijn in de grafiek getekend wordt. */
   normenset: Normenset;
+  /** Nodig voor de duiding: "T" betekent per laag iets anders. */
+  laag: LaagId;
 }
 
 /**
@@ -56,9 +60,9 @@ export class EvolutieVenster {
     });
   }
 
-  toon({ parameter, metingen, normenset }: EvolutieGegevens): void {
+  toon({ parameter, metingen, normenset, laag }: EvolutieGegevens): void {
     const gesorteerd = opDatum(metingen);
-    this.dialoog.innerHTML = this.inhoud(parameter, gesorteerd, normenset);
+    this.dialoog.innerHTML = this.inhoud(parameter, gesorteerd, normenset, laag);
     this.dialoog
       .querySelector("[data-actie='sluiten']")
       ?.addEventListener("click", () => this.dialoog.close());
@@ -110,8 +114,16 @@ export class EvolutieVenster {
     svg.addEventListener("pointerleave", verberg);
   }
 
-  private inhoud(parameter: ParameterSamenvatting, metingen: Meting[], set: Normenset): string {
-    const norm = NORMEN[set][parameter.symbool];
+  private inhoud(
+    parameter: ParameterSamenvatting,
+    metingen: Meting[],
+    set: Normenset,
+    laag: LaagId,
+  ): string {
+    // Via normVoor, niet rechtstreeks in de tabel: anders ontbreekt de normlijn
+    // juist bij de stoffen die hun norm aan hun groep ontlenen, zoals de
+    // honderden pesticiden met hun gezamenlijke 0,1 µg/L.
+    const norm = normVoor(parameter, set);
     const normGeldt = norm !== undefined && norm.eenheid === parameter.eenheid;
     const bereik = this.bereikTekst(metingen);
 
@@ -130,6 +142,7 @@ export class EvolutieVenster {
 
         ${this.grafiek(parameter, metingen, normGeldt ? norm : undefined)}
         ${this.legende(metingen, normGeldt ? norm : undefined)}
+        ${duidingHtml(parameter, laag)}
         ${this.tabel(metingen)}
       </article>`;
   }
@@ -330,3 +343,39 @@ export class EvolutieVenster {
   }
 }
 
+
+/**
+ * Wat deze stof is, waar ze vandaan komt en wat ze doet — met de bron erbij.
+ *
+ * Staat er bewust ook als er niets overschreden is: wie een vinkje ziet, mag
+ * evengoed weten wat er dan precies binnen de norm blijft. Kennen we de stof
+ * niet, dan verschijnt er niets; een tekst die op alles zou passen, legt niets
+ * uit en wekt alleen de indruk van wel.
+ */
+function duidingHtml(parameter: ParameterSamenvatting, laag: LaagId): string {
+  const profiel = stofprofiel(parameter, laag);
+  if (!profiel) return "";
+
+  const alinea = (kop: string, tekst?: string): string =>
+    tekst ? `<p><strong>${kop}</strong> ${escape(tekst)}</p>` : "";
+
+  const bronnen = profiel.bronnen
+    .map((id) => STOFBRONNEN[id])
+    .map(
+      (bron) =>
+        `<li><a href="${escape(bron.url)}" target="_blank" rel="noopener">${escape(bron.naam)}</a></li>`,
+    )
+    .join("");
+
+  return `
+    <section class="duiding">
+      <h3 class="duiding__kop">Over deze stof</h3>
+      ${alinea("Wat het is.", profiel.wat)}
+      ${alinea("Waar het vandaan komt.", profiel.herkomst)}
+      ${alinea("Waarom het uitmaakt.", profiel.risico)}
+      <details class="duiding__bronnen">
+        <summary>Waar dit op gebaseerd is</summary>
+        <ul>${bronnen}</ul>
+      </details>
+    </section>`;
+}

@@ -178,6 +178,33 @@ Aandachtspunten:
 - **Richtlijn (EU) 2024/2881 verstrengt de luchtnormen** maar geldt pas vanaf
   1 januari 2030. We toetsen aan wat vandaag geldt.
 
+## Duiding bij de stoffen
+
+`src/data/stoffen.ts` beantwoordt drie vragen per stof: wat is het, waar komt
+het vandaan, waarom maakt het uit. Het verschijnt in het grafiekvenster, ook
+wanneer er niets overschreden wordt — wie een vinkje ziet, mag evengoed weten
+wat er dan binnen de norm blijft.
+
+Bewust los van `normen.ts`: een norm zegt óf een waarde te hoog is, deze teksten
+waaróm dat uitmaakt.
+
+- **Elke uitspraak draagt haar bron**, en de zwaarste twee: lood, arseen, fijn
+  stof en PFAS zijn in twee bronnen nagegaan. Een test bewaakt dat.
+- **Kennen we de stof niet, dan staat er niets.** Een tekst die op elke stof zou
+  passen wekt de indruk van uitleg zonder er een te geven, en bij
+  gezondheidsinformatie is dat erger dan zwijgen.
+- **Dezelfde stof heet per bron anders**, dus de tekst hangt aan een eigen naam
+  en `SLEUTELS` wijst er vanuit elke bronspelling heen. Nitraat is "NO3-" bij de
+  VMM en "Nitraat (NO3)" bij DOV.
+- **`T` betekent per laag iets anders**: luchttemperatuur bij IRCELINE,
+  watertemperatuur bij de VMM. Vandaar `PER_LAAG`, en `stofprofiel` neemt de
+  laag mee. Beide teksten gaan over temperatuur, dus een verwisseling zou
+  niemand opvallen.
+- **De fractie doet er voor de duiding niet toe.** "As t" en "As o" zijn allebei
+  arseen; het achtervoegsel gaat eraf vóór het opzoeken.
+- Honderden pesticiden en duizenden PFAS krijgen duiding **via hun groep**,
+  net zoals de normen dat doen.
+
 ## Elke parameter blijft zichtbaar
 
 Geen enkele bron wordt gefilterd op een lijst die wij bijhouden — wat de bron
