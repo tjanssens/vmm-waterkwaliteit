@@ -542,11 +542,10 @@ export class Paneel {
       )
       .join("");
 
-    const links = bronUrls(
-      toestand.meetplaats.code,
-      toestand.meetplaats.matrix,
-      toestand.jaren.length ? toestand.jaren : [toestand.gekozenJaar],
-    );
+    // Het gekozen meetjaar, want dat is wat het paneel toont.
+    const links = bronUrls(toestand.meetplaats.code, toestand.meetplaats.matrix, [
+      toestand.gekozenJaar,
+    ]);
 
     return `
       <footer class="paneel__voet">
@@ -554,13 +553,12 @@ export class Paneel {
         <p>Per parameter tonen we het gemiddelde over ${toestand.gekozenJaar} en de laagste en hoogste
         gemeten waarde — niet elke afzonderlijke staalname.</p>
 
-        <h3>Brondata narekenen</h3>
+        <h3>Bron van deze cijfers</h3>
         <p>
-          <a href="${escape(links.ruw)}" target="_blank" rel="noopener">Ruwe meetgegevens voor ${escape(toestand.meetplaats.code)}</a>
-          — precies de tabel die deze pagina verwerkt, zoals de VMM-databank hem teruggeeft.
-          Ook na te kijken in de
-          <a href="${links.databank}" target="_blank" rel="noopener">databank waterkwaliteit</a>
-          van de VMM zelf, onder meetplaats ${escape(toestand.meetplaats.code)}.
+          <a href="${escape(links.rapport)}" target="_blank" rel="noopener">Analyseresultaten voor ${escape(toestand.meetplaats.code)} in ${toestand.gekozenJaar}</a>
+          — het rapport van de VMM zelf, waarop deze cijfers gepubliceerd staan.
+          Het opent rechtstreeks op dit meetpunt en meetjaar. Onderdeel van de
+          <a href="${links.databank}" target="_blank" rel="noopener">databank waterkwaliteit</a>.
         </p>
 
         <h3>Normen</h3>

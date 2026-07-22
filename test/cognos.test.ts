@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { bouwCognosUrl, leesAanvraag, ValidatieFout } from "../shared/cognos.js";
+import { bouwCognosUrl, leesAanvraag, rapportUrl, ValidatieFout } from "../shared/cognos.js";
 
 const vraag = (query: string) => new URLSearchParams(query);
 
@@ -78,5 +78,31 @@ describe("bouwCognosUrl", () => {
 
     expect(url).toContain("/report/i1B4F72B440A747A3B2F9D6057DC16031");
     expect(url.startsWith("https://int-web.vmm.be/ibmcognos/")).toBe(true);
+  });
+
+});
+
+describe("rapportUrl", () => {
+  const url = new URL(rapportUrl({ meetplaats: "OW65000", matrix: "OW", jaren: ["2024"] }));
+
+  it("opent het rapport rechtstreeks op meetplaats en meetjaar", () => {
+    expect(url.searchParams.get("p_pSamplePoint")).toBe("OW65000");
+    expect(url.searchParams.get("p_pMatrix")).toBe("OW");
+    expect(url.searchParams.getAll("p_pJaar")).toEqual(["2024"]);
+  });
+
+  it("slaat het keuzescherm over", () => {
+    // Zonder prompt=false toont Cognos alsnog de drie keuzelijsten.
+    expect(url.searchParams.get("prompt")).toBe("false");
+    expect(url.searchParams.get("action")).toBe("run");
+  });
+
+  it("wijst naar de VMM-rapportomgeving, niet naar onze eigen proxy", () => {
+    expect(url.host).toBe("int-web.vmm.be");
+    expect(url.searchParams.get("id")).toBe("i1B4F72B440A747A3B2F9D6057DC16031");
+  });
+
+  it("verwijst naar het rapport in de publieke map van de VMM", () => {
+    expect(url.searchParams.get("pathRef")).toContain("Analyseresultaten");
   });
 });

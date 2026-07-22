@@ -58,8 +58,10 @@ bij een eigen domein.
   worden samengevat tot één regel per parameter, gegroepeerd per thema, met de
   overschrijdingen bovenaan.
 
-- **De brondata.** Onderaan elk meetpunt staat een link naar precies de ruwe
-  tabel die de pagina verwerkt, zodat je elk getal kunt narekenen.
+- **De bron.** Onderaan elk meetpunt staat een link naar het VMM-rapport zelf,
+  dat rechtstreeks opent op dit meetpunt en meetjaar — zonder de drie
+  keuzelijsten die je normaal moet invullen. Zo kun je elk getal narekenen bij
+  de bron.
 
 ## Normen
 

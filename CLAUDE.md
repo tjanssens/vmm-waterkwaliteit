@@ -59,6 +59,20 @@ Geen authenticatie nodig. `p_pJaar` mag herhaald worden voor meerdere jaren.
 `fmt=HTMLFragment` geeft er gemeente en waterloop bij; `fmt=JSON` geeft de
 volledige rapportlayout.
 
+**Het rapport is ook rechtstreeks te openen** met de prompts al ingevuld — dat
+is wat `rapportUrl()` bouwt voor de bronvermelding:
+
+```
+https://int-web.vmm.be/ibmcognos/bi/?perspective=classicviewer
+  &pathRef=.public_folders/Water/Meetnetten/Analyseresultaten+per+meetplaats
+  &id=i1B4F72B440A747A3B2F9D6057DC16031
+  &action=run&format=HTML&prompt=false
+  &p_pMatrix=OW&p_pSamplePoint=OW68300&p_pJaar=2026
+```
+
+`prompt=false` is wat het keuzescherm overslaat; zonder die parameter toont
+Cognos alsnog de drie keuzelijsten.
+
 ## Zaken die stil fout gaan
 
 Deze zijn met tests afgedekt. Verwijder die tests niet zonder reden.

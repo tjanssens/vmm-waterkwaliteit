@@ -1,4 +1,5 @@
 import { parseAnalyseresultaten } from "./csv.js";
+import { rapportUrl } from "../../shared/cognos.js";
 import type { Meting } from "./types.js";
 
 /**
@@ -30,17 +31,13 @@ export class DatabankFout extends Error {
 }
 
 /**
- * Waar de getoonde cijfers vandaan komen, zodat je ze kunt narekenen: de ruwe
- * respons die wij verwerken, en het officiële VMM-rapport.
+ * Waar de getoonde cijfers vandaan komen: het VMM-rapport voor dit meetpunt,
+ * met de keuzes al ingevuld. Dat is de pagina waarop de VMM deze cijfers
+ * publiceert, en dus de bron om naar te verwijzen.
  */
 export function bronUrls(meetplaats: string, matrix: string, jaren: number[]) {
-  const ruw = new URL(PROXY, location.origin);
-  ruw.searchParams.set("meetplaats", meetplaats);
-  ruw.searchParams.set("matrix", matrix);
-  ruw.searchParams.set("jaren", jaren.join(","));
-
   return {
-    ruw: ruw.toString(),
+    rapport: rapportUrl({ meetplaats, matrix, jaren: jaren.map(String) }),
     databank:
       "https://vmm.vlaanderen.be/feiten-cijfers/water/kwaliteit-waterlopen/databank-waterkwaliteit",
   };

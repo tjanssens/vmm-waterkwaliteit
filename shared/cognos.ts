@@ -60,6 +60,29 @@ export function leesAanvraag(vraag: URLSearchParams, nu = new Date().getFullYear
   return { meetplaats, matrix, jaren };
 }
 
+/**
+ * Het VMM-rapport zelf, met de prompts al ingevuld. Dit is de pagina waarop de
+ * VMM deze cijfers publiceert — de juiste bron om naar te verwijzen, beter dan
+ * onze eigen tussenopslag.
+ */
+export function rapportUrl({ meetplaats, matrix, jaren }: Aanvraag): string {
+  const url = new URL("https://int-web.vmm.be/ibmcognos/bi/");
+  url.searchParams.set("perspective", "classicviewer");
+  url.searchParams.set(
+    "pathRef",
+    ".public_folders/Water/Meetnetten/Analyseresultaten+per+meetplaats",
+  );
+  url.searchParams.set("id", RAPPORT_ID);
+  url.searchParams.set("action", "run");
+  url.searchParams.set("format", "HTML");
+  // Zonder dit toont Cognos alsnog het keuzescherm.
+  url.searchParams.set("prompt", "false");
+  url.searchParams.set("p_pMatrix", matrix);
+  url.searchParams.set("p_pSamplePoint", meetplaats);
+  for (const jaar of jaren) url.searchParams.append("p_pJaar", jaar);
+  return url.toString();
+}
+
 export function bouwCognosUrl({ meetplaats, matrix, jaren }: Aanvraag): string {
   const url = new URL(COGNOS);
   url.searchParams.set("fmt", "CSV");
