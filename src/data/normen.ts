@@ -26,6 +26,11 @@ export const BRONNEN = {
     naam: "WHO global air quality guidelines (2021) — tabel 0.1, aanbevolen AQG-waarden",
     url: "https://www.who.int/publications/i/item/9789240034228",
   },
+  wac: {
+    naam:
+      "WAC/I/A/005 — Monstername van water via een peilput (Compendium voor de monsterneming, meting en analyse van water, versie mei 2019), §5.4.4.1",
+    url: "https://reflabos.vito.be/2020/WAC_I_A_005.pdf",
+  },
   drinkwaterVlaanderen: {
     naam:
       "Kwaliteitseisen van het drinkwater (VMM, oktober 2024) — bijlage I van het Vlaamse drinkwaterbesluit van 20 januari 2023",
@@ -776,7 +781,7 @@ export function beoordeel(
 const EXTRA_BRONNEN: Readonly<Record<Normenset, BronId[]>> = {
   oppervlaktewater: [],
   drinkwater: ["drinkwaterVlaanderen"],
-  grondwater: ["drinkwaterVlaanderen"],
+  grondwater: ["drinkwaterVlaanderen", "wac"],
   "lucht-eu": [],
   "lucht-who": [],
 };

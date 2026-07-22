@@ -490,12 +490,10 @@ export class Paneel {
               <span class="categorie__aantal">${categorie.parameters.length} parameters</span>
             </button>
             <div class="categorie__body">
-              ${
-                categorie.waarschuwing &&
-                (!categorie.waarschuwingVoor || categorie.waarschuwingVoor === toestand.normenset)
-                  ? `<p class="waarschuwing"><strong>Let op.</strong> ${escape(categorie.waarschuwing)}</p>`
-                  : ""
-              }
+              ${(categorie.waarschuwingen ?? [])
+                .filter((w) => !w.voor || w.voor === toestand.normenset)
+                .map((w) => `<p class="waarschuwing"><strong>Let op.</strong> ${escape(w.tekst)}</p>`)
+                .join("")}
               <div class="tabel-scroll">
                 <table>
                   <thead>
@@ -606,6 +604,7 @@ export class Paneel {
       <footer class="paneel__voet">
         <h3>Over deze cijfers</h3>
         <p>${escape(toestand.profiel.toelichting(toestand.gekozen))}</p>
+        ${meetwijzeHtml(toestand.profiel)}
 
         <h3>Bron van deze cijfers</h3>
         <p>
@@ -734,3 +733,16 @@ export class Paneel {
   }
 }
 
+
+/**
+ * Hoe er gemeten is, met de bron erbij. Bij grondwater bepaalt dat wat een
+ * oordeel waard is: de metalen zijn de opgeloste fractie, niet het geheel.
+ */
+function meetwijzeHtml(profiel: Laagprofiel): string {
+  const meetwijze = profiel.meetwijze;
+  if (!meetwijze) return "";
+  return `<p>${escape(meetwijze.tekst)}
+    <a href="${escape(meetwijze.bron.url)}" target="_blank" rel="noopener">${escape(
+      meetwijze.bron.naam,
+    )}</a>.</p>`;
+}

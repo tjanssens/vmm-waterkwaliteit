@@ -140,6 +140,15 @@ export const GRONDWATER: Laagprofiel<Grondwaterfilter> = {
     `Per parameter tonen we het gemiddelde over ${periode.label} en de laagste en hoogste ` +
     "gemeten waarde. Grondwater wordt enkele keren per jaar bemonsterd.",
 
+  meetwijze: {
+    tekst:
+      "Metalen worden bij de staalname ter plaatse over een filter van 0,45 µm geleid, om bodemdeeltjes en wat daaraan kleeft te verwijderen. Wat hier staat is dus de opgeloste fractie en niet het volledige gehalte. Voor de toetsing betekent dat: een overschrijding telt zeker, want het opgeloste deel alleen haalt de norm al niet; blijft een metaal eronder, dan zegt dat niets over de deeltjes die eruit gefilterd zijn. Kwik kan bovendien onderschat zijn, doordat het aan het filtermembraan blijft kleven. Voorgeschreven in",
+    bron: {
+      naam: "WAC/I/A/005, §5.4.4.1 — Compendium voor de monsterneming, meting en analyse van water",
+      url: "https://reflabos.vito.be/2020/WAC_I_A_005.pdf",
+    },
+  },
+
   leegTekst: (uitgebreid) =>
     uitgebreid
       ? "Voor deze filter zijn geen analyseresultaten gevonden."

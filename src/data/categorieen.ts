@@ -4,15 +4,14 @@ import { isTotaalgehalte } from "./normen.js";
 export interface Categorie {
   id: string;
   naam: string;
-  /** Waarschuwing bovenaan de categorie, bv. over de opgeloste fractie. */
-  waarschuwing?: string;
   /**
-   * Normenset waarvoor die waarschuwing geldt. De opmerking dat metalen als
-   * totaalgehalte gemeten zijn slaat op de milieukwaliteitsnorm voor
-   * oppervlaktewater; bij drinkwater geldt de norm juist wél op het
-   * totaalgehalte, en dan zou de waarschuwing onjuist zijn.
+   * Waarschuwingen bovenaan de categorie. Welke er geldt, hangt af van de
+   * normenset: metalen worden bij oppervlaktewater als totaalgehalte gemeten
+   * terwijl de norm op de opgeloste fractie slaat, en bij grondwater is het
+   * precies andersom. Eén vaste tekst zou dus in de helft van de gevallen
+   * onjuist zijn.
    */
-  waarschuwingVoor?: string;
+  waarschuwingen?: readonly { readonly voor?: string; readonly tekst: string }[];
 }
 
 export interface IngedeeldeCategorie extends Categorie {
@@ -25,16 +24,29 @@ const CATEGORIEEN = [
   { id: "fysisch", naam: "Algemeen fysisch-chemisch" },
   { id: "bacteriologie", naam: "Bacteriologie" },
   { id: "metalen", naam: "Metalen en sporenelementen",
-    waarschuwing:
-      "Deze stoffen zijn als totaalgehalte gemeten, terwijl de normen op de opgeloste fractie slaan. Ze zijn hier niet tegen een norm getoetst.",
-    waarschuwingVoor: "oppervlaktewater" },
+    waarschuwingen: [
+      {
+        voor: "oppervlaktewater",
+        tekst:
+          "Deze stoffen zijn als totaalgehalte gemeten, terwijl de normen op de opgeloste fractie slaan. Ze zijn hier niet tegen een norm getoetst.",
+      },
+      {
+        voor: "grondwater",
+        tekst:
+          "Grondwatermonsters voor metalen worden ter plaatse over 0,45 µm gefiltreerd. Wat hier staat is dus de opgeloste fractie, terwijl een drinkwaternorm het water als geheel bedoelt. Een overschrijding telt daarom zeker; een vinkje betekent alleen dat het opgeloste deel binnen de norm blijft. Kwik kan bovendien onderschat zijn, doordat het aan het filter blijft kleven.",
+      },
+    ] },
   { id: "pfas", naam: "PFAS" },
   { id: "fijnstof", naam: "Fijn stof en roet" },
   { id: "gassen", naam: "Gassen" },
   { id: "vos", naam: "Vluchtige organische stoffen" },
   { id: "weer", naam: "Weersomstandigheden",
-    waarschuwing:
-      "Deze waarden beschrijven het weer op het meetstation. Ze zeggen niets over de luchtkwaliteit, maar helpen die wel verklaren." },
+    waarschuwingen: [
+      {
+        tekst:
+          "Deze waarden beschrijven het weer op het meetstation. Ze zeggen niets over de luchtkwaliteit, maar helpen die wel verklaren.",
+      },
+    ] },
   { id: "pesticiden", naam: "Pesticiden" },
   { id: "overige", naam: "Overige parameters" },
 ] as const satisfies readonly Categorie[];

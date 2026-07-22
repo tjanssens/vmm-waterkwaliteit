@@ -156,6 +156,12 @@ export interface Laagprofiel<P extends Meetpunt = Meetpunt> {
   bron(punt: P, periode: Periode): Bronverwijzing;
   /** Alinea onder "Over deze cijfers", eigen aan deze bron. */
   toelichting(periode: Periode): string;
+  /**
+   * Hoe er gemeten wordt, en wat dat betekent voor de toetsing. Staat onder
+   * "Over deze cijfers" met de bron erbij: wie een oordeel leest, hoort te
+   * kunnen nagaan waarop het rust.
+   */
+  meetwijze?: { tekst: string; bron: { naam: string; url: string } };
   /** Zin wanneer er niets gemeten is. */
   leegTekst(uitgebreid: boolean): string;
   /** Optionele toelichting daaronder, in de woorden van deze bron. */
