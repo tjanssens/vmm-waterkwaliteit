@@ -60,7 +60,7 @@ Per laag kun je toetsen aan verschillende sets:
 |---|---|
 | Oppervlaktewater | [VLAREM II bijlage 2.3.1](https://navigator.emis.vito.be/detail?woId=10071) · [drinkwater (EU 2020/2184)](https://eur-lex.europa.eu/eli/dir/2020/2184/oj) |
 | Lucht | [EU-grenswaarden (2008/50/EG)](https://eur-lex.europa.eu/legal-content/NL/TXT/HTML/?uri=CELEX:32008L0050) · [WHO-advieswaarden 2021](https://www.who.int/publications/i/item/9789240034228) |
-| Grondwater | drinkwaternormen (EU 2020/2184) |
+| Grondwater | [VLAREM II bijlage 2.4.1](https://navigator.emis.vito.be/mijn-navigator?woId=10076) · drinkwater (EU 2020/2184) |
 
 Elke waarde is in de primaire bron opgezocht en met een tweede bron nagerekend.
 Dat is geen formaliteit: de eerste ronde bevatte drie drinkwaterwaarden uit een
@@ -70,7 +70,37 @@ als 10 µg/m³ waar de richtlijn 10 mg/m³ zegt — een factor duizend.
 Het verschil tussen de sets is zelf informatie. Meetstation Borgerhout haalde
 over het afgelopen jaar 16,4 µg/m³ PM10, 8,61 PM2,5 en 20 NO₂: drie keer conform
 tegen de Europese grenswaarden, drie keer een overschrijding tegen die van de
-WHO.
+WHO. Bij grondwater doet hetzelfde zich voor: mangaan op 0,325 mg/L blijft onder
+de VLAREM-norm van 1 mg/L, maar gaat ruim over de drinkwaternorm van 0,05.
+
+Honderden pesticiden delen één norm van 0,1 µg/L per stof. Die hangt aan de
+parametergroep die DOV zelf meegeeft, niet aan een lijst stofnamen die wij
+bijhouden — anders zou elke nieuwe stof stilzwijgend ongetoetst blijven.
+
+## Wat betekent deze stof?
+
+Klik een parameter aan en onder de grafiek staat wat het is, waar het vandaan
+komt en waarom het uitmaakt — ook als er niets overschreden is. Wie een vinkje
+ziet, mag evengoed weten wat er dan binnen de norm blijft.
+
+Bij een overschrijding staat één zin meteen in de tabel: niet wat de stof is,
+maar wat er misgaat.
+
+> **Atrazine (Atraz)** — boven norm · norm ≤ 0,1 µg/L
+> Verstoort de hormoonhuishouding van waterdieren, en duikt twintig jaar na het
+> Europese verbod nog op.
+
+Elke gezondheidsuitspraak draagt de bron waarin ze staat, en de zwaarste twee.
+Kennen we een stof niet, dan verschijnt er niets: een tekst die op elke stof zou
+passen wekt de indruk van uitleg zonder er een te geven.
+
+## Elke parameter blijft zichtbaar
+
+Geen enkele bron wordt gefilterd tegen een lijst die wij bijhouden. Wat de bron
+meet komt op het scherm, en wat we niet kennen valt terug op "Overige
+parameters" in plaats van te verdwijnen. Nagemeten: 108 van 108 bij een
+grondwaterfilter, 46 van 46 bij een oppervlaktewaterpunt, en de 23 stoffen die
+IRCELINE publiceert zijn alle 23 gedekt.
 
 ## Wat de app níét doet
 
@@ -129,5 +159,12 @@ bij een eigen domein.
 - Grondwater: [Databank Ondergrond Vlaanderen](https://www.dov.vlaanderen.be/)
 - Gemeentegrenzen: [VRBG](https://geo.api.vlaanderen.be/VRBG/wfs), Digitaal Vlaanderen
 - Kaartachtergrond: OpenStreetMap
+
+Voor de duiding bij de stoffen:
+
+- [WHO, Guidelines for drinking-water quality](https://www.who.int/publications/i/item/9789240045064) (vierde editie, 2022)
+- [WHO global air quality guidelines](https://www.who.int/publications/i/item/9789240034228) (2021), en de factsheets over [lood](https://www.who.int/news-room/fact-sheets/detail/lead-poisoning-and-health) en [arseen](https://www.who.int/news-room/fact-sheets/detail/arsenic)
+- [EFSA over PFAS in voeding](https://www.efsa.europa.eu/en/efsajournal/pub/6223) (2020)
+- [IARC Monographs](https://monographs.iarc.who.int/list-of-classifications), voor de indeling van kankerverwekkende stoffen
 
 Deze toepassing is geen officiële website van een van deze instanties.
