@@ -5,7 +5,17 @@ import type { Meting } from "./types.js";
  * In productie wijst dit naar de Cloudflare Worker, tijdens ontwikkeling naar
  * de dev-middleware in vite.config.ts. Zet VITE_PROXY_URL bij de build.
  */
-const PROXY = import.meta.env.VITE_PROXY_URL ?? "/api/resultaten";
+const DEV_PAD = "/api/resultaten";
+const PROXY = import.meta.env.VITE_PROXY_URL ?? DEV_PAD;
+
+/**
+ * Zonder VITE_PROXY_URL valt de app terug op het dev-pad, dat alleen bestaat
+ * terwijl de ontwikkelserver draait. Dat willen we uitleggen in plaats van de
+ * bezoeker op een onbegrijpelijke netwerkfout te laten lopen.
+ */
+function proxyOntbreekt(): boolean {
+  return PROXY === DEV_PAD && !["localhost", "127.0.0.1"].includes(location.hostname);
+}
 
 export class DatabankFout extends Error {
   constructor(
@@ -32,6 +42,15 @@ export async function haalResultaten(
   { meetplaats, jaren, matrix = "OW" }: Aanvraag,
   signaal?: AbortSignal,
 ): Promise<Meting[]> {
+  if (proxyOntbreekt()) {
+    throw new DatabankFout(
+      "De resultatenservice is voor deze installatie nog niet ingesteld. " +
+        "De kaart en het zoeken werken wel; meetresultaten opvragen nog niet. " +
+        "Zie de README onder 'Uitrollen'.",
+      false,
+    );
+  }
+
   const url = new URL(PROXY, location.origin);
   url.searchParams.set("meetplaats", meetplaats);
   url.searchParams.set("matrix", matrix);
