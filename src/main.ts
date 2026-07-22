@@ -106,7 +106,7 @@ async function start(): Promise<void> {
   function bouwLaagschakelaars(): void {
     // Met één laag valt er niets te kiezen; dan is de schakelaar ruis.
     if (LAGEN.length < 2) return;
-    laagbalk.hidden = false;
+    element<HTMLElement>("lagenblok").hidden = false;
 
     laagbalk.innerHTML = LAGEN.map(
       (profiel) => `
