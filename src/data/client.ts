@@ -29,6 +29,23 @@ export class DatabankFout extends Error {
   }
 }
 
+/**
+ * Waar de getoonde cijfers vandaan komen, zodat je ze kunt narekenen: de ruwe
+ * respons die wij verwerken, en het officiële VMM-rapport.
+ */
+export function bronUrls(meetplaats: string, matrix: string, jaren: number[]) {
+  const ruw = new URL(PROXY, location.origin);
+  ruw.searchParams.set("meetplaats", meetplaats);
+  ruw.searchParams.set("matrix", matrix);
+  ruw.searchParams.set("jaren", jaren.join(","));
+
+  return {
+    ruw: ruw.toString(),
+    databank:
+      "https://vmm.vlaanderen.be/feiten-cijfers/water/kwaliteit-waterlopen/databank-waterkwaliteit",
+  };
+}
+
 export interface Aanvraag {
   /** Meetplaatscode inclusief prefix, bv. "OW65000". */
   meetplaats: string;

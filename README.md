@@ -58,16 +58,29 @@ bij een eigen domein.
   worden samengevat tot één regel per parameter, gegroepeerd per thema, met de
   overschrijdingen bovenaan.
 
+- **De brondata.** Onderaan elk meetpunt staat een link naar precies de ruwe
+  tabel die de pagina verwerkt, zodat je elk getal kunt narekenen.
+
+## Normen
+
+Je kunt toetsen aan twee sets:
+
+- **Oppervlaktewater** — [VLAREM II, bijlage 2.3.1](https://navigator.emis.vito.be/detail?woId=10071),
+  de normen die voor de waterloop zelf gelden.
+- **Drinkwater** — [Richtlijn (EU) 2020/2184, bijlage I](https://eur-lex.europa.eu/eli/dir/2020/2184/oj),
+  ter vergelijking. Die normen gelden aan de kraan, ná zuivering; een beek hoeft
+  er niet aan te voldoen.
+
+Een deel van de oppervlaktewaternormen verschilt per waterlooptype. Welk type
+een waterloop heeft, weet de app niet, dus tussen de strengste en de soepelste
+waarde luidt het oordeel "hangt van type af" in plaats van een uitspraak.
+
 ## Wat de app níét doet
 
-De normtoetsing is **indicatief**. Ze gebruikt de algemene
-basiskwaliteitsnormen voor oppervlaktewater; typespecifieke normen per
-waterlooptype zijn nog niet verwerkt, en de drempelwaarden in
-`src/data/normen.ts` zijn nog niet stuk voor stuk tegen VLAREM II geverifieerd.
-Dit is geen officiële beoordeling van de VMM.
+De toetsing is **indicatief** en geen officiële beoordeling van de VMM.
 
-Waar toetsen zou misleiden, gebeurt het bewust niet: metalen worden als
-totaalgehalte gemeten terwijl de norm op de opgeloste fractie slaat,
+Waar toetsen zou misleiden, gebeurt het bewust niet: bij oppervlaktewater worden
+metalen als totaalgehalte gemeten terwijl de norm op de opgeloste fractie slaat,
 waterbodemwaarden staan in mg/kg droge stof, en parameters die nooit boven de
 detectielimiet uitkwamen hebben geen bruikbaar gemiddelde. Die krijgen alle drie
 "niet toetsbaar" in plaats van een vals vinkje.

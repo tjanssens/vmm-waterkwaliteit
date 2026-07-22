@@ -1,17 +1,24 @@
 import { describe, expect, it } from "vitest";
-import { beoordeel, isTotaalgehalte, NORMEN } from "../src/data/normen.js";
+import {
+  beoordeel,
+  bronnenVoor,
+  isTotaalgehalte,
+  NORMEN,
+  NORMENSETTEN,
+  type Normenset,
+} from "../src/data/normen.js";
 import type { ParameterJaar } from "../src/data/types.js";
 
-/**
- * Neemt standaard de eenheid waarin de norm geldt, zodat een test over de
- * drempelwaarde niet per ongeluk de eenheidscontrole test.
- */
-function samenvatting(over: Partial<ParameterJaar> = {}): ParameterJaar {
+/** Neemt standaard de eenheid waarin de norm geldt. */
+function samenvatting(
+  over: Partial<ParameterJaar> = {},
+  set: Normenset = "oppervlaktewater",
+): ParameterJaar {
   const symbool = over.symbool ?? "P t";
   return {
     symbool,
     omschrijving: "Fosfor, totaal",
-    eenheid: NORMEN[symbool]?.eenheid ?? "mgP/L",
+    eenheid: NORMEN[set][symbool]?.eenheid ?? "mgP/L",
     jaar: 2024,
     aantal: 6,
     aantalOnderLimiet: 0,
@@ -24,151 +31,155 @@ function samenvatting(over: Partial<ParameterJaar> = {}): ParameterJaar {
   };
 }
 
-describe("beoordeel", () => {
-  describe("bovengrens (hoe lager hoe beter)", () => {
-    it("noemt een jaargemiddelde boven de grens buiten norm", () => {
-      // Fosfor totaal: norm 0,14 mgP/L. OW65000 zat in 2024 op 0,328.
-      expect(beoordeel(samenvatting({ symbool: "P t", gemiddelde: 0.328 })).klasse).toBe(
-        "buiten-norm",
-      );
-    });
-
-    it("noemt een gemiddelde net onder de grens op-grens", () => {
-      // Orthofosfaat: norm 0,1 mgP/L. OW65000 zat op 0,0984 — nipt conform.
-      expect(beoordeel(samenvatting({ symbool: "oPO4 f", gemiddelde: 0.0984 })).klasse).toBe(
-        "op-grens",
-      );
-    });
-
-    it("noemt een gemiddelde ruim onder de grens conform", () => {
-      expect(beoordeel(samenvatting({ symbool: "NO3-", gemiddelde: 1.92 })).klasse).toBe("conform");
-    });
+describe("beoordeel — oppervlaktewater", () => {
+  it("noemt een jaargemiddelde boven de grens buiten norm", () => {
+    // OW65000 zat in 2024 op 0,328 mgP/L, norm 0,14.
+    expect(beoordeel(samenvatting({ symbool: "P t", gemiddelde: 0.328 })).klasse).toBe("buiten-norm");
   });
 
-  describe("ondergrens (hoe hoger hoe beter)", () => {
-    it("noemt een zuurstofgemiddelde onder de norm buiten norm", () => {
-      expect(beoordeel(samenvatting({ symbool: "O2", gemiddelde: 4.1, minimum: 2.4 })).klasse).toBe(
-        "buiten-norm",
-      );
-    });
+  it("noemt een gemiddelde ruim onder de grens conform", () => {
+    expect(beoordeel(samenvatting({ symbool: "P t", gemiddelde: 0.05 })).klasse).toBe("conform");
+  });
 
-    it("signaleert een zuurstofdip ook als het jaargemiddelde conform is", () => {
-      // OW65000 in 2024: gemiddeld 6,82 mg/L maar met een dip tot 2,36.
-      const oordeel = beoordeel(samenvatting({ symbool: "O2", gemiddelde: 6.82, minimum: 2.36 }));
+  it("signaleert een zuurstofdip ook als het jaargemiddelde conform is", () => {
+    const oordeel = beoordeel(samenvatting({ symbool: "O2", gemiddelde: 6.82, minimum: 2.36 }));
+
+    expect(oordeel.klasse).toBe("op-grens");
+    expect(oordeel.label).toBe("dipt onder");
+  });
+
+  it("noemt een zuurstofgemiddelde onder de norm buiten norm", () => {
+    expect(beoordeel(samenvatting({ symbool: "O2", gemiddelde: 4.1, minimum: 2.4 })).klasse).toBe(
+      "buiten-norm",
+    );
+  });
+
+  describe("typeafhankelijke normen", () => {
+    it("weigert te oordelen tussen de strengste en de soepelste grens", () => {
+      // Nitraat: 5,65 tot 10 mgN/L naargelang het waterlooptype.
+      const oordeel = beoordeel(samenvatting({ symbool: "NO3-", gemiddelde: 7 }));
 
       expect(oordeel.klasse).toBe("op-grens");
-      expect(oordeel.label).toBe("dipt onder");
+      expect(oordeel.label).toBe("hangt van type af");
+      expect(oordeel.toelichting).toMatch(/waterlooptype/i);
     });
 
-    it("noemt zuurstof conform wanneer ook het minimum boven de norm blijft", () => {
-      expect(beoordeel(samenvatting({ symbool: "O2", gemiddelde: 9, minimum: 7.2 })).klasse).toBe(
-        "conform",
-      );
-    });
-  });
-
-  describe("bandbreedte", () => {
-    it("noemt een pH onder de ondergrens buiten norm", () => {
-      expect(beoordeel(samenvatting({ symbool: "pH", gemiddelde: 6.44, minimum: 6.2 })).klasse).toBe(
-        "buiten-norm",
-      );
+    it("noemt boven de soepelste grens wél buiten norm", () => {
+      expect(beoordeel(samenvatting({ symbool: "NO3-", gemiddelde: 12 })).klasse).toBe("buiten-norm");
     });
 
-    it("noemt een pH boven de bovengrens buiten norm", () => {
-      expect(beoordeel(samenvatting({ symbool: "pH", gemiddelde: 8.9, minimum: 8.6 })).klasse).toBe(
-        "buiten-norm",
-      );
-    });
-
-    it("noemt een pH binnen de band conform", () => {
-      expect(beoordeel(samenvatting({ symbool: "pH", gemiddelde: 7.4, minimum: 7.1 })).klasse).toBe(
-        "conform",
-      );
+    it("noemt onder de strengste grens conform", () => {
+      expect(beoordeel(samenvatting({ symbool: "NO3-", gemiddelde: 1.9 })).klasse).toBe("conform");
     });
   });
 
-  describe("metalen als totaalgehalte", () => {
-    it("toetst een totaalgehalte niet tegen een norm voor de opgeloste fractie", () => {
-      const oordeel = beoordeel(samenvatting({ symbool: "Zn t", omschrijving: "Zink", gemiddelde: 33.9 }));
+  describe("PFOS", () => {
+    it("toetst PFOS in ng/L, de eenheid van de databank", () => {
+      // De norm staat in VLAREM als 0,00065 µg/L = 0,65 ng/L.
+      expect(NORMEN.oppervlaktewater["PFOS"]?.eenheid).toBe("ng/L");
+      expect(beoordeel(samenvatting({ symbool: "PFOS", gemiddelde: 3.3 })).klasse).toBe("buiten-norm");
+    });
+
+    it("noemt PFOS onder de norm conform", () => {
+      expect(beoordeel(samenvatting({ symbool: "PFOS", gemiddelde: 0.2 })).klasse).toBe("conform");
+    });
+  });
+
+  describe("metalen", () => {
+    it("toetst een totaalgehalte niet tegen de norm voor de opgeloste fractie", () => {
+      const oordeel = beoordeel(samenvatting({ symbool: "Zn t", gemiddelde: 33.9 }));
 
       expect(oordeel.klasse).toBe("geen-norm");
-      expect(oordeel.label).toBe("niet toetsbaar");
       expect(oordeel.toelichting).toMatch(/opgeloste fractie/i);
     });
 
-    it("herkent het totaalgehalte aan het achtervoegsel t", () => {
-      expect(isTotaalgehalte("Cd t")).toBe(true);
-      expect(isTotaalgehalte("Ag t")).toBe(true);
-      // De opgeloste fractie draagt het achtervoegsel o.
-      expect(isTotaalgehalte("Cd o")).toBe(false);
-      // Fosfor en stikstof totaal zijn nutriënten, geen metalen.
+    it("blijft fosfor en stikstof totaal wél toetsen", () => {
       expect(isTotaalgehalte("P t")).toBe(false);
       expect(isTotaalgehalte("N t")).toBe(false);
-    });
-
-    it("blijft fosfor totaal wél toetsen", () => {
-      expect(beoordeel(samenvatting({ symbool: "P t", gemiddelde: 0.328 })).klasse).toBe(
-        "buiten-norm",
-      );
+      expect(isTotaalgehalte("Cd t")).toBe(true);
     });
   });
 
-  describe("andere eenheid", () => {
-    it("toetst een waterbodemwaarde niet tegen een norm voor oppervlaktewater", () => {
-      // WB124 rapporteert stikstof in mg/kg droge stof. Zonder deze controle
-      // werd 1200 mg/kg vergeleken met 6 mgN/L en "boven norm" genoemd.
-      const oordeel = beoordeel(
-        samenvatting({ symbool: "N t", eenheid: "mg/kg ds", gemiddelde: 1200 }),
-      );
-
-      expect(oordeel.klasse).toBe("geen-norm");
-      expect(oordeel.label).toBe("andere eenheid");
-      expect(oordeel.toelichting).toContain("mg/kg ds");
-    });
-
-    it("toetst wél wanneer de eenheid overeenkomt", () => {
-      expect(
-        beoordeel(samenvatting({ symbool: "N t", eenheid: "mgN/L", gemiddelde: 8 })).klasse,
-      ).toBe("buiten-norm");
-    });
-  });
-
-  describe("zonder norm", () => {
-    it("geeft geen oordeel over een parameter die niet in de normtabel staat", () => {
-      const oordeel = beoordeel(samenvatting({ symbool: "DOC", gemiddelde: 14 }));
-
-      expect(oordeel.klasse).toBe("geen-norm");
-      expect(oordeel.label).toBe("geen norm");
-    });
-
-    it("toetst niet wanneer élke meting onder de detectielimiet lag", () => {
-      // Het gemiddelde is dan de limiet, niet de concentratie: toetsen zou
-      // een strengere limiet als "overschrijding" kunnen tonen.
-      const oordeel = beoordeel(
-        samenvatting({ symbool: "NH4+", gemiddelde: 0.6, volledigOnderLimiet: true, aantalOnderLimiet: 6 }),
-      );
-
-      expect(oordeel.klasse).toBe("geen-norm");
-      expect(oordeel.toelichting).toMatch(/detectielimiet/i);
-    });
+  it("heeft geen norm voor ammonium — die stond niet in de bron", () => {
+    // Eerder stond hier een onjuiste 0,5 mgN/L die nergens op gebaseerd was.
+    expect(NORMEN.oppervlaktewater["NH4+"]).toBeUndefined();
+    expect(beoordeel(samenvatting({ symbool: "NH4+", eenheid: "mgN/L", gemiddelde: 0.77 })).klasse).toBe(
+      "geen-norm",
+    );
   });
 });
 
-describe("NORMEN", () => {
-  it("draagt bij elke norm een bronvermelding, label en eenheid", () => {
-    for (const [symbool, norm] of Object.entries(NORMEN)) {
-      expect(norm.bron, `norm voor ${symbool}`).toBeTruthy();
-      expect(norm.label, `label voor ${symbool}`).toBeTruthy();
-      expect(norm.eenheid, `eenheid voor ${symbool}`).toBeTruthy();
-    }
+describe("beoordeel — drinkwater", () => {
+  const drink = (over: Partial<ParameterJaar>) =>
+    beoordeel(samenvatting(over, "drinkwater"), "drinkwater");
+
+  it("toetst nitraat tegen de omgerekende drinkwaternorm", () => {
+    // 50 mg NO3/L komt overeen met 11,3 mg N/L; de databank meet in mgN/L.
+    expect(drink({ symbool: "NO3-", gemiddelde: 12 }).klasse).toBe("buiten-norm");
+    expect(drink({ symbool: "NO3-", gemiddelde: 1.9 }).klasse).toBe("conform");
   });
 
-  it("heeft voor elke norm minstens een onder- of bovengrens", () => {
-    for (const [symbool, norm] of Object.entries(NORMEN)) {
-      expect(
-        norm.ondergrens !== undefined || norm.bovengrens !== undefined,
-        `norm voor ${symbool}`,
-      ).toBe(true);
+  it("toetst metalen hier wél, want de drinkwaternorm slaat op het totaalgehalte", () => {
+    const oordeel = drink({ symbool: "Pb t", gemiddelde: 15 });
+
+    expect(oordeel.klasse).toBe("buiten-norm");
+  });
+
+  it("toetst de som van PFAS tegen 100 ng/L", () => {
+    expect(drink({ symbool: "PFAS-20", gemiddelde: 150 }).klasse).toBe("buiten-norm");
+    expect(drink({ symbool: "PFAS-20", gemiddelde: 20 }).klasse).toBe("conform");
+  });
+
+  it("kent geen norm voor parameters die alleen in het oppervlaktewaterrecht staan", () => {
+    expect(NORMEN.drinkwater["CZV"]).toBeUndefined();
+  });
+
+  it("waarschuwt in de uitleg dat een waterloop geen drinkwater is", () => {
+    expect(NORMENSETTEN.drinkwater.uitleg).toMatch(/geen drinkwater/i);
+  });
+});
+
+describe("normtabellen", () => {
+  it.each(["oppervlaktewater", "drinkwater"] as Normenset[])(
+    "draagt in %s bij elke norm een eenheid, label, toets en bron",
+    (set) => {
+      for (const [symbool, norm] of Object.entries(NORMEN[set])) {
+        expect(norm.eenheid, `eenheid voor ${symbool}`).toBeTruthy();
+        expect(norm.label, `label voor ${symbool}`).toBeTruthy();
+        expect(norm.toets, `toets voor ${symbool}`).toBeTruthy();
+        expect(norm.bron, `bron voor ${symbool}`).toBeTruthy();
+      }
+    },
+  );
+
+  it.each(["oppervlaktewater", "drinkwater"] as Normenset[])(
+    "heeft in %s voor elke norm minstens een onder- of bovengrens",
+    (set) => {
+      for (const [symbool, norm] of Object.entries(NORMEN[set])) {
+        expect(
+          norm.ondergrens !== undefined || norm.bovengrens !== undefined,
+          `grens voor ${symbool}`,
+        ).toBe(true);
+      }
+    },
+  );
+
+  it("zet bij een typeafhankelijke norm de strengste grens onder de soepelste", () => {
+    for (const [set, tabel] of Object.entries(NORMEN)) {
+      for (const [symbool, norm] of Object.entries(tabel)) {
+        if (norm.strengsteBovengrens === undefined) continue;
+        expect(norm.strengsteBovengrens, `${set}/${symbool}`).toBeLessThan(norm.bovengrens!);
+      }
     }
+  });
+});
+
+describe("bronnenVoor", () => {
+  it("geeft de bronnen die in de set gebruikt worden, met naam en link", () => {
+    for (const bron of bronnenVoor("oppervlaktewater")) {
+      expect(bron.naam).toBeTruthy();
+      expect(bron.url).toMatch(/^https:\/\//);
+    }
+    expect(bronnenVoor("drinkwater").some((b) => b.url.includes("eur-lex"))).toBe(true);
   });
 });

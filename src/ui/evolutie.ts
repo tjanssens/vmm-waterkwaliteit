@@ -1,5 +1,5 @@
 import type { Meting, ParameterJaar } from "../data/types.js";
-import { NORMEN } from "../data/normen.js";
+import { NORMEN, type Normenset } from "../data/normen.js";
 import {
   bouwPad,
   kiesTicks,
@@ -24,6 +24,8 @@ export interface EvolutieGegevens {
   parameter: ParameterJaar;
   /** Alle metingen van deze parameter, over alle opgehaalde jaren. */
   metingen: Meting[];
+  /** Tegen welke normenset de lijn in de grafiek getekend wordt. */
+  normenset: Normenset;
 }
 
 /**
@@ -52,9 +54,9 @@ export class EvolutieVenster {
     });
   }
 
-  toon({ parameter, metingen }: EvolutieGegevens): void {
+  toon({ parameter, metingen, normenset }: EvolutieGegevens): void {
     const gesorteerd = opDatum(metingen);
-    this.dialoog.innerHTML = this.inhoud(parameter, gesorteerd);
+    this.dialoog.innerHTML = this.inhoud(parameter, gesorteerd, normenset);
     this.dialoog
       .querySelector("[data-actie='sluiten']")
       ?.addEventListener("click", () => this.dialoog.close());
@@ -106,8 +108,8 @@ export class EvolutieVenster {
     svg.addEventListener("pointerleave", verberg);
   }
 
-  private inhoud(parameter: ParameterJaar, metingen: Meting[]): string {
-    const norm = NORMEN[parameter.symbool];
+  private inhoud(parameter: ParameterJaar, metingen: Meting[], set: Normenset): string {
+    const norm = NORMEN[set][parameter.symbool];
     const normGeldt = norm !== undefined && norm.eenheid === parameter.eenheid;
     const jaren = [...new Set(metingen.map((m) => m.jaar))];
 

@@ -512,6 +512,110 @@ button:focus-visible {
   color: var(--ink-faint);
 }
 
+/* ---- gereedschap: zoeken en normenkeuze ---- */
+
+.gereedschap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 26px;
+  align-items: flex-end;
+  padding: 14px 26px 8px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.gereedschap__zoek {
+  display: flex;
+  flex: 1 1 220px;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gereedschap__zoek input {
+  padding: 8px 11px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--ground);
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+}
+
+.gereedschap__zoek input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.gereedschap__normen {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.normkeuze {
+  display: flex;
+  border: 1px solid var(--rule-strong);
+}
+
+.normknop {
+  display: inline-flex;
+  gap: 7px;
+  align-items: baseline;
+  padding: 8px 13px;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--ink-muted);
+  background: transparent;
+  border: 0;
+  border-right: 1px solid var(--rule-strong);
+  cursor: pointer;
+}
+
+.normknop:last-child {
+  border-right: 0;
+}
+
+.normknop:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.normknop[aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--surface);
+  font-weight: 600;
+}
+
+.normknop__telling {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+
+.gereedschap__uitleg {
+  margin: 0 !important;
+  padding: 8px 26px 14px;
+  max-width: 76ch;
+  border-bottom: 1px solid var(--rule);
+}
+
+.parameter__norm {
+  display: block;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--ink-faint);
+}
+
+.bronlijst {
+  margin: 0 0 10px;
+  padding-left: 18px;
+}
+
+.bronlijst li {
+  margin-bottom: 3px;
+}
+
 /* ---- categorieën ---- */
 
 .categorie {
@@ -1140,8 +1244,35 @@ body.is-rapport .app {
   .chips,
   .paneel__hint,
   .caret,
+  .gereedschap__zoek,
   .parameter__knop:hover {
     display: none !important;
+  }
+
+  /* De normenkeuze zelf verdwijnt, maar wélke set gebruikt is moet op papier
+     blijven staan — anders weet de lezer niet waartegen getoetst is. */
+  .gereedschap {
+    padding-left: 0;
+    padding-right: 0;
+    border-bottom: 0;
+  }
+
+  .normknop {
+    display: none;
+  }
+
+  .normknop[aria-pressed="true"] {
+    display: inline-flex;
+    color: #000;
+    background: none;
+    border: 1px solid #000;
+  }
+
+  .gereedschap__uitleg {
+    display: block !important;
+    padding-left: 0;
+    padding-right: 0;
+    color: #333;
   }
 
   .parameter__knop {

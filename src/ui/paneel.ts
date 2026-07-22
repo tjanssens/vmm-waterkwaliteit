@@ -1,5 +1,13 @@
 import { vatSamen, meetjaren } from "../data/aggregate.js";
-import { beoordeel, NORMBRON } from "../data/normen.js";
+import {
+  beoordeel,
+  BRONNEN,
+  bronnenVoor,
+  NORMEN,
+  NORMENSETTEN,
+  type Normenset,
+} from "../data/normen.js";
+import { bronUrls } from "../data/client.js";
 import { deelIn } from "../data/categorieen.js";
 import { haalResultaten, DatabankFout } from "../data/client.js";
 import { FormaatFout } from "../data/csv.js";
@@ -35,6 +43,9 @@ interface Toestand {
   gekozenJaar: number;
   filters: Set<OordeelKlasse>;
   volledigeHistoriek: boolean;
+  normenset: Normenset;
+  /** Vrije tekst waarop de parametertabel gefilterd wordt. */
+  zoekterm: string;
 }
 
 /**
@@ -120,6 +131,8 @@ export class Paneel {
       gekozenJaar: jaren[0] ?? 0,
       filters: new Set(KLASSE_VOLGORDE),
       volledigeHistoriek: volledig,
+      normenset: this.toestand?.normenset ?? "oppervlaktewater",
+      zoekterm: "",
     };
     this.teken();
   }
@@ -176,7 +189,9 @@ export class Paneel {
     }
 
     const vanJaar = vatSamen(toestand.metingen).filter((p) => p.jaar === toestand.gekozenJaar);
-    const oordelen = new Map(vanJaar.map((p) => [p.symbool, beoordeel(p)] as const));
+    const oordelen = new Map(
+      vanJaar.map((p) => [p.symbool, beoordeel(p, toestand.normenset)] as const),
+    );
 
     const tellingen = new Map<OordeelKlasse, number>();
     for (const oordeel of oordelen.values()) {
@@ -192,6 +207,7 @@ export class Paneel {
       ${this.kopHtml(toestand.meetplaats)}
       ${this.jarenHtml(toestand)}
       ${this.samenvattingHtml(toestand, vanJaar, oordelen, tellingen, aanwezig, allesAan)}
+      ${this.gereedschapHtml(toestand, vanJaar)}
       ${this.categorieenHtml(toestand, vanJaar, oordelen)}
       ${this.voetHtml(toestand)}`;
 
@@ -222,6 +238,27 @@ export class Paneel {
       this.teken();
     });
 
+    this.houder.querySelectorAll<HTMLButtonElement>("[data-normenset]").forEach((knop) => {
+      knop.addEventListener("click", () => {
+        toestand.normenset = knop.dataset.normenset as Normenset;
+        // De klassen verschillen per set; begin weer met alles zichtbaar.
+        toestand.filters = new Set(KLASSE_VOLGORDE);
+        this.teken();
+      });
+    });
+
+    const zoekveld = this.houder.querySelector<HTMLInputElement>("[data-parameterzoek]");
+    if (zoekveld) {
+      zoekveld.addEventListener("input", () => {
+        toestand.zoekterm = zoekveld.value;
+        this.teken();
+        // Na hertekenen is het veld vervangen; zet de cursor terug.
+        const nieuw = this.houder.querySelector<HTMLInputElement>("[data-parameterzoek]");
+        nieuw?.focus();
+        nieuw?.setSelectionRange(nieuw.value.length, nieuw.value.length);
+      });
+    }
+
     this.houder.querySelectorAll<HTMLButtonElement>("[data-evolutie]").forEach((knop) => {
       knop.addEventListener("click", () => {
         const symbool = knop.dataset.evolutie!;
@@ -232,6 +269,7 @@ export class Paneel {
         this.venster.toon({
           parameter,
           metingen: toestand.metingen.filter((m) => m.symbool === symbool),
+          normenset: toestand.normenset,
         });
       });
     });
@@ -333,16 +371,55 @@ export class Paneel {
       </section>`;
   }
 
+  /** Zoekveld op parameter plus de keuze van de normenset. */
+  private gereedschapHtml(toestand: Toestand, parameters: ParameterJaar[]): string {
+    const knoppen = (Object.keys(NORMENSETTEN) as Normenset[])
+      .map((set) => {
+        const getoetst = parameters.filter((p) => NORMEN[set][p.symbool]).length;
+        return `<button type="button" class="normknop" data-normenset="${set}"
+                  aria-pressed="${toestand.normenset === set}"
+                  title="${escape(NORMENSETTEN[set].uitleg)}">
+                  ${escape(NORMENSETTEN[set].naam)}
+                  <span class="normknop__telling">${getoetst}</span>
+                </button>`;
+      })
+      .join("");
+
+    return `
+      <div class="gereedschap">
+        <div class="gereedschap__zoek">
+          <label class="paneel__label" for="parameterzoek">Zoek een parameter</label>
+          <input id="parameterzoek" type="search" data-parameterzoek
+                 value="${escape(toestand.zoekterm)}" autocomplete="off"
+                 placeholder="nitraat, PFOS, zuurstof…" />
+        </div>
+        <div class="gereedschap__normen">
+          <span class="paneel__label" id="normlabel">Toetsen aan</span>
+          <div class="normkeuze" role="group" aria-labelledby="normlabel">${knoppen}</div>
+        </div>
+      </div>
+      <p class="paneel__hint gereedschap__uitleg">${escape(NORMENSETTEN[toestand.normenset].uitleg)}</p>`;
+  }
+
   private categorieenHtml(
     toestand: Toestand,
     parameters: ParameterJaar[],
     oordelen: Map<string, Oordeel>,
   ): string {
-    const zichtbaar = parameters.filter((p) =>
-      toestand.filters.has(oordelen.get(p.symbool)!.klasse),
-    );
+    const term = toestand.zoekterm.trim().toLowerCase();
+    const zichtbaar = parameters
+      .filter((p) => toestand.filters.has(oordelen.get(p.symbool)!.klasse))
+      .filter(
+        (p) =>
+          term === "" ||
+          p.omschrijving.toLowerCase().includes(term) ||
+          p.symbool.toLowerCase().includes(term),
+      );
+
     if (zichtbaar.length === 0) {
-      return '<p class="paneel__leeg">Geen parameters in deze selectie.</p>';
+      return `<p class="paneel__leeg">${
+        term ? `Geen parameter gevonden voor "${escape(toestand.zoekterm)}".` : "Geen parameters in deze selectie."
+      }</p>`;
     }
 
     const vorigJaar = this.vorigMeetjaar(toestand);
@@ -359,13 +436,14 @@ export class Paneel {
         // lezen en afdrukken, zonder eerst overal te klikken.
         const heeftAandacht =
           this.modus === "rapport" ||
+          toestand.zoekterm.trim() !== "" ||
           gesorteerd.some((p) => {
             const klasse = oordelen.get(p.symbool)!.klasse;
             return klasse === "buiten-norm" || klasse === "op-grens";
           });
 
         const rijen = gesorteerd
-          .map((p) => this.rijHtml(p, oordelen.get(p.symbool)!, vorigJaar))
+          .map((p) => this.rijHtml(p, oordelen.get(p.symbool)!, vorigJaar, toestand.normenset))
           .join("");
 
         return `
@@ -395,9 +473,18 @@ export class Paneel {
       .join("");
   }
 
-  private rijHtml(parameter: ParameterJaar, oordeel: Oordeel, vorigJaar: ParameterJaar[]): string {
+  private rijHtml(
+    parameter: ParameterJaar,
+    oordeel: Oordeel,
+    vorigJaar: ParameterJaar[],
+    set: Normenset,
+  ): string {
     const vorig = vorigJaar.find((p) => p.symbool === parameter.symbool);
     const verloop = vorig ? this.verloopHtml(parameter, vorig, oordeel) : "";
+    const norm = NORMEN[set][parameter.symbool];
+    const normregel = norm
+      ? `<span class="parameter__norm" title="${escape(norm.toets)} — ${escape(BRONNEN[norm.bron].naam)}">norm ${escape(norm.label)}</span>`
+      : "";
 
     return `
       <tr>
@@ -410,6 +497,7 @@ export class Paneel {
             ${escape(parameter.omschrijving)}
             <span class="parameter__symbool">${escape(parameter.symbool)}</span>
           </button>
+          ${normregel}
           ${verloop}
         </td>
         <td class="num waarde">
@@ -447,19 +535,46 @@ export class Paneel {
   }
 
   private voetHtml(toestand: Toestand): string {
+    const bronnen = bronnenVoor(toestand.normenset)
+      .map(
+        (b) =>
+          `<li><a href="${b.url}" target="_blank" rel="noopener">${escape(b.naam)}</a></li>`,
+      )
+      .join("");
+
+    const links = bronUrls(
+      toestand.meetplaats.code,
+      toestand.meetplaats.matrix,
+      toestand.jaren.length ? toestand.jaren : [toestand.gekozenJaar],
+    );
+
     return `
       <footer class="paneel__voet">
         <h3>Over deze cijfers</h3>
         <p>Per parameter tonen we het gemiddelde over ${toestand.gekozenJaar} en de laagste en hoogste
         gemeten waarde — niet elke afzonderlijke staalname.</p>
-        <p>De normtoetsing is <strong>indicatief</strong>. De drempelwaarden zijn gebaseerd op
-        <a href="${NORMBRON.url}" target="_blank" rel="noopener">${escape(NORMBRON.naam)}</a>,
-        maar zijn niet stuk voor stuk tegen die tekst geverifieerd. Typespecifieke normen per
-        waterlooptype — die strenger of soepeler kunnen zijn — zijn hier niet verwerkt.
-        Dit is geen officiële beoordeling van de VMM.</p>
+
+        <h3>Brondata narekenen</h3>
+        <p>
+          <a href="${escape(links.ruw)}" target="_blank" rel="noopener">Ruwe meetgegevens voor ${escape(toestand.meetplaats.code)}</a>
+          — precies de tabel die deze pagina verwerkt, zoals de VMM-databank hem teruggeeft.
+          Ook na te kijken in de
+          <a href="${links.databank}" target="_blank" rel="noopener">databank waterkwaliteit</a>
+          van de VMM zelf, onder meetplaats ${escape(toestand.meetplaats.code)}.
+        </p>
+
+        <h3>Normen</h3>
+        <p>${escape(NORMENSETTEN[toestand.normenset].uitleg)}</p>
+        <ul class="bronlijst">${bronnen}</ul>
+        <p>De toetsing is <strong>indicatief</strong> en geen officiële beoordeling van de VMM.
+        Een deel van de normen voor oppervlaktewater verschilt per waterlooptype; welk type deze
+        waterloop heeft weten we niet, dus die parameters krijgen "hangt van type af" in plaats van
+        een oordeel.</p>
+
         <p>Waarden met <code>&lt;</code> liggen onder de detectielimiet van het labo: de stof is niet
         aangetoond en de getoonde waarde is de limiet zelf.</p>
-        <p>Bron: Vlaamse Milieumaatschappij, databank waterkwaliteit.</p>
+        <p>Meetgegevens: Vlaamse Milieumaatschappij, databank waterkwaliteit.
+        Locaties: Digitaal Vlaanderen.</p>
       </footer>`;
   }
 

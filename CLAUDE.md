@@ -91,8 +91,38 @@ Deze zijn met tests afgedekt. Verwijder die tests niet zonder reden.
 - **Het endpoint is ongedocumenteerd.** Verandert het formaat, dan werpt de
   parser een `FormaatFout` in plaats van verkeerde cijfers te tonen.
 
+## Normen
+
+Twee sets in `src/data/normen.ts`, elk met bron per norm:
+
+- **oppervlaktewater** — VLAREM II bijlage 2.3.1. Wat deze waterloop zelf moet halen.
+- **drinkwater** — Richtlijn (EU) 2020/2184 bijlage I. Ter vergelijking; geldt
+  aan de kraan, niet in een beek. De uitleg in de UI zegt dat expliciet.
+
+Bij het opzoeken bleken eerdere gokwaarden fout: totaal stikstof is 4 mgN/L
+(niet 6), nitraat 5,65–10 (niet 11,3), pH 5,5–9,0 (niet 6,5–8,5). Voor ammonium
+staat in bijlage 2.3.1 géén norm voor oppervlaktewater — die is verwijderd in
+plaats van geraden.
+
+Aandachtspunten:
+
+- **Veel normen verschillen per waterlooptype** (Bk, BkK, Rg …). Wij kennen het
+  type niet, dus zulke normen dragen `strengsteBovengrens` naast `bovengrens`;
+  daartussen luidt het oordeel "hangt van type af" in plaats van een uitspraak.
+- **Eenheden verschillen tussen recht en databank.** De drinkwaterrichtlijn geeft
+  nitraat als mg NO₃/L terwijl de databank mgN/L meet; die omrekening staat in de
+  tabel én in het label. PFOS staat in VLAREM als 0,00065 µg/L en in de databank
+  als ng/L — dus 0,65 ng/L.
+- **Metalen toetsen alleen in de drinkwaterset.** De milieukwaliteitsnorm geldt op
+  de opgeloste fractie, de drinkwaternorm op het totaalgehalte — en dat laatste is
+  wat de databank rapporteert.
+
 ## Openstaand
 
-- De drempelwaarden in `src/data/normen.ts` zijn nog niet één voor één
-  geverifieerd tegen VLAREM II, bijlage 2.3.1. Vooral de norm voor ammonium is
-  onzeker. Typespecifieke normen per waterlooptype zijn nog niet verwerkt.
+- PFAS heeft in VLAREM II alleen een norm voor PFOS; voor de overige PFAS
+  bestaat er geen. De drinkwaterset dekt wel `PFAS-20` en `PFAS-43`.
+- Een parameterfilter op de kaart ("toon enkel punten die PFOS meten") vraagt een
+  index per meetpunt. Het PFAS-rapport
+  (`i7350EB794040455D86FDD1FFA0C58B93`) is daarvoor de goedkope weg: het vraagt om
+  een bekken of gemeente in plaats van een meetplaats en geeft ~15.000 rijen per
+  bekken, inclusief coördinaten.
