@@ -38,7 +38,7 @@ interface Toestand {
   punt: Meetpunt;
   profiel: Laagprofiel;
   metingen: Meting[];
-  periodes: Periode[];
+  periodes: readonly Periode[];
   gekozen: Periode;
   filters: Set<OordeelKlasse>;
   /** Of de ruimere historiek al opgehaald is; alleen bij een tijdas uit data. */
@@ -227,8 +227,12 @@ export class Paneel {
 
     const alles = vatSamen(toestand.metingen, this.bucket(toestand));
     const vanPeriode = alles.filter((p) => p.bucket === toestand.gekozen.id);
+    // Het venster gaat mee: een jaargrenswaarde mag niet op een week
+    // metingen losgelaten worden.
+    const venster =
+      toestand.gekozen.dagen === undefined ? undefined : { dagen: toestand.gekozen.dagen };
     const oordelen = new Map(
-      vanPeriode.map((p) => [p.symbool, beoordeel(p, toestand.normenset)] as const),
+      vanPeriode.map((p) => [p.symbool, beoordeel(p, toestand.normenset, venster)] as const),
     );
 
     const tellingen = new Map<OordeelKlasse, number>();

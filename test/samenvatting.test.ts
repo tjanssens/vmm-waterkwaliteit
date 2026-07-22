@@ -90,7 +90,7 @@ describe("samenvattingsZin", () => {
     ]);
 
     expect(samenvattingsZin(parameters, oordelen)).toBe(
-      "Alle getoetste parameters blijven binnen de basiskwaliteitsnorm.",
+      "Alle getoetste parameters blijven binnen de norm.",
     );
   });
 

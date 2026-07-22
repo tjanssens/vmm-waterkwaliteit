@@ -25,7 +25,9 @@ export function samenvattingsZin(
   }
 
   if (buiten.length === 0 && grens.length === 0) {
-    return "Alle getoetste parameters blijven binnen de basiskwaliteitsnorm.";
+    // Neutraal geformuleerd: "basiskwaliteitsnorm" is een VLAREM-begrip dat
+    // bij lucht en grondwater niet bestaat.
+    return "Alle getoetste parameters blijven binnen de norm.";
   }
 
   if (buiten.length === 0) {

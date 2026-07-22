@@ -21,6 +21,12 @@ const CATEGORIEEN = [
     waarschuwing:
       "Deze stoffen zijn als totaalgehalte gemeten, terwijl de normen op de opgeloste fractie slaan. Ze zijn hier niet tegen een norm getoetst." },
   { id: "pfas", naam: "PFAS" },
+  { id: "fijnstof", naam: "Fijn stof en roet" },
+  { id: "gassen", naam: "Gassen" },
+  { id: "vos", naam: "Vluchtige organische stoffen" },
+  { id: "weer", naam: "Weersomstandigheden",
+    waarschuwing:
+      "Deze waarden beschrijven het weer op het meetstation. Ze zeggen niets over de luchtkwaliteit, maar helpen die wel verklaren." },
   { id: "pesticiden", naam: "Pesticiden" },
   { id: "overige", naam: "Overige parameters" },
 ] as const satisfies readonly Categorie[];
@@ -54,6 +60,32 @@ const VAST: Readonly<Record<string, CategorieId>> = {
   "ZS": "fysisch",
   "TAM": "fysisch",
   "Secchi": "fysisch",
+
+  // --- luchtkwaliteit (IRCELINE) ---
+  "PM10": "fijnstof",
+  "PM2.5": "fijnstof",
+  "PM1": "fijnstof",
+  "BC": "fijnstof",
+  "PNC": "fijnstof",
+
+  "NO2": "gassen",
+  "NO": "gassen",
+  "O3": "gassen",
+  "SO2": "gassen",
+  "CO": "gassen",
+  "CO2": "gassen",
+  "NH3": "gassen",
+
+  "C6H6": "vos",
+  "C7H8": "vos",
+  "C8H10": "vos",
+  "MPX": "vos",
+  "OX": "vos",
+
+  "RV": "weer",
+  "P": "weer",
+  "WR": "weer",
+  "WS": "weer",
 
   "EColi": "bacteriologie",
   "TColi": "bacteriologie",

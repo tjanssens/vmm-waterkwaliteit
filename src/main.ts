@@ -209,9 +209,10 @@ async function start(): Promise<void> {
               </span>
               <span class="treffer__oms">${escape(punt.omschrijving || "Geen omschrijving")}</span>
               <span class="treffer__meta">
-                ${escape(punt.gemeente ?? "onbekende gemeente")}${
-                  meter === null ? "" : ` · ${formatteerAfstand(meter)}`
-                }
+                ${[punt.gemeente, meter === null ? null : formatteerAfstand(meter)]
+                  .filter(Boolean)
+                  .map((deel) => escape(String(deel)))
+                  .join(" · ")}
               </span>
             </button>
           </li>`;

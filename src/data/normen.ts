@@ -17,6 +17,11 @@ export const BRONNEN = {
     naam: "Richtlijn (EU) 2020/2184 over water bestemd voor menselijke consumptie, bijlage I",
     url: "https://eur-lex.europa.eu/legal-content/NL/TXT/HTML/?uri=CELEX:32020L2184",
   },
+  luchtEu: {
+    naam:
+      "Richtlijn 2008/50/EG betreffende de luchtkwaliteit en schonere lucht voor Europa — bijlagen VII, XI en XIV",
+    url: "https://eur-lex.europa.eu/legal-content/NL/TXT/HTML/?uri=CELEX:32008L0050",
+  },
   drinkwaterVlaanderen: {
     naam:
       "Kwaliteitseisen van het drinkwater (VMM, oktober 2024) — bijlage I van het Vlaamse drinkwaterbesluit van 20 januari 2023",
@@ -27,13 +32,36 @@ export const BRONNEN = {
 export type BronId = keyof typeof BRONNEN;
 
 /** Welke normen we tegen de metingen leggen. */
-export type Normenset = "oppervlaktewater" | "drinkwater";
+export type Normenset = "oppervlaktewater" | "drinkwater" | "lucht-eu";
+
+/**
+ * De periode waarover het gemiddelde genomen wordt waarop een norm slaat.
+ * Bij water is dat altijd het meetjaar en staat het er niet bij; bij lucht is
+ * het wezenlijk: een jaargrenswaarde zegt niets over een week metingen.
+ */
+export type Middeling = "uur" | "8-uur" | "dag" | "jaar";
+
+/**
+ * Hoeveel dagen het getoonde venster beslaat. Nodig om te bepalen of een
+ * norm überhaupt toetsbaar is op wat er in beeld staat.
+ */
+export interface Venster {
+  dagen: number;
+}
+
+/** Vanaf hoeveel dagen we een venster een jaar durven noemen. */
+const JAAR_DREMPEL = 300;
 
 export const NORMENSETTEN: Readonly<Record<Normenset, { naam: string; uitleg: string }>> = {
   oppervlaktewater: {
     naam: "Oppervlaktewater",
     uitleg:
       "De milieukwaliteitsnormen die voor deze waterloop zelf gelden. Dit is de toetsing die hoort bij een meetpunt in een beek of rivier.",
+  },
+  "lucht-eu": {
+    naam: "EU-grenswaarden",
+    uitleg:
+      "De Europese grenswaarden voor luchtkwaliteit. Een deel ervan geldt op het jaargemiddelde; over een korter venster valt daar niets zinnigs over te zeggen.",
   },
   drinkwater: {
     naam: "Drinkwater",
@@ -62,6 +90,17 @@ export interface Norm {
   /** Op welke statistiek de norm slaat. */
   toets: string;
   bron: BronId;
+  /**
+   * Middelingstijd. Staat die op "jaar", dan is de norm alleen zinvol te
+   * toetsen wanneer het venster ook ongeveer een jaar beslaat.
+   */
+  middeling?: Middeling;
+  /**
+   * Aantal overschrijdingen dat per kalenderjaar is toegestaan. Zo'n norm is
+   * geen drempel op een gemiddelde maar een telling, en die kunnen wij op een
+   * willekeurig venster niet eerlijk uitvoeren.
+   */
+  toegestaneOverschrijdingen?: number;
 }
 
 const OPPERVLAKTEWATER: Readonly<Record<string, Norm>> = {
@@ -296,9 +335,85 @@ const DRINKWATER: Readonly<Record<string, Norm>> = {
   "IEntero": { bovengrens: 0, eenheid: "/100mL", label: "0 per 100 mL", toets: "parameterwaarde", bron: "drinkwater" },
 };
 
+/**
+ * Grenswaarden uit richtlijn 2008/50/EG, bijlage XI (SO₂, NO₂, benzeen, CO,
+ * PM10), bijlage XIV (PM2,5) en bijlage VII (ozon). Letterlijk overgenomen uit
+ * de Nederlandse tekst op EUR-Lex en nagerekend tegen de tabel van IRCELINE.
+ *
+ * Twee dingen om in de gaten te houden. Ten eerste dragen deze normen een
+ * middelingstijd: de jaargrenswaarde voor NO₂ zegt niets over een week
+ * metingen. Ten tweede zijn de dag- en uurgrenswaarden geen drempel op een
+ * gemiddelde maar een telling met een toegestaan aantal overschrijdingen —
+ * die tonen we wel, maar we vellen er geen oordeel over.
+ *
+ * Richtlijn (EU) 2024/2881 verstrengt deze waarden, maar die gelden pas vanaf
+ * 1 januari 2030. We toetsen aan wat vandaag geldt.
+ */
+const LUCHT_EU: Readonly<Record<string, Norm>> = {
+  "NO2": {
+    bovengrens: 40,
+    eenheid: "µg/m³",
+    label: "≤ 40 µg/m³ per jaar",
+    toets: "jaargemiddelde; daarnaast geldt 200 µg/m³ per uur, maximaal 18 keer per jaar",
+    middeling: "jaar",
+    bron: "luchtEu",
+  },
+  "PM10": {
+    bovengrens: 40,
+    eenheid: "µg/m³",
+    label: "≤ 40 µg/m³ per jaar",
+    toets: "jaargemiddelde; daarnaast geldt 50 µg/m³ per dag, maximaal 35 keer per jaar",
+    middeling: "jaar",
+    bron: "luchtEu",
+  },
+  "PM2.5": {
+    bovengrens: 25,
+    eenheid: "µg/m³",
+    label: "≤ 25 µg/m³ per jaar",
+    toets: "jaargemiddelde",
+    middeling: "jaar",
+    bron: "luchtEu",
+  },
+  "C6H6": {
+    bovengrens: 5,
+    eenheid: "µg/m³",
+    label: "≤ 5 µg/m³ per jaar",
+    toets: "jaargemiddelde",
+    middeling: "jaar",
+    bron: "luchtEu",
+  },
+  "SO2": {
+    bovengrens: 125,
+    eenheid: "µg/m³",
+    label: "≤ 125 µg/m³ per dag, max. 3× per jaar",
+    toets: "daggemiddelde met een toegestaan aantal overschrijdingen",
+    middeling: "dag",
+    toegestaneOverschrijdingen: 3,
+    bron: "luchtEu",
+  },
+  "O3": {
+    bovengrens: 120,
+    eenheid: "µg/m³",
+    label: "≤ 120 µg/m³ (8 uur), max. 25 dagen per jaar",
+    toets: "hoogste 8-uurgemiddelde van een dag, gemiddeld over drie jaar",
+    middeling: "8-uur",
+    toegestaneOverschrijdingen: 25,
+    bron: "luchtEu",
+  },
+  "CO": {
+    bovengrens: 10,
+    eenheid: "mg/m³",
+    label: "≤ 10 mg/m³ (8 uur)",
+    toets: "hoogste 8-uurgemiddelde van een dag",
+    middeling: "8-uur",
+    bron: "luchtEu",
+  },
+};
+
 export const NORMEN: Readonly<Record<Normenset, Readonly<Record<string, Norm>>>> = {
   oppervlaktewater: OPPERVLAKTEWATER,
   drinkwater: DRINKWATER,
+  "lucht-eu": LUCHT_EU,
 };
 
 /** Binnen deze marge van de grens spreken we van een grensgeval. */
@@ -323,6 +438,7 @@ export function isTotaalgehalte(symbool: string): boolean {
 export function beoordeel(
   parameter: ParameterSamenvatting,
   set: Normenset = "oppervlaktewater",
+  venster?: Venster,
 ): Oordeel {
   const norm = NORMEN[set][parameter.symbool];
 
@@ -343,6 +459,30 @@ export function beoordeel(
       klasse: "geen-norm",
       label: "andere eenheid",
       toelichting: `De norm geldt in ${norm.eenheid}; hier is gemeten in ${parameter.eenheid}.`,
+    };
+  }
+
+  // Een norm met een toegestaan aantal overschrijdingen is geen drempel op een
+  // gemiddelde maar een telling over een volledig kalenderjaar. Die kunnen wij
+  // op een zelfgekozen venster niet eerlijk uitvoeren.
+  if (norm.toegestaneOverschrijdingen !== undefined) {
+    return {
+      klasse: "geen-norm",
+      label: "telt overschrijdingen",
+      toelichting:
+        `De norm staat ${norm.toegestaneOverschrijdingen} overschrijdingen per kalenderjaar toe. ` +
+        "Dat is een telling over een volledig jaar en geen drempel op een gemiddelde, dus toetsen we hier niet.",
+    };
+  }
+
+  // Een jaargrenswaarde zegt niets over een week metingen.
+  if (norm.middeling === "jaar" && venster && venster.dagen < JAAR_DREMPEL) {
+    return {
+      klasse: "geen-norm",
+      label: "jaarnorm",
+      toelichting:
+        "Deze norm geldt op het jaargemiddelde. Het gekozen venster is daarvoor te kort; " +
+        "kies een jaar om te kunnen toetsen.",
     };
   }
 
@@ -393,6 +533,7 @@ export function beoordeel(
 const EXTRA_BRONNEN: Readonly<Record<Normenset, BronId[]>> = {
   oppervlaktewater: [],
   drinkwater: ["drinkwaterVlaanderen"],
+  "lucht-eu": [],
 };
 
 /** De bronnen die in deze normenset gebruikt worden. */

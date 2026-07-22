@@ -47,6 +47,12 @@ export interface Vak {
 export interface Periode {
   id: string;
   label: string;
+  /**
+   * Hoeveel dagen de periode beslaat. Bepaalt of een norm met een
+   * middelingstijd hier überhaupt op toegepast mag worden — een
+   * jaargrenswaarde zegt niets over een week metingen.
+   */
+  dagen?: number;
 }
 
 /**
@@ -76,7 +82,7 @@ export type Tijdas<P extends Meetpunt> =
       soort: "uit-data";
       /** Haalt alles op; de perioden volgen uit wat er terugkomt. */
       haal(punt: P, signaal?: AbortSignal): Promise<Meting[]>;
-      periodes(metingen: Meting[]): Periode[];
+      periodes(metingen: Meting[]): readonly Periode[];
       /** Onder welke periode een meting valt. */
       bucketVan(meting: Meting): string;
       ladenTekst(): string;
@@ -92,7 +98,7 @@ export type Tijdas<P extends Meetpunt> =
     }
   | {
       soort: "per-periode";
-      periodes(): Periode[];
+      periodes(): readonly Periode[];
       standaard(): Periode;
       haal(punt: P, periode: Periode, signaal?: AbortSignal): Promise<Meting[]>;
       ladenTekst(periode: Periode): string;

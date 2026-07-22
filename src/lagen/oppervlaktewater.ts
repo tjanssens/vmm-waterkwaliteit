@@ -22,7 +22,10 @@ export const OPPERVLAKTEWATER: Laagprofiel<Meetplaats> = {
   id: "oppervlaktewater",
   naam: "Oppervlaktewater",
   eyebrow: "Meetplaats oppervlaktewater",
-  merk: { vorm: "cirkel", kleur: "#0b5f63" },
+  // Kleuren van de drie lagen zijn samen door de palletvalidator gehaald:
+  // lichtheid, chroma, onderling contrast en kleurenblindheid. Het paneelaccent
+  // (#0b5f63) is te grijs voor een kaartmerk, net als bij de grafiekreeks.
+  merk: { vorm: "cirkel", kleur: "#0090a8" },
 
   perVenster: false,
   laadPunten: () => laadMeetplaatsen(document.baseURI),
