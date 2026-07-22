@@ -11,7 +11,7 @@ import { deelIn } from "../data/categorieen.js";
 import { DatabankFout } from "../data/client.js";
 import { FormaatFout } from "../data/csv.js";
 import type { Meting, Oordeel, OordeelKlasse, ParameterSamenvatting } from "../data/types.js";
-import type { Laagprofiel, Meetpunt, Periode } from "../lagen/types.js";
+import type { Laagprofiel, LaagId, Meetpunt, Periode } from "../lagen/types.js";
 import { laagprofiel } from "../lagen/index.js";
 import { vormSvg } from "../lagen/merk.js";
 import {
@@ -24,6 +24,7 @@ import {
 } from "./format.js";
 import { samenvattingsZin } from "./samenvatting.js";
 import { EvolutieVenster } from "./evolutie.js";
+import { kiesCategorieOpen, kiesNormenset, kiesPeriode } from "./voorkeuren.js";
 
 const KLASSE_LABELS: Record<OordeelKlasse, string> = {
   "buiten-norm": "buiten norm",
@@ -59,6 +60,19 @@ export class Paneel {
   private lopend: AbortController | null = null;
   private readonly venster = new EvolutieVenster();
 
+  /**
+   * Keuzes die de bezoeker maakt, blijven staan als hij naar een ander punt
+   * gaat. Wie 1 jaar kiest en dan drie stations vergelijkt, wil niet elke keer
+   * opnieuw op 1 jaar klikken.
+   *
+   * Periode en normenset worden per laag onthouden: een meetjaar zegt niets
+   * bij lucht, en de normensetten verschillen sowieso per bron.
+   */
+  private readonly voorkeurPeriode = new Map<LaagId, string>();
+  private readonly voorkeurNormenset = new Map<LaagId, Normenset>();
+  /** Per categorie of hij open staat; die zijn wél gedeeld over de lagen. */
+  private readonly voorkeurCategorie = new Map<string, boolean>();
+
   constructor(
     private readonly houder: HTMLElement,
     private readonly modus: Modus = "paneel",
@@ -85,7 +99,9 @@ export class Paneel {
 
     const tijdas = profiel.tijdas;
     if (tijdas.soort === "per-periode") {
-      await this.haalPeriode(punt, profiel, tijdas.standaard(), beheerser);
+      const onthouden = this.voorkeurPeriode.get(profiel.id);
+      const periode = tijdas.periodes().find((p) => p.id === onthouden) ?? tijdas.standaard();
+      await this.haalPeriode(punt, profiel, periode, beheerser);
       return;
     }
 
@@ -156,9 +172,7 @@ export class Paneel {
     const tijdas = profiel.tijdas;
     const periodes = tijdas.soort === "uit-data" ? tijdas.periodes(metingen) : tijdas.periodes();
 
-    // De knoppenrij loopt oplopend, dus de laatste is de recentste — en dat
-    // is wat de gebruiker wil zien.
-    const standaard = gekozen ?? periodes[periodes.length - 1] ?? { id: "", label: "" };
+    const standaard = kiesPeriode(periodes, this.voorkeurPeriode.get(profiel.id), gekozen);
 
     this.toestand = {
       punt,
@@ -175,13 +189,16 @@ export class Paneel {
   }
 
   /**
-   * Bij het wisselen tussen punten van dezelfde laag houdt de gebruiker zijn
-   * normenkeuze; bij een andere laag bestaat die keuze daar niet meer.
+   * De normenkeuze wordt per laag onthouden. Globaal onthouden zou betekenen
+   * dat wie bij water op "drinkwater" staat en even een luchtstation opent,
+   * daarna terugvalt op de standaard — de keuze bestaat immers niet bij lucht.
    */
   private behoudNormenset(profiel: Laagprofiel): Normenset {
-    const vorige = this.toestand?.normenset;
-    if (vorige && profiel.normensetten.includes(vorige)) return vorige;
-    return profiel.standaardNormenset;
+    return kiesNormenset(
+      profiel.normensetten,
+      this.voorkeurNormenset.get(profiel.id),
+      profiel.standaardNormenset,
+    );
   }
 
   // ---- weergave ----
@@ -448,20 +465,25 @@ export class Paneel {
 
         // In het rapport staat alles open: dat moet je in één keer kunnen
         // lezen en afdrukken, zonder eerst overal te klikken.
-        const heeftAandacht =
+        const standaardOpen =
           this.modus === "rapport" ||
           toestand.zoekterm.trim() !== "" ||
           gesorteerd.some((p) => {
             const klasse = oordelen.get(p.symbool)!.klasse;
             return klasse === "buiten-norm" || klasse === "op-grens";
           });
+        const heeftAandacht = kiesCategorieOpen(
+          standaardOpen,
+          this.voorkeurCategorie.get(categorie.id),
+          this.modus === "rapport",
+        );
 
         const rijen = gesorteerd
           .map((p) => this.rijHtml(p, oordelen.get(p.symbool)!, vorige, toestand.normenset))
           .join("");
 
         return `
-          <section class="categorie" data-open="${heeftAandacht ? 1 : 0}">
+          <section class="categorie" data-categorie="${escape(categorie.id)}" data-open="${heeftAandacht ? 1 : 0}">
             <button type="button" class="categorie__kop" aria-expanded="${heeftAandacht}">
               <span class="caret" aria-hidden="true"></span>
               <span class="categorie__naam">${escape(categorie.naam)}</span>
@@ -612,6 +634,7 @@ export class Paneel {
       knop.addEventListener("click", () => {
         const periode = toestand.periodes.find((p) => p.id === knop.dataset.periode);
         if (!periode) return;
+        this.voorkeurPeriode.set(toestand.profiel.id, periode.id);
 
         if (toestand.profiel.tijdas.soort === "per-periode") {
           // Hier bepaalt de keuze wát er opgehaald wordt, niet wat er getoond wordt.
@@ -647,6 +670,7 @@ export class Paneel {
     this.houder.querySelectorAll<HTMLButtonElement>("[data-normenset]").forEach((knop) => {
       knop.addEventListener("click", () => {
         toestand.normenset = knop.dataset.normenset as Normenset;
+        this.voorkeurNormenset.set(toestand.profiel.id, toestand.normenset);
         // De klassen verschillen per set; begin weer met alles zichtbaar.
         toestand.filters = new Set(KLASSE_VOLGORDE);
         this.teken();
@@ -688,9 +712,11 @@ export class Paneel {
   private koppelCategorieen(): void {
     this.houder.querySelectorAll<HTMLButtonElement>(".categorie__kop").forEach((knop) => {
       knop.addEventListener("click", () => {
-        const sectie = knop.closest(".categorie");
+        const sectie = knop.closest<HTMLElement>(".categorie");
         const open = sectie?.getAttribute("data-open") === "1";
         sectie?.setAttribute("data-open", open ? "0" : "1");
+        const id = sectie?.dataset.categorie;
+        if (id) this.voorkeurCategorie.set(id, !open);
         knop.setAttribute("aria-expanded", String(!open));
       });
     });
