@@ -109,8 +109,8 @@ export const GRONDWATER: Laagprofiel<Grondwaterfilter> = {
     },
   },
 
-  normensetten: ["grondwater"],
-  standaardNormenset: "grondwater",
+  normensetten: ["grondwater-vlarem", "grondwater"],
+  standaardNormenset: "grondwater-vlarem",
 
   feiten(punt) {
     const regels: Array<[string, string]> = [];

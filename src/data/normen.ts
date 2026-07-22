@@ -26,6 +26,10 @@ export const BRONNEN = {
     naam: "WHO global air quality guidelines (2021) — tabel 0.1, aanbevolen AQG-waarden",
     url: "https://www.who.int/publications/i/item/9789240034228",
   },
+  vlaremGrondwater: {
+    naam: "VLAREM II, bijlage 2.4.1 — milieukwaliteitsnormen voor grondwater",
+    url: "https://navigator.emis.vito.be/mijn-navigator?woId=10076",
+  },
   wac: {
     naam:
       "WAC/I/A/005 — Monstername van water via een peilput (Compendium voor de monsterneming, meting en analyse van water, versie mei 2019), §5.4.4.1",
@@ -41,7 +45,7 @@ export const BRONNEN = {
 export type BronId = keyof typeof BRONNEN;
 
 /** Welke normen we tegen de metingen leggen. */
-export type Normenset = "oppervlaktewater" | "drinkwater" | "lucht-eu" | "lucht-who" | "grondwater";
+export type Normenset = "oppervlaktewater" | "drinkwater" | "lucht-eu" | "lucht-who" | "grondwater" | "grondwater-vlarem";
 
 /**
  * De periode waarover het gemiddelde genomen wordt waarop een norm slaat.
@@ -66,6 +70,11 @@ export const NORMENSETTEN: Readonly<Record<Normenset, { naam: string; uitleg: st
     naam: "Oppervlaktewater",
     uitleg:
       "De milieukwaliteitsnormen die voor deze waterloop zelf gelden. Dit is de toetsing die hoort bij een meetpunt in een beek of rivier.",
+  },
+  "grondwater-vlarem": {
+    naam: "Grondwaternormen",
+    uitleg:
+      "De milieukwaliteitsnormen die voor het grondwater zelf gelden, uit VLAREM II. Dit is de toetsing die bij een grondwaterfilter hoort; de wet noemt ze richtwaarden.",
   },
   grondwater: {
     naam: "Drinkwaternormen",
@@ -669,10 +678,246 @@ const GRONDWATER: Readonly<Record<string, Norm>> = {
   },
 };
 
+/**
+ * De milieukwaliteitsnormen voor grondwater uit VLAREM II, bijlage 2.4.1.
+ * Dit is de norm die op het grondwater zélf slaat, anders dan de
+ * drinkwaternormen die pas aan de kraan gelden.
+ *
+ * Letterlijk overgenomen uit de tekst op EMIS en nagerekend tegen de
+ * geconsolideerde versie in de Vlaamse Codex; die twee komen op elke waarde
+ * overeen. Enig verschil: EMIS schrijft de zuurtegraad als "5 < pH < 8,5", de
+ * Codex als "5 ≤ pH ≤ 8,5". We volgen de Codex.
+ *
+ * De bijlage noemt ook barium, antimoon, seleen, cyanide, minerale oliën,
+ * fenolen, PAK's en gechloreerde ethenen. Die staan hier niet: DOV rapporteert
+ * ze niet onder een naam die we hebben kunnen vaststellen, en een norm op een
+ * gegokte sleutel sluit nooit aan.
+ *
+ * De sleutels zijn de parameternamen van DOV, in de eenheid waarin DOV meet.
+ */
+const GRONDWATER_VLAREM: Readonly<Record<string, Norm>> = {
+  // --- A. fysisch-chemische parameters ---
+  "Temperatuur (T)": {
+    bovengrens: 25,
+    eenheid: "°C",
+    label: "≤ 25 °C",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+  "Zuurtegraad (pH)": {
+    ondergrens: 5,
+    bovengrens: 8.5,
+    eenheid: "Sörensen",
+    label: "5 – 8,5",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+  "Elektrische geleidbaarheid (EC)": {
+    bovengrens: 1600,
+    eenheid: "µS/cm",
+    label: "≤ 1600 µS/cm",
+    toets: "richtwaarde bij 20 °C",
+    bron: "vlaremGrondwater",
+  },
+  "Chloriden (Cl)": {
+    bovengrens: 250,
+    eenheid: "mg/L",
+    label: "≤ 250 mg/L",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+  "Sulfaat (SO4)": {
+    bovengrens: 250,
+    eenheid: "mg/L",
+    label: "≤ 250 mg/L",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+  "Calcium (Ca)": {
+    bovengrens: 270,
+    eenheid: "mg/L",
+    label: "≤ 270 mg/L",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+  "Magnesium (Mg)": {
+    bovengrens: 50,
+    eenheid: "mg/L",
+    label: "≤ 50 mg/L",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+  "Natrium (Na)": {
+    bovengrens: 150,
+    eenheid: "mg/L",
+    label: "≤ 150 mg/L",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+  "Kalium (K)": {
+    bovengrens: 12,
+    eenheid: "mg/L",
+    label: "≤ 12 mg/L",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+  "Aluminium (Al)": {
+    bovengrens: 0.2,
+    eenheid: "mg/L",
+    label: "≤ 0,2 mg/L",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+
+  // --- B. ongewenste stoffen ---
+  "Nitraat (NO3)": {
+    bovengrens: 50,
+    eenheid: "mg/L",
+    label: "≤ 50 mg/L",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+  "Nitriet (NO2)": {
+    bovengrens: 0.1,
+    eenheid: "mg/L",
+    label: "≤ 0,1 mg/L",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+  "Ammonium (NH4)": {
+    bovengrens: 0.5,
+    eenheid: "mg/L",
+    label: "≤ 0,5 mg/L",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+  "Boor (B)": {
+    bovengrens: 1000,
+    eenheid: "µg/L",
+    label: "≤ 1000 µg/L",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+  "Ijzer (Fe)": {
+    bovengrens: 20,
+    eenheid: "mg/L",
+    label: "≤ 20 mg/L",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+  "Mangaan (Mn)": {
+    bovengrens: 1,
+    eenheid: "mg/L",
+    label: "≤ 1 mg/L",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+  "Koper (Cu)": {
+    bovengrens: 100,
+    eenheid: "µg/L",
+    label: "≤ 100 µg/L",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+  "Zink (Zn)": {
+    bovengrens: 500,
+    eenheid: "µg/L",
+    label: "≤ 500 µg/L",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+  "Fosfaat (PO4)": {
+    bovengrens: 1.34,
+    eenheid: "mg/L",
+    label: "≤ 1,34 mg/L",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+  "Fluoride (F)": {
+    bovengrens: 1.5,
+    eenheid: "mg/L",
+    label: "≤ 1,5 mg/L",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+
+  // --- C. toxische stoffen ---
+  "Arseen (As)": {
+    bovengrens: 20,
+    eenheid: "µg/L",
+    label: "≤ 20 µg/L",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+  "Cadmium (Cd)": {
+    bovengrens: 5,
+    eenheid: "µg/L",
+    label: "≤ 5 µg/L",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+  "Chroom (Cr)": {
+    bovengrens: 50,
+    eenheid: "µg/L",
+    label: "≤ 50 µg/L",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+  "Kwik (Hg)": {
+    bovengrens: 1,
+    eenheid: "µg/L",
+    label: "≤ 1 µg/L",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+  "Nikkel (Ni)": {
+    bovengrens: 40,
+    eenheid: "µg/L",
+    label: "≤ 40 µg/L",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+  "Lood (Pb)": {
+    bovengrens: 20,
+    eenheid: "µg/L",
+    label: "≤ 20 µg/L",
+    toets: "richtwaarde",
+    bron: "vlaremGrondwater",
+  },
+};
+
+/**
+ * Normen die niet op één stof slaan maar op een hele groep. VLAREM stelt voor
+ * pesticiden 0,1 µg/L per afzonderlijke stof — dat zijn er honderden, en die
+ * gaan we niet stuk voor stuk opsommen.
+ *
+ * Niet-relevante metabolieten vallen er bewust buiten: die tellen ook in de
+ * drinkwaterwetgeving niet mee onder de pesticidennorm.
+ */
+const GROEPSNORMEN: Readonly<Partial<Record<Normenset, Readonly<Record<string, Norm>>>>> = {
+  "grondwater-vlarem": {
+    "Pesticiden: actieve stoffen": {
+      bovengrens: 0.1,
+      eenheid: "µg/L",
+      label: "≤ 0,1 µg/L per stof",
+      toets: "richtwaarde per afzonderlijke stof; voor alle pesticiden samen geldt 0,5 µg/L",
+      bron: "vlaremGrondwater",
+    },
+    "Pesticiden: relevante metabolieten": {
+      bovengrens: 0.1,
+      eenheid: "µg/L",
+      label: "≤ 0,1 µg/L per stof",
+      toets: "richtwaarde per afzonderlijke stof; voor alle pesticiden samen geldt 0,5 µg/L",
+      bron: "vlaremGrondwater",
+    },
+  },
+};
+
 export const NORMEN: Readonly<Record<Normenset, Readonly<Record<string, Norm>>>> = {
   oppervlaktewater: OPPERVLAKTEWATER,
   drinkwater: DRINKWATER,
   grondwater: GRONDWATER,
+  "grondwater-vlarem": GRONDWATER_VLAREM,
   "lucht-eu": LUCHT_EU,
   "lucht-who": LUCHT_WHO,
 };
@@ -696,12 +941,30 @@ export function isTotaalgehalte(symbool: string): boolean {
   return symbool.endsWith(" t") && !TOTAAL_MAAR_GEEN_METAAL.has(symbool);
 }
 
+/**
+ * De norm die op deze parameter van toepassing is: eerst die voor de stof
+ * zelf, anders die van haar groep — zoals de ene pesticidennorm die voor
+ * honderden stoffen tegelijk geldt.
+ *
+ * Zowel het oordeel als het normlabel in de tabel gebruiken deze functie, want
+ * anders zou de tabel een oordeel tonen zonder de norm waarop het rust.
+ */
+export function normVoor(
+  parameter: Pick<ParameterSamenvatting, "symbool" | "groep">,
+  set: Normenset,
+): Norm | undefined {
+  return (
+    NORMEN[set][parameter.symbool] ??
+    (parameter.groep ? GROEPSNORMEN[set]?.[parameter.groep] : undefined)
+  );
+}
+
 export function beoordeel(
   parameter: ParameterSamenvatting,
   set: Normenset = "oppervlaktewater",
   venster?: Venster,
 ): Oordeel {
-  const norm = NORMEN[set][parameter.symbool];
+  const norm = normVoor(parameter, set);
 
   if (set === "oppervlaktewater" && isTotaalgehalte(parameter.symbool)) {
     return {
@@ -795,6 +1058,7 @@ const EXTRA_BRONNEN: Readonly<Record<Normenset, BronId[]>> = {
   oppervlaktewater: [],
   drinkwater: ["drinkwaterVlaanderen"],
   grondwater: ["drinkwaterVlaanderen", "wac"],
+  "grondwater-vlarem": ["wac"],
   "lucht-eu": [],
   "lucht-who": [],
 };

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { normaliseerEenheid, splitsParameternaam } from "../src/data/grondwater.js";
 import { categorieVan } from "../src/data/categorieen.js";
-import { NORMEN } from "../src/data/normen.js";
+import { beoordeel, NORMEN, normVoor } from "../src/data/normen.js";
 import type { ParameterSamenvatting } from "../src/data/types.js";
 
 const parameter = (symbool: string, omschrijving = symbool): ParameterSamenvatting => ({
@@ -127,5 +127,76 @@ describe("indelen op de groep van de bron", () => {
 
   it("valt terug op overige bij een groep die we niet kennen", () => {
     expect(categorieVan(metGroep("Iets Nieuws Van DOV"))).toBe("overige");
+  });
+});
+
+describe("VLAREM-grondwaternormen naast de drinkwaternormen", () => {
+  const gemeten = (symbool: string, gemiddelde: number, eenheid: string) => ({
+    ...parameter(symbool),
+    eenheid,
+    gemiddelde,
+    minimum: gemiddelde,
+    maximum: gemiddelde,
+  });
+
+  it("is bij mangaan twintig keer soepeler dan drinkwater", () => {
+    // Dit is waarom beide sets er zijn. 0,065 mg/L mangaan is ruim boven de
+    // drinkwaterindicator van 0,05 maar ver onder de VLAREM-richtwaarde van 1.
+    const mangaan = gemeten("Mangaan (Mn)", 0.065, "mg/L");
+
+    expect(beoordeel(mangaan, "grondwater").klasse).toBe("buiten-norm");
+    expect(beoordeel(mangaan, "grondwater-vlarem").klasse).toBe("conform");
+  });
+
+  it("is bij nikkel juist strenger dan drinkwater", () => {
+    // Niet elke VLAREM-waarde is soepeler: nikkel mag 40 µg/L in grondwater
+    // maar 20 aan de kraan... andersom dus. Hier controleren we dat we ze
+    // niet door elkaar halen.
+    expect(NORMEN["grondwater-vlarem"]["Nikkel (Ni)"]?.bovengrens).toBe(40);
+    expect(NORMEN["grondwater"]["Nikkel (Ni)"]?.bovengrens).toBe(20);
+  });
+
+  it("toetst pesticiden via hun groep, niet per stof", () => {
+    // VLAREM stelt 0,1 µg/L per afzonderlijke stof; DOV kent er honderden.
+    const bentazon = { ...gemeten("Bentazon (Bentaz)", 0.25, "µg/L"), groep: "Pesticiden: actieve stoffen" };
+
+    const oordeel = beoordeel(bentazon, "grondwater-vlarem");
+    expect(oordeel.klasse).toBe("buiten-norm");
+  });
+
+  it("laat niet-relevante metabolieten buiten de pesticidennorm", () => {
+    // Die tellen ook in de drinkwaterwetgeving niet mee.
+    const metaboliet = {
+      ...gemeten("Iets (X)", 0.25, "µg/L"),
+      groep: "Niet-relevante metabolieten van pesticiden",
+    };
+
+    expect(beoordeel(metaboliet, "grondwater-vlarem").klasse).toBe("geen-norm");
+  });
+
+  it("laat een stofnorm voorgaan op de groepsnorm", () => {
+    // Arseen zit in "Zware metalen" zonder groepsnorm, maar heeft een eigen.
+    const arseen = { ...gemeten("Arseen (As)", 30, "µg/L"), groep: "Zware metalen" };
+
+    expect(beoordeel(arseen, "grondwater-vlarem").klasse).toBe("buiten-norm");
+  });
+});
+
+describe("normVoor", () => {
+  it("geeft de groepsnorm terug voor een pesticide zonder eigen norm", () => {
+    // Zonder deze functie toonde de tabel wél een oordeel maar niet de norm
+    // waarop het rust: het paneel zocht alleen op stofnaam.
+    const norm = normVoor(
+      { symbool: "Atrazine (Atraz)", groep: "Pesticiden: actieve stoffen" },
+      "grondwater-vlarem",
+    );
+
+    expect(norm?.bovengrens).toBe(0.1);
+    expect(norm?.label).toContain("per stof");
+  });
+
+  it("geeft niets terug wanneer noch de stof noch de groep een norm heeft", () => {
+    expect(normVoor({ symbool: "Cobalt (Co)", groep: "Zware metalen" }, "grondwater-vlarem"))
+      .toBeUndefined();
   });
 });

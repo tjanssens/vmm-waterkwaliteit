@@ -3,8 +3,8 @@ import {
   beoordeel,
   BRONNEN,
   bronnenVoor,
-  NORMEN,
   NORMENSETTEN,
+  normVoor,
   type Normenset,
 } from "../data/normen.js";
 import { deelIn } from "../data/categorieen.js";
@@ -403,7 +403,7 @@ export class Paneel {
   private gereedschapHtml(toestand: Toestand, parameters: ParameterSamenvatting[]): string {
     const knoppen = toestand.profiel.normensetten
       .map((set) => {
-        const getoetst = parameters.filter((p) => NORMEN[set][p.symbool]).length;
+        const getoetst = parameters.filter((p) => normVoor(p, set)).length;
         return `<button type="button" class="normknop" data-normenset="${set}"
                   aria-pressed="${toestand.normenset === set}"
                   title="${escape(NORMENSETTEN[set].uitleg)}">
@@ -520,7 +520,7 @@ export class Paneel {
   ): string {
     const toen = vorige.find((p) => p.symbool === parameter.symbool);
     const verloop = toen ? this.verloopHtml(parameter, toen, oordeel) : "";
-    const norm = NORMEN[set][parameter.symbool];
+    const norm = normVoor(parameter, set);
     const normregel = norm
       ? `<span class="parameter__norm" title="${escape(norm.toets)} — ${escape(BRONNEN[norm.bron].naam)}">norm ${escape(norm.label)}</span>`
       : "";
