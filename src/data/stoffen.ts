@@ -611,6 +611,23 @@ const PROFIELEN = {
     bronnen: ["whoDrinkwater"],
   },
 
+  geneesmiddelen: {
+    wat: "Resten van medicijnen en hun afbraakproducten.",
+    herkomst:
+      "Wat mensen en dieren innemen, verlaat het lichaam grotendeels weer. Waterzuivering is er niet op gebouwd deze stoffen te verwijderen, dus komen ze via het riool in het water terecht. Ook mest van behandeld vee draagt bij.",
+    risico:
+      "De aangetroffen gehalten liggen ver onder een medicinale dosis. De zorg gaat over blootstelling van waterleven gedurende het hele leven, en over resten van antibiotica, die resistentie in de hand kunnen werken. Voor de meeste van deze stoffen bestaat nog geen norm.",
+    bronnen: ["whoDrinkwater", "vmmWater"],
+  },
+  organisch: {
+    wat: "Door de mens gemaakte koolstofverbindingen: oplosmiddelen, brandstofbestanddelen en industriële grondstoffen.",
+    herkomst:
+      "Vaak historische bodemvervuiling van tankstations, chemische reiniging en industrie. Zulke stoffen zakken door naar het grondwater en blijven daar lang.",
+    risico:
+      "Verschilt sterk per stof: sommige zijn vooral hinderlijk van smaak of geur, andere zijn kankerverwekkend. Wat een concrete waarde betekent, hangt dus af van welke stof het is.",
+    bronnen: ["whoDrinkwater"],
+  },
+
   // ---- labocontrole ----
   ionenbalans: {
     wat: "Een controle van het labo, geen stof in het water.",
@@ -785,6 +802,8 @@ const GROEPEN: Readonly<Record<string, ProfielId>> = {
   "Niet-relevante metabolieten van pesticiden": "pesticiden",
   Grondwater_chemisch_PFAS: "pfas",
   "Bacteriologische parameters": "fecaleBacterien",
+  "Farmaceutische stoffen": "geneesmiddelen",
+  "Organische verbindingen": "organisch",
 };
 
 /**

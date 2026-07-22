@@ -56,6 +56,31 @@ describe("stofprofiel", () => {
     expect(profiel?.wat).toMatch(/maïsteelt/i);
   });
 
+  it("heeft een terugval voor elke parametergroep die DOV chemisch rapporteert", () => {
+    // De twaalf groepen zijn bij DOV opgehaald. Drie ervan zijn geen chemie —
+    // de fysisch-chemische parameters, anionen en kationen dragen we per stof,
+    // en "Onbekend" zegt niets. De rest moet minstens een groepstekst hebben,
+    // anders staat een hele categorie zonder enige uitleg op het scherm.
+    const chemisch = [
+      "Zware metalen",
+      "Pesticiden: actieve stoffen",
+      "Pesticiden: relevante metabolieten",
+      "Niet-relevante metabolieten van pesticiden",
+      "Grondwater_chemisch_PFAS",
+      "Bacteriologische parameters",
+      "Farmaceutische stoffen",
+      "Organische verbindingen",
+    ];
+
+    const zonder = chemisch.filter(
+      (groep) => !stofprofiel(parameter("ONBEKEND-999", "Een stof zonder eigen tekst", groep)),
+    );
+
+    // Zware metalen dragen we per element; een groepstekst zou daar niets
+    // toevoegen aan wat lood of cadmium al zelf zegt.
+    expect(zonder).toEqual(["Zware metalen"]);
+  });
+
   it("zwijgt over een stof die we niet kennen", () => {
     // Liever niets dan een tekst die op alles past: bij gezondheidsinformatie
     // is de schijn van uitleg erger dan geen uitleg.
