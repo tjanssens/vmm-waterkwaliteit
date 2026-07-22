@@ -71,3 +71,12 @@ export function escape(tekst: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
 }
+
+/**
+ * Dag plus tijdstip, als dat bekend is. Bij lucht liggen 24 metingen op
+ * dezelfde dag; zonder het uur zijn ze in de tooltip niet uit elkaar te houden.
+ */
+export function formatteerMoment(datum: string, tijdstip: string | null): string {
+  const dag = formatteerDatum(datum);
+  return tijdstip ? `${dag}, ${tijdstip.slice(0, 5)}` : dag;
+}
