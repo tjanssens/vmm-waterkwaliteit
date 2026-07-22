@@ -79,7 +79,7 @@ export const LUCHT: Laagprofiel<Luchtpunt> = {
       ((periode.dagen ?? 0) > 90 ? " Een heel jaar uurmetingen duurt ongeveer een minuut." : ""),
   },
 
-  normensetten: ["lucht-eu"],
+  normensetten: ["lucht-eu", "lucht-who"],
   standaardNormenset: "lucht-eu",
 
   feiten(punt) {

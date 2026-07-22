@@ -22,6 +22,10 @@ export const BRONNEN = {
       "Richtlijn 2008/50/EG betreffende de luchtkwaliteit en schonere lucht voor Europa — bijlagen VII, XI en XIV",
     url: "https://eur-lex.europa.eu/legal-content/NL/TXT/HTML/?uri=CELEX:32008L0050",
   },
+  luchtWho: {
+    naam: "WHO global air quality guidelines (2021) — tabel 0.1, aanbevolen AQG-waarden",
+    url: "https://www.who.int/publications/i/item/9789240034228",
+  },
   drinkwaterVlaanderen: {
     naam:
       "Kwaliteitseisen van het drinkwater (VMM, oktober 2024) — bijlage I van het Vlaamse drinkwaterbesluit van 20 januari 2023",
@@ -32,7 +36,7 @@ export const BRONNEN = {
 export type BronId = keyof typeof BRONNEN;
 
 /** Welke normen we tegen de metingen leggen. */
-export type Normenset = "oppervlaktewater" | "drinkwater" | "lucht-eu";
+export type Normenset = "oppervlaktewater" | "drinkwater" | "lucht-eu" | "lucht-who";
 
 /**
  * De periode waarover het gemiddelde genomen wordt waarop een norm slaat.
@@ -62,6 +66,11 @@ export const NORMENSETTEN: Readonly<Record<Normenset, { naam: string; uitleg: st
     naam: "EU-grenswaarden",
     uitleg:
       "De Europese grenswaarden voor luchtkwaliteit. Een deel ervan geldt op het jaargemiddelde; over een korter venster valt daar niets zinnigs over te zeggen.",
+  },
+  "lucht-who": {
+    naam: "WHO-advieswaarden",
+    uitleg:
+      "De advieswaarden van de Wereldgezondheidsorganisatie uit 2021. Fors strenger dan de Europese grenswaarden, en geen wetgeving: niemand is verplicht ze te halen. Ze laten zien wat gezondheidskundig wenselijk is.",
   },
   drinkwater: {
     naam: "Drinkwater",
@@ -410,10 +419,77 @@ const LUCHT_EU: Readonly<Record<string, Norm>> = {
   },
 };
 
+/**
+ * De advieswaarden van de Wereldgezondheidsorganisatie uit 2021, tabel 0.1.
+ * Ze zijn fors strenger dan de Europese grenswaarden — PM2,5 mag jaarlijks
+ * 5 in plaats van 25 µg/m³ — en juist dat verschil maakt zichtbaar dat
+ * "voldoet aan de EU-norm" niet hetzelfde is als "gezond".
+ *
+ * Dit zijn advieswaarden en geen wetgeving; niemand is ze verplicht te halen.
+ *
+ * De waarden voor 24 uur zijn 99-percentielen, wat neerkomt op 34
+ * overschrijdingsdagen per jaar. Dat is een telling en geen drempel op een
+ * gemiddelde, dus daar vellen we geen oordeel over.
+ */
+const LUCHT_WHO: Readonly<Record<string, Norm>> = {
+  "PM2.5": {
+    bovengrens: 5,
+    eenheid: "µg/m³",
+    label: "≤ 5 µg/m³ per jaar",
+    toets: "jaargemiddelde; de EU-grenswaarde ligt op 25",
+    middeling: "jaar",
+    bron: "luchtWho",
+  },
+  "PM10": {
+    bovengrens: 15,
+    eenheid: "µg/m³",
+    label: "≤ 15 µg/m³ per jaar",
+    toets: "jaargemiddelde; de EU-grenswaarde ligt op 40",
+    middeling: "jaar",
+    bron: "luchtWho",
+  },
+  "NO2": {
+    bovengrens: 10,
+    eenheid: "µg/m³",
+    label: "≤ 10 µg/m³ per jaar",
+    toets: "jaargemiddelde; de EU-grenswaarde ligt op 40",
+    middeling: "jaar",
+    bron: "luchtWho",
+  },
+  "O3": {
+    bovengrens: 100,
+    eenheid: "µg/m³",
+    label: "≤ 100 µg/m³ (8 uur, 99-percentiel)",
+    toets: "hoogste 8-uurgemiddelde van een dag, 99-percentiel",
+    middeling: "8-uur",
+    toegestaneOverschrijdingen: 34,
+    bron: "luchtWho",
+  },
+  "SO2": {
+    bovengrens: 40,
+    eenheid: "µg/m³",
+    label: "≤ 40 µg/m³ per dag (99-percentiel)",
+    toets: "daggemiddelde, 99-percentiel",
+    middeling: "dag",
+    toegestaneOverschrijdingen: 34,
+    bron: "luchtWho",
+  },
+  "CO": {
+    bovengrens: 4,
+    eenheid: "mg/m³",
+    label: "≤ 4 mg/m³ per dag (99-percentiel)",
+    toets: "daggemiddelde, 99-percentiel",
+    middeling: "dag",
+    toegestaneOverschrijdingen: 34,
+    bron: "luchtWho",
+  },
+};
+
 export const NORMEN: Readonly<Record<Normenset, Readonly<Record<string, Norm>>>> = {
   oppervlaktewater: OPPERVLAKTEWATER,
   drinkwater: DRINKWATER,
   "lucht-eu": LUCHT_EU,
+  "lucht-who": LUCHT_WHO,
 };
 
 /** Binnen deze marge van de grens spreken we van een grensgeval. */
@@ -534,6 +610,7 @@ const EXTRA_BRONNEN: Readonly<Record<Normenset, BronId[]>> = {
   oppervlaktewater: [],
   drinkwater: ["drinkwaterVlaanderen"],
   "lucht-eu": [],
+  "lucht-who": [],
 };
 
 /** De bronnen die in deze normenset gebruikt worden. */

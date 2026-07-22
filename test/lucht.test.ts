@@ -103,3 +103,43 @@ describe("beoordeel met een venster", () => {
     expect(fosfor.klasse).toBe("buiten-norm");
   });
 });
+
+describe("WHO-advieswaarden naast de EU-grenswaarden", () => {
+  it("is op elke stof strenger dan of gelijk aan de EU", () => {
+    for (const stof of ["PM2.5", "PM10", "NO2"]) {
+      const eu = NORMEN["lucht-eu"][stof]!.bovengrens!;
+      const who = NORMEN["lucht-who"][stof]!.bovengrens!;
+      expect(who).toBeLessThan(eu);
+    }
+  });
+
+  it("velt over hetzelfde jaargemiddelde een ander oordeel dan de EU", () => {
+    // Dit is de reden dat beide sets er zijn. Borgerhout haalde over een jaar
+    // 20 µg/m³ NO2: ruim onder de Europese grenswaarde van 40, maar het
+    // dubbele van wat de WHO gezond noemt.
+    const gemeten = parameter({ symbool: "NO2", gemiddelde: 20 });
+
+    expect(beoordeel(gemeten, "lucht-eu", { dagen: 365 }).klasse).toBe("conform");
+    expect(beoordeel(gemeten, "lucht-who", { dagen: 365 }).klasse).toBe("buiten-norm");
+  });
+
+  it("toetst ook de WHO-jaarnorm niet op een week", () => {
+    const oordeel = beoordeel(parameter({ symbool: "PM2.5", gemiddelde: 9 }), "lucht-who", {
+      dagen: 7,
+    });
+
+    expect(oordeel.label).toBe("jaarnorm");
+  });
+
+  it("velt geen oordeel over de 99-percentielwaarden", () => {
+    // De WHO-daggrenzen zijn 99-percentielen, wat neerkomt op 34
+    // overschrijdingsdagen per jaar — een telling, geen gemiddelde.
+    const oordeel = beoordeel(
+      parameter({ symbool: "SO2", gemiddelde: 1 }),
+      "lucht-who",
+      { dagen: 365 },
+    );
+
+    expect(oordeel.klasse).toBe("geen-norm");
+  });
+});

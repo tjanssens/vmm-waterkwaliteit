@@ -12,7 +12,9 @@ export function samenvattingsZin(
   const namenVan = (klasse: OordeelKlasse) =>
     parameters
       .filter((p) => oordelen.get(p.symbool)?.klasse === klasse)
-      .map((p) => kleinLetter(p.omschrijving.split(",")[0]!));
+      // Op ", " en niet op ",": dat kort "Fosfor, totaal" in tot "fosfor",
+      // maar laat de decimale komma van "Fijn stof (PM2,5)" met rust.
+      .map((p) => kleinLetter(p.omschrijving.split(", ")[0]!));
 
   const buiten = namenVan("buiten-norm");
   const grens = namenVan("op-grens");

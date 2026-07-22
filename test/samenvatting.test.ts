@@ -107,3 +107,54 @@ describe("samenvattingsZin", () => {
     );
   });
 });
+
+describe("namen met een komma erin", () => {
+  it("kort een naam met een bijstelling in", () => {
+    const zin = samenvattingsZin(
+      [
+        {
+          symbool: "P t",
+          omschrijving: "Fosfor, totaal",
+          eenheid: "mgP/L",
+          bucket: "2024",
+          aantal: 6,
+          aantalOnderLimiet: 0,
+          gemiddelde: 1,
+          minimum: 1,
+          maximum: 1,
+          laatsteDatum: "2024-11-07",
+          volledigOnderLimiet: false,
+        },
+      ],
+      new Map([["P t", { klasse: "buiten-norm" as const, label: "boven norm" }]]),
+    );
+
+    expect(zin).toContain("fosfor");
+    expect(zin).not.toContain("totaal");
+  });
+
+  it("laat een decimale komma binnen een naam staan", () => {
+    // "Fijn stof (PM2,5)" werd afgekapt tot "fijn stof (PM2" zodra de zin
+    // op elke komma inkortte.
+    const zin = samenvattingsZin(
+      [
+        {
+          symbool: "PM2.5",
+          omschrijving: "Fijn stof (PM2,5)",
+          eenheid: "µg/m³",
+          bucket: "1j",
+          aantal: 8735,
+          aantalOnderLimiet: 0,
+          gemiddelde: 8.61,
+          minimum: 1,
+          maximum: 40,
+          laatsteDatum: "2026-07-22",
+          volledigOnderLimiet: false,
+        },
+      ],
+      new Map([["PM2.5", { klasse: "buiten-norm" as const, label: "boven norm" }]]),
+    );
+
+    expect(zin).toContain("fijn stof (PM2,5)");
+  });
+});
