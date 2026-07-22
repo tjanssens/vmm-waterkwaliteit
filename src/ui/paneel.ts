@@ -715,6 +715,7 @@ export class Paneel {
           parameter,
           metingen: toestand.metingen.filter((m) => m.symbool === symbool),
           normenset: toestand.normenset,
+          laag: toestand.punt.laag,
         });
       });
     });
