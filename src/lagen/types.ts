@@ -137,6 +137,11 @@ export interface Laagprofiel<P extends Meetpunt = Meetpunt> {
   /** Vanaf welk zoomniveau het venster klein genoeg is om te laden. */
   minimumZoom?: number;
   laadPunten(venster: Vak | null, signaal?: AbortSignal): Promise<P[]>;
+  /**
+   * Eén punt op zijn id. Een laag die per venster laadt kan niet eerst alles
+   * ophalen, en de rapportweergave en de deelbare link kennen alleen een id.
+   */
+  puntOpId?(id: string, signaal?: AbortSignal): Promise<P | null>;
 
   tijdas: Tijdas<P>;
 

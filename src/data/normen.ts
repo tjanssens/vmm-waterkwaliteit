@@ -36,7 +36,7 @@ export const BRONNEN = {
 export type BronId = keyof typeof BRONNEN;
 
 /** Welke normen we tegen de metingen leggen. */
-export type Normenset = "oppervlaktewater" | "drinkwater" | "lucht-eu" | "lucht-who";
+export type Normenset = "oppervlaktewater" | "drinkwater" | "lucht-eu" | "lucht-who" | "grondwater";
 
 /**
  * De periode waarover het gemiddelde genomen wordt waarop een norm slaat.
@@ -61,6 +61,11 @@ export const NORMENSETTEN: Readonly<Record<Normenset, { naam: string; uitleg: st
     naam: "Oppervlaktewater",
     uitleg:
       "De milieukwaliteitsnormen die voor deze waterloop zelf gelden. Dit is de toetsing die hoort bij een meetpunt in een beek of rivier.",
+  },
+  grondwater: {
+    naam: "Drinkwaternormen",
+    uitleg:
+      "Grondwater vergeleken met de normen voor kraantjeswater. Wie een eigen put heeft, drinkt dit water of geeft het aan zijn dieren, dus die vergelijking is hier zinnig. Streng blijft ze wel: de norm geldt aan de kraan, ná zuivering, en onbehandeld grondwater hoeft er niet aan te voldoen.",
   },
   "lucht-eu": {
     naam: "EU-grenswaarden",
@@ -485,9 +490,171 @@ const LUCHT_WHO: Readonly<Record<string, Norm>> = {
   },
 };
 
+/**
+ * Grondwater getoetst aan de drinkwaternormen.
+ *
+ * Dat is hier een zinniger vergelijking dan bij een beek: wie een eigen put
+ * heeft, drinkt dit water of geeft het aan zijn dieren. Streng blijft het wel —
+ * de norm geldt aan de kraan, ná zuivering, en onbehandeld grondwater hoeft er
+ * niet aan te voldoen.
+ *
+ * De waarden komen uit richtlijn (EU) 2020/2184, bijlage I, in de eenheid die
+ * de richtlijn zelf hanteert. Anders dan bij oppervlaktewater is er dus geen
+ * omrekening naar stikstof nodig: DOV rapporteert nitraat óók als NO₃.
+ *
+ * Wel omgerekend, omdat DOV daar in mg/l meet waar de richtlijn µg/L geeft:
+ * ijzer, mangaan en aluminium.
+ *
+ * De sleutels zijn de parameternamen van DOV, inclusief hun eigen schrijfwijze
+ * ("Ijzer", "Chloriden"). Wijkt die af, dan sluit de norm niet aan en toont de
+ * app "geen norm" — geen fout oordeel.
+ */
+const GRONDWATER: Readonly<Record<string, Norm>> = {
+  "Nitraat (NO3)": {
+    bovengrens: 50,
+    eenheid: "mg/L",
+    label: "≤ 50 mg/L",
+    toets: "parameterwaarde",
+    bron: "drinkwater",
+  },
+  "Nitriet (NO2)": {
+    bovengrens: 0.5,
+    eenheid: "mg/L",
+    label: "≤ 0,50 mg/L",
+    toets: "parameterwaarde",
+    bron: "drinkwater",
+  },
+  "Ammonium (NH4)": {
+    bovengrens: 0.5,
+    eenheid: "mg/L",
+    label: "≤ 0,50 mg/L",
+    toets: "indicatorparameter",
+    bron: "drinkwater",
+  },
+  "Sulfaat (SO4)": {
+    bovengrens: 250,
+    eenheid: "mg/L",
+    label: "≤ 250 mg/L",
+    toets: "indicatorparameter",
+    bron: "drinkwater",
+  },
+  "Chloriden (Cl)": {
+    bovengrens: 250,
+    eenheid: "mg/L",
+    label: "≤ 250 mg/L",
+    toets: "indicatorparameter",
+    bron: "drinkwater",
+  },
+  "Natrium (Na)": {
+    bovengrens: 200,
+    eenheid: "mg/L",
+    label: "≤ 200 mg/L",
+    toets: "indicatorparameter",
+    bron: "drinkwater",
+  },
+  "Zuurtegraad (pH)": {
+    ondergrens: 6.5,
+    bovengrens: 9.5,
+    eenheid: "Sörensen",
+    label: "6,5 – 9,5",
+    toets: "indicatorparameter",
+    bron: "drinkwater",
+  },
+  "Elektrische geleidbaarheid (EC)": {
+    bovengrens: 2500,
+    eenheid: "µS/cm",
+    label: "≤ 2500 µS/cm",
+    toets: "indicatorparameter",
+    bron: "drinkwater",
+  },
+
+  // --- metalen, in de eenheid waarin DOV ze rapporteert ---
+  "Arseen (As)": {
+    bovengrens: 10,
+    eenheid: "µg/L",
+    label: "≤ 10 µg/L",
+    toets: "parameterwaarde",
+    bron: "drinkwater",
+  },
+  "Cadmium (Cd)": {
+    bovengrens: 5,
+    eenheid: "µg/L",
+    label: "≤ 5,0 µg/L",
+    toets: "parameterwaarde",
+    bron: "drinkwater",
+  },
+  // Vanaf 12 januari 2036 wordt de norm 25 µg/L; tot dan geldt 50.
+  "Chroom (Cr)": {
+    bovengrens: 50,
+    eenheid: "µg/L",
+    label: "≤ 50 µg/L (wordt 25 in 2036)",
+    toets: "parameterwaarde",
+    bron: "drinkwater",
+  },
+  "Koper (Cu)": {
+    bovengrens: 2000,
+    eenheid: "µg/L",
+    label: "≤ 2000 µg/L (= 2,0 mg/L)",
+    toets: "parameterwaarde",
+    bron: "drinkwater",
+  },
+  // Vanaf 12 januari 2036 wordt de norm 5 µg/L; tot dan geldt 10.
+  "Lood (Pb)": {
+    bovengrens: 10,
+    eenheid: "µg/L",
+    label: "≤ 10 µg/L (wordt 5 in 2036)",
+    toets: "parameterwaarde",
+    bron: "drinkwater",
+  },
+  "Nikkel (Ni)": {
+    bovengrens: 20,
+    eenheid: "µg/L",
+    label: "≤ 20 µg/L",
+    toets: "parameterwaarde",
+    bron: "drinkwater",
+  },
+  "Kwik (Hg)": {
+    bovengrens: 1,
+    eenheid: "µg/L",
+    label: "≤ 1,0 µg/L",
+    toets: "parameterwaarde",
+    bron: "drinkwaterVlaanderen",
+  },
+  "Zink (Zn)": {
+    bovengrens: 5000,
+    eenheid: "µg/L",
+    label: "≤ 5000 µg/L",
+    toets: "indicatorparameter",
+    bron: "drinkwaterVlaanderen",
+  },
+  // DOV meet deze drie in mg/l; de richtlijn geeft ze in µg/L.
+  "Ijzer (Fe)": {
+    bovengrens: 0.2,
+    eenheid: "mg/L",
+    label: "≤ 0,2 mg/L (= 200 µg/L)",
+    toets: "indicatorparameter",
+    bron: "drinkwater",
+  },
+  "Mangaan (Mn)": {
+    bovengrens: 0.05,
+    eenheid: "mg/L",
+    label: "≤ 0,05 mg/L (= 50 µg/L)",
+    toets: "indicatorparameter",
+    bron: "drinkwater",
+  },
+  "Aluminium (Al)": {
+    bovengrens: 0.2,
+    eenheid: "mg/L",
+    label: "≤ 0,2 mg/L (= 200 µg/L)",
+    toets: "indicatorparameter",
+    bron: "drinkwaterVlaanderen",
+  },
+};
+
 export const NORMEN: Readonly<Record<Normenset, Readonly<Record<string, Norm>>>> = {
   oppervlaktewater: OPPERVLAKTEWATER,
   drinkwater: DRINKWATER,
+  grondwater: GRONDWATER,
   "lucht-eu": LUCHT_EU,
   "lucht-who": LUCHT_WHO,
 };
@@ -609,6 +776,7 @@ export function beoordeel(
 const EXTRA_BRONNEN: Readonly<Record<Normenset, BronId[]>> = {
   oppervlaktewater: [],
   drinkwater: ["drinkwaterVlaanderen"],
+  grondwater: ["drinkwaterVlaanderen"],
   "lucht-eu": [],
   "lucht-who": [],
 };

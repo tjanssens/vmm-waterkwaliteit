@@ -6,6 +6,13 @@ export interface Categorie {
   naam: string;
   /** Waarschuwing bovenaan de categorie, bv. over de opgeloste fractie. */
   waarschuwing?: string;
+  /**
+   * Normenset waarvoor die waarschuwing geldt. De opmerking dat metalen als
+   * totaalgehalte gemeten zijn slaat op de milieukwaliteitsnorm voor
+   * oppervlaktewater; bij drinkwater geldt de norm juist wél op het
+   * totaalgehalte, en dan zou de waarschuwing onjuist zijn.
+   */
+  waarschuwingVoor?: string;
 }
 
 export interface IngedeeldeCategorie extends Categorie {
@@ -19,7 +26,8 @@ const CATEGORIEEN = [
   { id: "bacteriologie", naam: "Bacteriologie" },
   { id: "metalen", naam: "Metalen en sporenelementen",
     waarschuwing:
-      "Deze stoffen zijn als totaalgehalte gemeten, terwijl de normen op de opgeloste fractie slaan. Ze zijn hier niet tegen een norm getoetst." },
+      "Deze stoffen zijn als totaalgehalte gemeten, terwijl de normen op de opgeloste fractie slaan. Ze zijn hier niet tegen een norm getoetst.",
+    waarschuwingVoor: "oppervlaktewater" },
   { id: "pfas", naam: "PFAS" },
   { id: "fijnstof", naam: "Fijn stof en roet" },
   { id: "gassen", naam: "Gassen" },
@@ -60,6 +68,41 @@ const VAST: Readonly<Record<string, CategorieId>> = {
   "ZS": "fysisch",
   "TAM": "fysisch",
   "Secchi": "fysisch",
+
+  // --- grondwater; DOV schrijft de parameternaam voluit ---
+  "Opgeloste zuurstof (O2)": "zuurstof",
+  "Totaal organische koolstof (TOC)": "zuurstof",
+
+  "Nitraat (NO3)": "nutrienten",
+  "Nitriet (NO2)": "nutrienten",
+  "Ammonium (NH4)": "nutrienten",
+  "Fosfaat (PO4)": "nutrienten",
+
+  "Zuurtegraad (pH)": "fysisch",
+  "Temperatuur (T)": "fysisch",
+  "Elektrische geleidbaarheid (EC)": "fysisch",
+  "Redoxpotentiaal (Eh°)": "fysisch",
+  "Chloriden (Cl)": "fysisch",
+  "Sulfaat (SO4)": "fysisch",
+  "Bicarbonaat (HCO3)": "fysisch",
+  "Carbonaat (CO3)": "fysisch",
+  "Calcium (Ca)": "fysisch",
+  "Magnesium (Mg)": "fysisch",
+  "Natrium (Na)": "fysisch",
+  "Kalium (K)": "fysisch",
+
+  "Arseen (As)": "metalen",
+  "Cadmium (Cd)": "metalen",
+  "Chroom (Cr)": "metalen",
+  "Koper (Cu)": "metalen",
+  "Lood (Pb)": "metalen",
+  "Nikkel (Ni)": "metalen",
+  "Zink (Zn)": "metalen",
+  "Kwik (Hg)": "metalen",
+  "Aluminium (Al)": "metalen",
+  "Mangaan (Mn)": "metalen",
+  "Ijzer (Fe)": "metalen",
+  "Ijzer II (Fe2+)": "metalen",
 
   // --- luchtkwaliteit (IRCELINE) ---
   "PM10": "fijnstof",

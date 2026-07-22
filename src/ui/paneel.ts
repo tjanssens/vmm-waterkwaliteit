@@ -490,7 +490,12 @@ export class Paneel {
               <span class="categorie__aantal">${categorie.parameters.length} parameters</span>
             </button>
             <div class="categorie__body">
-              ${categorie.waarschuwing ? `<p class="waarschuwing"><strong>Let op.</strong> ${escape(categorie.waarschuwing)}</p>` : ""}
+              ${
+                categorie.waarschuwing &&
+                (!categorie.waarschuwingVoor || categorie.waarschuwingVoor === toestand.normenset)
+                  ? `<p class="waarschuwing"><strong>Let op.</strong> ${escape(categorie.waarschuwing)}</p>`
+                  : ""
+              }
               <div class="tabel-scroll">
                 <table>
                   <thead>
@@ -531,7 +536,13 @@ export class Paneel {
           <button type="button" class="parameter__knop" data-evolutie="${escape(parameter.symbool)}"
                   title="Toon het verloop van ${escape(parameter.omschrijving)} over de tijd">
             ${escape(parameter.omschrijving)}
-            <span class="parameter__symbool">${escape(parameter.symbool)}</span>
+            ${
+              // Bij DOV is het symbool de volledige naam; die twee keer tonen
+              // levert "Mangaan (Mn) Mangaan (Mn)" op.
+              parameter.symbool === parameter.omschrijving
+                ? ""
+                : `<span class="parameter__symbool">${escape(parameter.symbool)}</span>`
+            }
           </button>
           ${normregel}
           ${verloop}

@@ -1,3 +1,4 @@
+import { GRONDWATER } from "./grondwater.js";
 import { LUCHT } from "./lucht.js";
 import { OPPERVLAKTEWATER } from "./oppervlaktewater.js";
 import type { Laagprofiel, LaagId } from "./types.js";
@@ -9,6 +10,7 @@ import type { Laagprofiel, LaagId } from "./types.js";
 export const LAGEN: readonly Laagprofiel[] = [
   OPPERVLAKTEWATER as Laagprofiel,
   LUCHT as Laagprofiel,
+  GRONDWATER as Laagprofiel,
 ];
 
 export function laagprofiel(id: LaagId): Laagprofiel | undefined {

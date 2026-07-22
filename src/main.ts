@@ -9,7 +9,7 @@ import { vormSvg } from "./lagen/merk.js";
 import { escape } from "./ui/format.js";
 import { Paneel } from "./ui/paneel.js";
 import { LAGEN, laagprofiel } from "./lagen/index.js";
-import type { LaagId, Meetpunt } from "./lagen/types.js";
+import type { LaagId, Meetpunt, Vak } from "./lagen/types.js";
 import { zoek, afstand, formatteerAfstand, type LatLon } from "./geo/meetplaatsen.js";
 
 const element = <T extends HTMLElement>(id: string): T => {
@@ -35,9 +35,12 @@ async function toonRapport(laagId: LaagId, puntId: string): Promise<void> {
     return;
   }
 
-  let punten: Meetpunt[];
+  let gekozen: Meetpunt | null | undefined;
   try {
-    punten = await profiel.laadPunten(null);
+    // Een laag die per venster laadt kan niet eerst alles ophalen.
+    gekozen = profiel.puntOpId
+      ? await profiel.puntOpId(puntId)
+      : (await profiel.laadPunten(null)).find((p) => p.id === puntId);
   } catch (reden) {
     houder.innerHTML = `<p class="rapport__fout">${
       reden instanceof Error ? reden.message : "De meetpunten konden niet geladen worden."
@@ -45,7 +48,6 @@ async function toonRapport(laagId: LaagId, puntId: string): Promise<void> {
     return;
   }
 
-  const gekozen = punten.find((p) => p.id === puntId);
   if (!gekozen) {
     houder.innerHTML = `<p class="rapport__fout">Meetpunt ${puntId} bestaat niet in ${profiel.naam}.
       <a href="./">Terug naar de kaart</a></p>`;
@@ -67,6 +69,7 @@ async function start(): Promise<void> {
   const paneel = new Paneel(element("paneel"));
   const kaart = new Kaart(element("kaart"), {
     onSelectie: (punt) => void paneel.toon(punt),
+    onVenster: (venster, zoom) => plannenVensterlagen(venster, zoom),
   });
 
   /** Alle geladen punten per laag, en welke daarvan na filteren zichtbaar zijn. */
@@ -125,6 +128,11 @@ async function start(): Promise<void> {
         // De filterknoppen van een uitgeschakelde laag horen te verdwijnen.
         bouwPuntfilters();
         pasFiltersToe();
+        // Een laag die per venster laadt, heeft nog geen punten als hij aangaat.
+        if (aan && LAGEN.find((l) => l.id === id)?.perVenster) {
+          const nu = kaart.huidigVenster();
+          void laadVensterlagen(nu.venster, nu.zoom);
+        }
       });
     });
   }
@@ -156,21 +164,77 @@ async function start(): Promise<void> {
   }
 
   function pasFiltersToe(): void {
-    for (const profiel of LAGEN) {
-      const alle = geladen.get(profiel.id) ?? [];
-      const aan = (profiel.puntfilters ?? []).filter((f) =>
-        actieveFilters.has(`${profiel.id}/${f.id}`),
-      );
-      // Geen filter aan betekent alles tonen, niet niets.
-      const na = aan.length === 0 ? alle : alle.filter((punt) => aan.some((f) => f.past(punt)));
-
-      zichtbaar.set(profiel.id, na);
-      kaart.zet(profiel.id, na);
-
-      const telling = laagbalk.querySelector(`[data-telling="${profiel.id}"]`);
-      if (telling) telling.textContent = String(na.length);
-    }
+    for (const profiel of LAGEN) tekenLaag(profiel.id, false);
     toonLijst();
+  }
+
+  /** Past de puntfilters van één laag toe en tekent die opnieuw. */
+  function tekenLaag(laagId: LaagId, ookLijst = true): void {
+    const profiel = LAGEN.find((l) => l.id === laagId);
+    if (!profiel) return;
+
+    const alle = geladen.get(profiel.id) ?? [];
+    const aan = (profiel.puntfilters ?? []).filter((f) =>
+      actieveFilters.has(`${profiel.id}/${f.id}`),
+    );
+    // Geen filter aan betekent alles tonen, niet niets.
+    const na = aan.length === 0 ? alle : alle.filter((punt) => aan.some((f) => f.past(punt)));
+
+    zichtbaar.set(profiel.id, na);
+    kaart.zet(profiel.id, na);
+
+    const telling = laagbalk.querySelector(`[data-telling="${profiel.id}"]`);
+    if (telling) telling.textContent = String(na.length);
+    if (ookLijst) toonLijst();
+  }
+
+  // ---- lagen die per kaartvenster laden ----
+
+  /**
+   * Grondwater staat niet vooraf in een bestand: DOV filtert server-side op een
+   * venster, dus we halen alleen op wat in beeld is. Dat vraagt wel wat
+   * omzichtigheid. Slepen mag geen stapel aanroepen opleveren, en een antwoord
+   * dat te laat binnenkomt mag een nieuwer antwoord niet overschrijven.
+   */
+  const vensterlagen = LAGEN.filter((profiel) => profiel.perVenster);
+  const lopendPerLaag = new Map<LaagId, AbortController>();
+  let vensterTimer: ReturnType<typeof setTimeout> | undefined;
+
+  function plannenVensterlagen(venster: Vak, zoom: number): void {
+    if (vensterlagen.length === 0) return;
+    // Leaflet vuurt herhaaldelijk tijdens het slepen; wacht tot het stil valt.
+    clearTimeout(vensterTimer);
+    vensterTimer = setTimeout(() => void laadVensterlagen(venster, zoom), 400);
+  }
+
+  async function laadVensterlagen(venster: Vak, zoom: number): Promise<void> {
+    for (const profiel of vensterlagen) {
+      if (!actieveLagen.has(profiel.id)) continue;
+
+      if (zoom < (profiel.minimumZoom ?? 0)) {
+        // Te ver uitgezoomd: liever niets tonen dan duizenden punten halen.
+        lopendPerLaag.get(profiel.id)?.abort();
+        geladen.set(profiel.id, []);
+        tekenLaag(profiel.id);
+        statusregel.textContent = `Zoom verder in om ${profiel.naam.toLowerCase()} te zien.`;
+        continue;
+      }
+
+      lopendPerLaag.get(profiel.id)?.abort();
+      const beheerser = new AbortController();
+      lopendPerLaag.set(profiel.id, beheerser);
+
+      try {
+        const punten = await profiel.laadPunten(venster, beheerser.signal);
+        if (beheerser.signal.aborted) return;
+        geladen.set(profiel.id, punten);
+        tekenLaag(profiel.id);
+      } catch (reden) {
+        if (beheerser.signal.aborted) return;
+        statusregel.textContent =
+          reden instanceof Error ? reden.message : `${profiel.naam} kon niet geladen worden.`;
+      }
+    }
   }
 
   // ---- resultatenlijst ----
