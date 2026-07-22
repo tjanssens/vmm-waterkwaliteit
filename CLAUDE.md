@@ -96,8 +96,15 @@ Deze zijn met tests afgedekt. Verwijder die tests niet zonder reden.
 Twee sets in `src/data/normen.ts`, elk met bron per norm:
 
 - **oppervlaktewater** — VLAREM II bijlage 2.3.1. Wat deze waterloop zelf moet halen.
-- **drinkwater** — Richtlijn (EU) 2020/2184 bijlage I. Ter vergelijking; geldt
+- **drinkwater** — Richtlijn (EU) 2020/2184 bijlage I, zoals omgezet in het
+  Besluit van de Vlaamse Regering van 20 januari 2023. Ter vergelijking; geldt
   aan de kraan, niet in een beek. De uitleg in de UI zegt dat expliciet.
+
+De drinkwaterwaarden komen uit de geverifieerde tekst van 2020/2184 op EUR-Lex,
+niet uit de ingetrokken richtlijn 98/83. Dat onderscheid is niet academisch:
+antimoon ging van 5 naar 10 µg/L, boor van 1,0 naar 1,5 mg/L en seleen van 10
+naar 20 µg/L. Lood (5) en chroom (25) gelden pas vanaf 12 januari 2036; tot dan
+10 respectievelijk 50, en dát zijn de waarden die de app toepast.
 
 Bij het opzoeken bleken eerdere gokwaarden fout: totaal stikstof is 4 mgN/L
 (niet 6), nitraat 5,65–10 (niet 11,3), pH 5,5–9,0 (niet 6,5–8,5). Voor ammonium

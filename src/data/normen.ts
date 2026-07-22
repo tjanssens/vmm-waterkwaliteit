@@ -15,7 +15,12 @@ export const BRONNEN = {
   },
   drinkwater: {
     naam: "Richtlijn (EU) 2020/2184 over water bestemd voor menselijke consumptie, bijlage I",
-    url: "https://eur-lex.europa.eu/eli/dir/2020/2184/oj",
+    url: "https://eur-lex.europa.eu/legal-content/NL/TXT/HTML/?uri=CELEX:32020L2184",
+  },
+  drinkwaterVlaanderen: {
+    naam:
+      "Besluit van de Vlaamse Regering van 20 januari 2023 over de kwaliteit, kwantiteit en levering van water bestemd voor menselijke consumptie",
+    url: "https://vmm.vlaanderen.be/beleid/waterbeleid/drinkwater/kwaliteit",
   },
 } as const;
 
@@ -246,15 +251,17 @@ const DRINKWATER: Readonly<Record<string, Norm>> = {
 
   // Metalen: de drinkwaternorm slaat op het totaalgehalte in het monster,
   // en dat is precies wat de databank rapporteert.
-  "Sb t": { bovengrens: 5, eenheid: "µg/L", label: "≤ 5,0 µg/L", toets: "parameterwaarde", bron: "drinkwater" },
+  "Sb t": { bovengrens: 10, eenheid: "µg/L", label: "≤ 10 µg/L", toets: "parameterwaarde", bron: "drinkwater" },
   "As t": { bovengrens: 10, eenheid: "µg/L", label: "≤ 10 µg/L", toets: "parameterwaarde", bron: "drinkwater" },
-  "B t": { bovengrens: 1000, eenheid: "µg/L", label: "≤ 1000 µg/L (= 1,0 mg/L)", toets: "parameterwaarde", bron: "drinkwater" },
+  "B t": { bovengrens: 1500, eenheid: "µg/L", label: "≤ 1500 µg/L (= 1,5 mg/L)", toets: "parameterwaarde", bron: "drinkwater" },
   "Cd t": { bovengrens: 5, eenheid: "µg/L", label: "≤ 5,0 µg/L", toets: "parameterwaarde", bron: "drinkwater" },
-  "Cr t": { bovengrens: 50, eenheid: "µg/L", label: "≤ 50 µg/L", toets: "parameterwaarde", bron: "drinkwater" },
+  // Vanaf 12 januari 2036 wordt de norm 25 µg/L; tot dan geldt 50.
+  "Cr t": { bovengrens: 50, eenheid: "µg/L", label: "≤ 50 µg/L (wordt 25 in 2036)", toets: "parameterwaarde", bron: "drinkwater" },
   "Cu t": { bovengrens: 2000, eenheid: "µg/L", label: "≤ 2000 µg/L (= 2,0 mg/L)", toets: "parameterwaarde", bron: "drinkwater" },
-  "Pb t": { bovengrens: 10, eenheid: "µg/L", label: "≤ 10 µg/L", toets: "parameterwaarde", bron: "drinkwater" },
+  // Vanaf 12 januari 2036 wordt de norm 5 µg/L; tot dan geldt 10.
+  "Pb t": { bovengrens: 10, eenheid: "µg/L", label: "≤ 10 µg/L (wordt 5 in 2036)", toets: "parameterwaarde", bron: "drinkwater" },
   "Ni t": { bovengrens: 20, eenheid: "µg/L", label: "≤ 20 µg/L", toets: "parameterwaarde", bron: "drinkwater" },
-  "Se t": { bovengrens: 10, eenheid: "µg/L", label: "≤ 10 µg/L", toets: "parameterwaarde", bron: "drinkwater" },
+  "Se t": { bovengrens: 20, eenheid: "µg/L", label: "≤ 20 µg/L", toets: "parameterwaarde", bron: "drinkwater" },
   "Fe t": { bovengrens: 200, eenheid: "µg/L", label: "≤ 200 µg/L", toets: "indicatorparameter", bron: "drinkwater" },
   "Mn t": { bovengrens: 50, eenheid: "µg/L", label: "≤ 50 µg/L", toets: "indicatorparameter", bron: "drinkwater" },
 
@@ -369,8 +376,20 @@ export function beoordeel(
   return { klasse: "conform", label: "conform" };
 }
 
-/** De bronnen die in deze normenset daadwerkelijk gebruikt worden. */
+/**
+ * Bronnen die bij een set horen zonder aan één norm te hangen — de Vlaamse
+ * omzetting bijvoorbeeld, die de Europese waarden overneemt.
+ */
+const EXTRA_BRONNEN: Readonly<Record<Normenset, BronId[]>> = {
+  oppervlaktewater: [],
+  drinkwater: ["drinkwaterVlaanderen"],
+};
+
+/** De bronnen die in deze normenset gebruikt worden. */
 export function bronnenVoor(set: Normenset): { naam: string; url: string }[] {
-  const ids = new Set(Object.values(NORMEN[set]).map((n) => n.bron));
+  const ids = new Set([
+    ...Object.values(NORMEN[set]).map((n) => n.bron),
+    ...EXTRA_BRONNEN[set],
+  ]);
   return [...ids].map((id) => BRONNEN[id]);
 }

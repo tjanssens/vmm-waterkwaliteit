@@ -125,6 +125,29 @@ describe("beoordeel — drinkwater", () => {
     expect(oordeel.klasse).toBe("buiten-norm");
   });
 
+  describe("waarden uit richtlijn 2020/2184, niet uit de ingetrokken 98/83", () => {
+    it.each([
+      ["Sb t", 10],
+      ["B t", 1500],
+      ["Se t", 20],
+    ])("gebruikt voor %s de waarde %i", (symbool, verwacht) => {
+      expect(NORMEN.drinkwater[symbool]?.bovengrens).toBe(verwacht);
+    });
+
+    it("hanteert voor lood en chroom de waarde die nu geldt, met de latere erbij vermeld", () => {
+      // De richtlijn zet lood op 5 µg/L, maar pas vanaf 12 januari 2036;
+      // tot dan geldt 10. Idem chroom: 25 vanaf 2036, tot dan 50.
+      expect(NORMEN.drinkwater["Pb t"]?.bovengrens).toBe(10);
+      expect(NORMEN.drinkwater["Pb t"]?.label).toContain("2036");
+      expect(NORMEN.drinkwater["Cr t"]?.bovengrens).toBe(50);
+      expect(NORMEN.drinkwater["Cr t"]?.label).toContain("2036");
+    });
+  });
+
+  it("vermeldt ook de Vlaamse omzetting als bron", () => {
+    expect(bronnenVoor("drinkwater").some((b) => b.naam.includes("Vlaamse Regering"))).toBe(true);
+  });
+
   it("toetst de som van PFAS tegen 100 ng/L", () => {
     expect(drink({ symbool: "PFAS-20", gemiddelde: 150 }).klasse).toBe("buiten-norm");
     expect(drink({ symbool: "PFAS-20", gemiddelde: 20 }).klasse).toBe("conform");
