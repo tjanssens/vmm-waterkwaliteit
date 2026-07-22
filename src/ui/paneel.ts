@@ -8,6 +8,7 @@ import {
   type Normenset,
 } from "../data/normen.js";
 import { deelIn } from "../data/categorieen.js";
+import { stofprofiel } from "../data/stoffen.js";
 import { DatabankFout } from "../data/client.js";
 import { FormaatFout } from "../data/csv.js";
 import type { Meting, Oordeel, OordeelKlasse, ParameterSamenvatting } from "../data/types.js";
@@ -480,7 +481,9 @@ export class Paneel {
         );
 
         const rijen = gesorteerd
-          .map((p) => this.rijHtml(p, oordelen.get(p.symbool)!, vorige, toestand.normenset))
+          .map((p) =>
+            this.rijHtml(p, oordelen.get(p.symbool)!, vorige, toestand.normenset, toestand.punt.laag),
+          )
           .join("");
 
         return `
@@ -518,6 +521,7 @@ export class Paneel {
     oordeel: Oordeel,
     vorige: ParameterSamenvatting[],
     set: Normenset,
+    laag: LaagId,
   ): string {
     const toen = vorige.find((p) => p.symbool === parameter.symbool);
     const verloop = toen ? this.verloopHtml(parameter, toen, oordeel) : "";
@@ -545,6 +549,7 @@ export class Paneel {
           </button>
           ${normregel}
           ${verloop}
+          ${wattekstHtml(parameter, oordeel, laag)}
         </td>
         <td class="num waarde">
           ${parameter.aantal}
@@ -735,6 +740,25 @@ export class Paneel {
   }
 }
 
+
+/**
+ * Eén zin over wat de stof is, alleen bij een overschrijding.
+ *
+ * Wie hier komt en "atrazine" ziet staan, weet nog niets. De volle duiding
+ * hangt achter de grafiek, maar de lezer die nooit doorklikt is juist degene
+ * die deze regel nodig heeft. Enkel bij "buiten norm": zou de zin overal staan,
+ * dan wordt het behang en valt de overschrijding niet meer op.
+ */
+function wattekstHtml(
+  parameter: ParameterSamenvatting,
+  oordeel: Oordeel,
+  laag: LaagId,
+): string {
+  if (oordeel.klasse !== "buiten-norm") return "";
+  const profiel = stofprofiel(parameter, laag);
+  if (!profiel) return "";
+  return `<span class="parameter__duiding">${escape(profiel.wat)}</span>`;
+}
 
 /**
  * Hoe er gemeten is, met de bron erbij. Bij grondwater bepaalt dat wat een

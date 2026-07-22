@@ -185,6 +185,10 @@ het vandaan, waarom maakt het uit. Het verschijnt in het grafiekvenster, ook
 wanneer er niets overschreden wordt — wie een vinkje ziet, mag evengoed weten
 wat er dan binnen de norm blijft.
 
+Bij een overschrijding staat de "wat het is"-zin ook in de tabelrij zelf, want
+de lezer die nooit doorklikt is juist degene die ze nodig heeft. Alleen bij
+"buiten norm": overal zou ze behang worden en de overschrijding verbergen.
+
 Bewust los van `normen.ts`: een norm zegt óf een waarde te hoog is, deze teksten
 waaróm dat uitmaakt.
 
