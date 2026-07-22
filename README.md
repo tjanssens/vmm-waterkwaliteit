@@ -21,19 +21,31 @@ Open http://localhost:5173. Tijdens ontwikkeling neemt een middleware in
 
 ## Uitrollen
 
-De app is statisch en draait op GitHub Pages. De analyseresultaten komen van een
-Cloudflare Worker, omdat de Cognos-server van de VMM geen CORS-header stuurt en
-een browser de resultaten dus niet rechtstreeks mag lezen.
+De app staat op **https://tjanssens.github.io/vmm-waterkwaliteit/** en rolt
+zichzelf uit bij elke push naar `main`.
+
+De analyseresultaten komen van een Cloudflare Worker, omdat de Cognos-server
+van de VMM geen CORS-header stuurt en een browser de resultaten dus niet
+rechtstreeks mag lezen. Zolang die Worker niet draait, werken de kaart, het
+zoeken en de filters wel, maar levert een meetpunt openen een melding op dat de
+resultatenservice ontbreekt.
+
+Twee stappen om dat af te maken:
 
 ```bash
+# 1. Worker uitrollen (vraagt eenmalig om aan te melden bij Cloudflare)
 cd worker
 npx wrangler deploy
 ```
 
-Zet daarna in `worker/wrangler.toml` je Pages-URL bij `TOEGELATEN_ORIGINS`, en
-in de repository-instellingen een variabele `VITE_PROXY_URL` met de URL van de
-Worker. Zonder die variabele valt de app terug op het dev-pad en werkt ze in
-productie niet.
+```bash
+# 2. De URL die stap 1 teruggeeft als repository-variabele zetten
+gh variable set VITE_PROXY_URL --body "https://vmm-waterkwaliteit-proxy.<subdomein>.workers.dev"
+gh workflow run "Uitrollen naar GitHub Pages"
+```
+
+`TOEGELATEN_ORIGINS` in `worker/wrangler.toml` staat al op de Pages-URL; vul aan
+bij een eigen domein.
 
 ## Wat de app voor je uitzoekt
 
