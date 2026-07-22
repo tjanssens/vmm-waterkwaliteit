@@ -1,0 +1,37 @@
+name: Meetplaatsen verversen
+
+# De meetplaatsen wijzigen zelden; wekelijks volstaat ruim.
+on:
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  ververs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run data:meetplaatsen
+
+      - name: Commit bij wijziging
+        run: |
+          if git diff --quiet public/data/meetplaatsen.json; then
+            echo "Geen wijzigingen in de meetplaatsen."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data/meetplaatsen.json
+          git commit -m "Meetplaatsen bijgewerkt vanaf de WFS"
+          git push

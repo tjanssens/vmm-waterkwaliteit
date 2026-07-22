@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Waterkwaliteit in Vlaanderen — klik een meetpunt</title>
+    <meta
+      name="description"
+      content="Bekijk de analyseresultaten van de Vlaamse meetplaatsen oppervlaktewater door op de kaart een punt aan te klikken."
+    />
+  </head>
+  <body>
+    <!-- Rapportweergave: alleen de resultaten, voor een eigen tabblad en om af te drukken. -->
+    <main id="rapport" class="rapport" hidden></main>
+
+    <div class="app" id="app">
+      <aside class="zijbalk">
+        <header class="zijbalk__kop">
+          <h1>Waterkwaliteit in Vlaanderen</h1>
+          <p>Klik een meetpunt op de kaart, of zoek op gemeente, nummer of waterloop.</p>
+        </header>
+
+        <div class="zoekbalk">
+          <input
+            id="zoek"
+            type="search"
+            placeholder="Kalmthout, 65000, Rupel…"
+            aria-label="Zoek een meetplaats"
+            autocomplete="off"
+          />
+          <button id="locatie" type="button" class="knop knop--stil" title="Sorteer op afstand vanaf mijn locatie">
+            In mijn buurt
+          </button>
+        </div>
+
+        <div id="filters" class="filters" role="group" aria-label="Filter op meetnet"></div>
+        <p id="status" class="status" role="status"></p>
+
+        <ul id="resultaten" class="lijst"></ul>
+
+        <footer class="zijbalk__voet">
+          Meetplaatsen: Digitaal Vlaanderen. Resultaten: Vlaamse Milieumaatschappij.
+          Deze toepassing is geen officiële VMM-website.
+        </footer>
+      </aside>
+
+      <main class="kaartvlak">
+        <div id="kaart" class="kaart"></div>
+        <section id="paneel" class="paneel" hidden aria-live="polite"></section>
+      </main>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

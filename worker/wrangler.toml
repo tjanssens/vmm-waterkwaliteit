@@ -1,0 +1,10 @@
+name = "vmm-waterkwaliteit-proxy"
+main = "src/index.ts"
+compatibility_date = "2026-07-01"
+
+[vars]
+# Vul aan met de eigen GitHub Pages-URL voor de app gedeeld wordt.
+TOEGELATEN_ORIGINS = "http://localhost:5173,http://127.0.0.1:5173"
+
+[observability]
+enabled = true

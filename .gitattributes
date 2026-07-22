@@ -1,0 +1,4 @@
+# De CI draait op Linux; houd de repo op LF ongeacht het werkstation.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
