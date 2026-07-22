@@ -7,7 +7,7 @@ import { vormSvg } from "../lagen/merk.js";
 const START = { midden: [51.05, 4.4] as [number, number], zoom: 9 };
 
 export interface KaartOpties {
-  onSelectie: (punt: Meetpunt, profiel: Laagprofiel) => void;
+  onSelectie: (punt: Meetpunt) => void;
   /** Roept terug wanneer het kaartvenster verschoven of gezoomd is. */
   onVenster?: (venster: Vak, zoom: number) => void;
 }
@@ -15,7 +15,6 @@ export interface KaartOpties {
 interface Laag {
   profiel: Laagprofiel;
   cluster: L.MarkerClusterGroup;
-  punten: Map<string, Meetpunt>;
   markers: Map<string, L.CircleMarker | L.Marker>;
   zichtbaar: boolean;
 }
@@ -23,7 +22,7 @@ interface Laag {
 export class Kaart {
   private readonly kaart: L.Map;
   private readonly lagen = new Map<LaagId, Laag>();
-  private geselecteerd: { laag: LaagId; id: string } | null = null;
+  private geselecteerd: Meetpunt | null = null;
   private eigenPositie: L.CircleMarker | null = null;
 
   constructor(
@@ -62,7 +61,6 @@ export class Kaart {
     this.lagen.set(profiel.id, {
       profiel,
       cluster,
-      punten: new Map(),
       markers: new Map(),
       zichtbaar,
     });
@@ -77,10 +75,8 @@ export class Kaart {
 
     laag.cluster.clearLayers();
     laag.markers.clear();
-    laag.punten.clear();
 
     const markers = punten.map((punt) => {
-      laag.punten.set(punt.id, punt);
       const marker = this.maakMarker(punt, laag.profiel.merk);
       marker.bindTooltip(`<strong>${punt.code}</strong><br>${punt.omschrijving}`, {
         direction: "top",
@@ -104,17 +100,16 @@ export class Kaart {
 
   selecteer(punt: Meetpunt, zoomIn = false): void {
     const vorige = this.geselecteerd;
-    this.geselecteerd = { laag: punt.laag, id: punt.id };
+    this.geselecteerd = punt;
 
-    if (vorige) this.herteken(vorige.laag, vorige.id);
-    this.herteken(punt.laag, punt.id);
+    if (vorige) this.herteken(vorige);
+    this.herteken(punt);
 
     if (zoomIn) {
       this.kaart.setView([punt.lat, punt.lon], Math.max(this.kaart.getZoom(), 14));
     }
 
-    const laag = this.lagen.get(punt.laag);
-    if (laag) this.opties.onSelectie(punt, laag.profiel);
+    this.opties.onSelectie(punt);
   }
 
   toonPositie(lat: number, lon: number): void {
@@ -149,11 +144,10 @@ export class Kaart {
     this.opties.onVenster?.(venster, zoom);
   }
 
-  private herteken(laagId: LaagId, id: string): void {
-    const laag = this.lagen.get(laagId);
-    const punt = laag?.punten.get(id);
-    const marker = laag?.markers.get(id);
-    if (!laag || !punt || !marker) return;
+  private herteken(punt: Meetpunt): void {
+    const laag = this.lagen.get(punt.laag);
+    const marker = laag?.markers.get(punt.id);
+    if (!laag || !marker) return;
 
     const actief = this.isActief(punt);
     if (marker instanceof L.CircleMarker) {

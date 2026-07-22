@@ -8,7 +8,7 @@ import {
   splitsInReeksen,
   type Punt,
 } from "./grafiek.js";
-import { formatteerDatum, formatteerGetal, formatteerWaarde } from "./format.js";
+import { escape, formatteerDatum, formatteerGetal, formatteerWaarde } from "./format.js";
 
 const BREEDTE = 720;
 const HOOGTE = 300;
@@ -283,10 +283,3 @@ export class EvolutieVenster {
   }
 }
 
-function escape(tekst: string): string {
-  return tekst
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}

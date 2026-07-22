@@ -7,13 +7,6 @@ export type Bucket = (meting: Meting) => string;
 export const PER_JAAR: Bucket = (meting) => String(meting.jaar);
 
 /**
- * Alles in één emmer. Bij lucht kiest de gebruiker niet welk deel van de
- * opgehaalde data getoond wordt maar wélk venster opgehaald wordt; er valt
- * daarna niets meer te verdelen.
- */
-export const ALLES: Bucket = () => "alles";
-
-/**
  * Dicht losse metingen samen tot één regel per parameter per periode.
  * Een meetpunt levert al snel honderden metingen; de gebruiker leest liever
  * 46 parameters dan 466 staalnames.

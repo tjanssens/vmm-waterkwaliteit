@@ -34,10 +34,10 @@ export const OPPERVLAKTEWATER: Laagprofiel<Meetplaats> = {
         { meetplaats: punt.code, matrix: punt.matrix, jaren: laatsteJaren(STANDAARD_JAREN) },
         signaal,
       ),
+    // meetjaren geeft recentste eerst; de knoppenrij loopt oplopend.
     periodes: (metingen) =>
       meetjaren(metingen)
-        .slice()
-        .sort((a, b) => a - b)
+        .reverse()
         .map((jaar) => ({ id: String(jaar), label: String(jaar) })),
     bucketVan: PER_JAAR,
     ladenTekst: () =>
@@ -53,6 +53,13 @@ export const OPPERVLAKTEWATER: Laagprofiel<Meetplaats> = {
         ),
     },
   },
+
+  // Meetnetten waarop filteren zinvol is; de rest zit in de details.
+  puntfilters: (["FYSICOCHEM", "BACTERIO", "WATBODEM", "MACROINV"] as const).map((net) => ({
+    id: net,
+    label: MEETNET_NAMEN[net],
+    past: (punt: Meetplaats) => punt.meetnetten.includes(net),
+  })),
 
   normensetten: ["oppervlaktewater", "drinkwater"],
   standaardNormenset: "oppervlaktewater",
@@ -82,6 +89,8 @@ export const OPPERVLAKTEWATER: Laagprofiel<Meetplaats> = {
   toelichting: (periode: Periode) =>
     `Per parameter tonen we het gemiddelde over ${periode.label} en de laagste en hoogste ` +
     "gemeten waarde — niet elke afzonderlijke staalname.",
+
+  leegHint: "Meetplaatsen blijven op de kaart staan nadat ze uit een meetnet zijn gehaald.",
 
   leegTekst: (uitgebreid) =>
     `Voor deze meetplaats zijn geen analyseresultaten beschikbaar ${

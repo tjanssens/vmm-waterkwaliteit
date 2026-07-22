@@ -99,6 +99,18 @@ export type Tijdas<P extends Meetpunt> =
     };
 
 /**
+ * Een knop in de filterbalk die punten van deze laag weglaat. Wat er te
+ * filteren valt, verschilt per bron: meetnetten bij oppervlaktewater,
+ * aquifer bij grondwater, gemeten stof bij lucht. De schil hoeft daar niets
+ * van te weten — anders staat er straks per laag een uitzondering in.
+ */
+export interface Puntfilter<P extends Meetpunt = Meetpunt> {
+  id: string;
+  label: string;
+  past(punt: P): boolean;
+}
+
+/**
  * Alles wat één databron eigen is, achter één interface. Kaart en paneel
  * praten hiertegen en niet tegen Cognos, IRCELINE of DOV rechtstreeks — een
  * vierde laag toevoegen hoort daarom één bestand te kosten.
@@ -122,6 +134,9 @@ export interface Laagprofiel<P extends Meetpunt = Meetpunt> {
 
   tijdas: Tijdas<P>;
 
+  /** Knoppen in de filterbalk; ze verschijnen alleen als deze laag aanstaat. */
+  puntfilters?: readonly Puntfilter<P>[];
+
   normensetten: readonly Normenset[];
   standaardNormenset: Normenset;
 
@@ -132,4 +147,6 @@ export interface Laagprofiel<P extends Meetpunt = Meetpunt> {
   toelichting(periode: Periode): string;
   /** Zin wanneer er niets gemeten is. */
   leegTekst(uitgebreid: boolean): string;
+  /** Optionele toelichting daaronder, in de woorden van deze bron. */
+  leegHint?: string;
 }

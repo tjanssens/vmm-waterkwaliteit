@@ -58,3 +58,16 @@ export function sommMaakOp(delen: readonly string[]): string {
   if (delen.length === 1) return delen[0]!;
   return `${delen.slice(0, -1).join(", ")} en ${delen[delen.length - 1]!}`;
 }
+
+/**
+ * Ontsnapt tekst die in HTML terechtkomt. Stond eerder drie keer in de
+ * codebase, in twee varianten waarvan er één `>` liet staan — vandaar één
+ * versie op de plek waar de andere opmaakhulpjes ook wonen.
+ */
+export function escape(tekst: string): string {
+  return tekst
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}

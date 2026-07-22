@@ -12,12 +12,15 @@ import { DatabankFout } from "../data/client.js";
 import { FormaatFout } from "../data/csv.js";
 import type { Meting, Oordeel, OordeelKlasse, ParameterSamenvatting } from "../data/types.js";
 import type { Laagprofiel, Meetpunt, Periode } from "../lagen/types.js";
+import { laagprofiel } from "../lagen/index.js";
 import { vormSvg } from "../lagen/merk.js";
 import {
+  escape,
   formatteerBereik,
   formatteerDatum,
   formatteerDatumKort,
   formatteerWaarde,
+  sommMaakOp,
 } from "./format.js";
 import { samenvattingsZin } from "./samenvatting.js";
 import { EvolutieVenster } from "./evolutie.js";
@@ -69,7 +72,14 @@ export class Paneel {
     this.houder.innerHTML = "";
   }
 
-  async toon(punt: Meetpunt, profiel: Laagprofiel): Promise<void> {
+  /**
+   * Het profiel hoeft er niet bij: elk punt draagt zijn laag, en die bepaalt
+   * de bron. Zo hoeft de aanroeper niet twee dingen bij elkaar te houden.
+   */
+  async toon(punt: Meetpunt): Promise<void> {
+    const profiel = laagprofiel(punt.laag);
+    if (!profiel) throw new Error(`Onbekende databron "${punt.laag}".`);
+
     const beheerser = this.begin();
     this.houder.hidden = false;
 
@@ -203,7 +213,7 @@ export class Paneel {
     this.koppelSluiten();
     this.houder
       .querySelector('[data-actie="opnieuw"]')
-      ?.addEventListener("click", () => void this.toon(punt, profiel));
+      ?.addEventListener("click", () => void this.toon(punt));
   }
 
   private teken(): void {
@@ -257,8 +267,8 @@ export class Paneel {
       ${this.kopHtml(toestand.punt, toestand.profiel)}
       <div class="paneel__leeg">
         <p>${escape(toestand.profiel.leegTekst(toestand.uitgebreid))}</p>
-        <p class="paneel__hint">Meetpunten blijven op de kaart staan nadat ze uit een meetnet zijn gehaald.</p>
-        ${kanUitbreiden ? '<button type="button" class="knop" data-actie="uitbreiden">Volledige historiek zoeken</button>' : ""}
+        ${toestand.profiel.leegHint ? `<p class="paneel__hint">${escape(toestand.profiel.leegHint)}</p>` : ""}
+        ${kanUitbreiden ? `<button type="button" class="knop" data-actie="uitbreiden">${escape(tijdas.uitbreiden!.label)}</button>` : ""}
       </div>`;
     this.koppelSluiten();
     this.koppelUitbreiden();
@@ -354,7 +364,7 @@ export class Paneel {
 
     const gefilterd = allesAan
       ? "Klik een label om enkel die parameters te tonen."
-      : `Gefilterd op: ${[...toestand.filters].map((k) => KLASSE_LABELS[k]).join(", ")}.`;
+      : `Gefilterd op: ${sommMaakOp([...toestand.filters].map((k) => KLASSE_LABELS[k]))}.`;
 
     return `
       <section class="paneel__oordeel">
@@ -683,10 +693,3 @@ export class Paneel {
   }
 }
 
-function escape(tekst: string): string {
-  return tekst
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
