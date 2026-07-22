@@ -20,6 +20,12 @@ export interface Meting {
    * `waarde` is de detectielimiet, niet de werkelijke concentratie.
    */
   onderDetectielimiet: boolean;
+  /**
+   * Indeling zoals de bron die zelf geeft, bv. "Zware metalen" of
+   * "Pesticiden: actieve stoffen". Betrouwbaarder dan namen opsommen: DOV kent
+   * duizenden pesticiden die we nooit allemaal in een lijst krijgen.
+   */
+  groep?: string;
 }
 
 /**
@@ -47,6 +53,8 @@ export interface ParameterSamenvatting {
    * dan een bovengrens en moet als "< x" getoond worden.
    */
   volledigOnderLimiet: boolean;
+  /** Indeling zoals de bron die geeft; zie Meting.groep. */
+  groep?: string;
 }
 
 /**

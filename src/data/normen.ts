@@ -573,6 +573,19 @@ const GRONDWATER: Readonly<Record<string, Norm>> = {
     bron: "drinkwater",
   },
 
+  // --- PFAS ---
+  // DOV rekent de som van de twintig PFAS uit de drinkwaterrichtlijn zelf uit
+  // en rapporteert die in ng/L; de richtlijn geeft 0,10 µg/L, wat 100 ng/L is.
+  // Losse PFAS krijgen geen norm: de richtlijn stelt er geen per stof, alleen
+  // op de som.
+  "PFAS (EU DWRL-20)": {
+    bovengrens: 100,
+    eenheid: "ng/L",
+    label: "≤ 100 ng/L (= 0,10 µg/L)",
+    toets: "som van de twintig PFAS uit de drinkwaterrichtlijn",
+    bron: "drinkwater",
+  },
+
   // --- metalen, in de eenheid waarin DOV ze rapporteert ---
   "Arseen (As)": {
     bovengrens: 10,

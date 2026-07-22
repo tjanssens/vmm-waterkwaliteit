@@ -48,6 +48,7 @@ function samenvattenGroep(groep: Meting[], bucket: string): ParameterSamenvattin
     maximum: Math.max(...waarden),
     laatsteDatum: groep.reduce((laatst, m) => (m.datum > laatst ? m.datum : laatst), eerste.datum),
     volledigOnderLimiet: onderLimiet === groep.length,
+    ...(eerste.groep === undefined ? {} : { groep: eerste.groep }),
   };
 }
 

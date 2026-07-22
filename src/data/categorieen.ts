@@ -48,6 +48,8 @@ const CATEGORIEEN = [
       },
     ] },
   { id: "pesticiden", naam: "Pesticiden" },
+  { id: "farmaceutisch", naam: "Geneesmiddelenresten" },
+  { id: "organisch", naam: "Organische verbindingen" },
   { id: "overige", naam: "Overige parameters" },
 ] as const satisfies readonly Categorie[];
 
@@ -150,13 +152,53 @@ const VAST: Readonly<Record<string, CategorieId>> = {
   "Salm": "bacteriologie",
 };
 
-/** PFAS-symbolen zijn te talrijk om op te sommen; ze delen een vorm. */
-const PFAS = /^(PF[A-Z]{2,4}|\d+:\d+\s?FT[SA]|[A-Za-z]*PFOS|[A-Za-z]*PFOA)/;
+/**
+ * PFAS zijn te talrijk om op te sommen — DOV alleen al rapporteert er 62 — maar
+ * ze delen een vorm in hun code en een woordstam in hun naam.
+ */
+const PFAS_SYMBOOL =
+  /^(PF[A-Z]|\d+:\d+[\s/]|[A-Za-z]*PFOS|[A-Za-z]*PFOA|HFPO|DONA|\d*Cl-PF|\d+H-PF|P\d+DMOA|Me?PF|Et?PF)/;
+/**
+ * "Fluoride" mag hier niet in trappen, vandaar de stam en niet enkel "fluor":
+ * per-, poly- en fluortelomeerverbindingen zijn PFAS, fluoride is dat niet.
+ */
+const PFAS_NAAM = /(perfluor|polyfluor|fluortelomeer|fluoroctaan|fluorbutaan)/i;
+
+/**
+ * Indeling zoals de bron die zelf geeft. Betrouwbaarder dan namen opsommen:
+ * DOV kent 998 parameters, waaronder honderden pesticiden die we nooit
+ * allemaal in een lijst krijgen.
+ *
+ * De twaalf groepen zijn exact opgehaald bij DOV. Een referentie-endpoint
+ * bestaat er niet — `parametergroep` is in het WFS-schema een vrije string —
+ * dus dat ging door de waarden alfabetisch af te lopen. Een steekproef van
+ * 10.000 observaties miste er drie, waaronder PFAS.
+ */
+const GROEPEN: Readonly<Record<string, CategorieId>> = {
+  "Zware metalen": "metalen",
+  Grondwater_chemisch_PFAS: "pfas",
+  "Pesticiden: actieve stoffen": "pesticiden",
+  "Pesticiden: relevante metabolieten": "pesticiden",
+  "Niet-relevante metabolieten van pesticiden": "pesticiden",
+  "Bacteriologische parameters": "bacteriologie",
+  "Farmaceutische stoffen": "farmaceutisch",
+  "Organische verbindingen": "organisch",
+  Anionen: "fysisch",
+  Kationen: "fysisch",
+  // DOV schrijft hier twee spaties; overnemen zoals het is.
+  "Fysico-chemische  parameters": "fysisch",
+  Onbekend: "overige",
+};
 
 export function categorieVan(parameter: ParameterSamenvatting): CategorieId {
+  // Een naam die we kennen is het nauwkeurigst: nitraat is een anion, maar
+  // hoort bij de nutriënten en niet bij "algemeen fysisch-chemisch".
   const vast = VAST[parameter.symbool];
   if (vast) return vast;
-  if (PFAS.test(parameter.symbool)) return "pfas";
+  if (PFAS_SYMBOOL.test(parameter.symbool) || PFAS_NAAM.test(parameter.omschrijving)) return "pfas";
+
+  const uitGroep = parameter.groep ? GROEPEN[parameter.groep] : undefined;
+  if (uitGroep) return uitGroep;
   if (isTotaalgehalte(parameter.symbool) || /\s[ot]$/.test(parameter.symbool)) return "metalen";
   return "overige";
 }

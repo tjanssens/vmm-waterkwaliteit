@@ -175,6 +175,8 @@ async function haalObservaties(
     const waarde = getal(p["resultaat"]);
     if (!datum || !naam || waarde === null) return [];
 
+    const { omschrijving, symbool } = splitsParameternaam(naam);
+
     return [
       {
         meetplaats: code,
@@ -182,12 +184,13 @@ async function haalObservaties(
         jaar: Number(datum.slice(0, 4)),
         staalId: id,
         tijdstip: null,
-        symbool: naam,
-        omschrijving: naam,
+        symbool,
+        omschrijving,
         eenheid: normaliseerEenheid(tekst(p["eenheid"]) ?? ""),
         waarde,
         // DOV noteert "<" wanneer de stof niet is aangetoond.
         onderDetectielimiet: tekst(p["detectieconditie"]) === "<",
+        ...(tekst(p["parametergroep"]) ? { groep: tekst(p["parametergroep"])! } : {}),
       },
     ];
   });
@@ -200,6 +203,37 @@ async function haalObservaties(
  */
 export function normaliseerEenheid(eenheid: string): string {
   return eenheid.trim().replace(/\/l\b/i, "/L");
+}
+
+/**
+ * Splitst de parameternaam in een omschrijving en een korte code.
+ *
+ * Bij de gewone parameters is de naam "Arseen (As)" en is er niets te splitsen.
+ * Bij PFAS herhaalt DOV de code achteraan: "perfluoroctaansulfonzuur (PFOS)
+ * (PFOS)". Alleen die dubbeling halen we weg — staat de code er één keer, dan
+ * blijft de naam zoals hij is, want daar zijn de normen op gesleuteld.
+ */
+export function splitsParameternaam(naam: string): { omschrijving: string; symbool: string } {
+  const ongewijzigd = { omschrijving: naam, symbool: naam };
+  if (!naam.endsWith(")")) return ongewijzigd;
+
+  // Zoek het haakje dat de laatste groep opent; die groepen kunnen zelf
+  // haakjes bevatten, zoals "(PFAS (EU DWRL-20))".
+  let diepte = 0;
+  for (let i = naam.length - 1; i >= 0; i--) {
+    if (naam[i] === ")") diepte++;
+    else if (naam[i] === "(") {
+      diepte--;
+      if (diepte !== 0) continue;
+
+      const code = naam.slice(i + 1, -1).trim();
+      const rest = naam.slice(0, i).trim();
+      // Alleen splitsen als de code er echt dubbel staat.
+      if (rest === code || rest.endsWith(`(${code})`)) return { omschrijving: rest, symbool: code };
+      return ongewijzigd;
+    }
+  }
+  return ongewijzigd;
 }
 
 /** De pagina bij DOV waar deze cijfers te raadplegen zijn. */
