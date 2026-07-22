@@ -1,3 +1,5 @@
+import type { Meetpunt } from "../lagen/types.js";
+
 /** Meetnetten in de volgorde waarin het bouwscript de bitvlaggen zet. */
 export const MEETNETTEN = [
   "FYSICOCHEM",
@@ -37,26 +39,16 @@ interface RuweMeetplaats {
 
 export type Matrix = "OW" | "WB" | "BI";
 
-export interface Meetplaats {
+export interface Meetplaats extends Meetpunt {
+  laag: "oppervlaktewater";
   /** Meetplaatsnummer zoals op de kaart, bv. "65000". */
   nummer: string;
-  /**
-   * Code zoals de databank hem verwacht: matrixprefix plus nummer.
-   * Dit is precies de vertaalslag die de VMM-website aan de gebruiker overlaat.
-   */
-  code: string;
   /**
    * Meetnet waarin het rapport dit punt kent. Moet bij de prefix passen:
    * een OW-code opvragen met matrix WB levert nul resultaten op.
    */
   matrix: Matrix;
-  omschrijving: string;
-  gemeente: string | null;
-  lon: number;
-  lat: number;
   meetnetten: Meetnet[];
-  /** Voor zoeken: alles doorzoekbaar in kleine letters. */
-  zoeksleutel: string;
 }
 
 /**
@@ -93,6 +85,8 @@ export async function laadMeetplaatsen(basis: string): Promise<Meetplaats[]> {
     const meetnetten = MEETNETTEN.filter((_, i) => (ruw.net & (1 << i)) !== 0);
     const code = codeVoor(ruw.nr, meetnetten);
     return {
+      laag: "oppervlaktewater",
+      id: ruw.nr,
       nummer: ruw.nr,
       code,
       matrix: matrixVanCode(code),
@@ -133,27 +127,31 @@ export function formatteerAfstand(meter: number): string {
  * te weten welk van de drie hij in handen heeft. Met een positie erbij komen de
  * dichtstbijzijnde punten eerst.
  */
-export function zoek(
-  meetplaatsen: readonly Meetplaats[],
+export function zoek<T extends Meetpunt>(
+  punten: readonly T[],
   term: string,
   vanaf?: LatLon,
   maximum = 50,
-): Meetplaats[] {
+): T[] {
   const genormaliseerd = term.trim().toLowerCase().replace(/^ow|^wb/, "");
   const treffers = genormaliseerd
-    ? meetplaatsen.filter((m) => m.zoeksleutel.includes(genormaliseerd))
-    : [...meetplaatsen];
+    ? punten.filter((m) => m.zoeksleutel.includes(genormaliseerd))
+    : [...punten];
 
   if (vanaf) {
     treffers.sort((a, b) => afstand(vanaf, a) - afstand(vanaf, b));
   } else {
-    // Zonder positie: exacte nummertreffers eerst, dan alfabetisch.
+    // Zonder positie: exacte treffers eerst, dan op nummer. Sorteren gebeurt
+    // op `id` en niet op de code, want het nummer uit de prefix terugrekenen
+    // gaat mis bij codes als "OWTimbers 15" — daar blijft " 15" over, en een
+    // spatie sorteert vóór elk cijfer.
     treffers.sort((a, b) => {
-      const exactA = a.nummer.toLowerCase() === genormaliseerd ? 0 : 1;
-      const exactB = b.nummer.toLowerCase() === genormaliseerd ? 0 : 1;
-      return exactA - exactB || a.nummer.localeCompare(b.nummer, "nl", { numeric: true });
+      const exactA = a.id.toLowerCase() === genormaliseerd ? 0 : 1;
+      const exactB = b.id.toLowerCase() === genormaliseerd ? 0 : 1;
+      return exactA - exactB || a.id.localeCompare(b.id, "nl", { numeric: true });
     });
   }
 
   return treffers.slice(0, maximum);
 }
+

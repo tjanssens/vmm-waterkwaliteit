@@ -75,6 +75,33 @@ export function kiesTicks(min: number, max: number, streefaantal = 5): number[] 
   return ticks;
 }
 
+/**
+ * Het tijdstip van een meting in milliseconden. Bij water is er hoogstens één
+ * staalname per dag en volstaat de datum, maar lucht meet elk uur: zonder het
+ * tijdstip vallen 24 metingen op dezelfde x-positie.
+ */
+export function tijdstipVan(meting: Meting): number {
+  return Date.parse(`${meting.datum}T${meting.tijdstip ?? "00:00:00"}Z`);
+}
+
+/**
+ * Hoe groot een gat mag zijn voordat de lijn breekt. Dat hangt af van hoe dicht
+ * er gemeten wordt: bij maandelijkse staalnames is twee maanden niets, bij
+ * uurmetingen is het een storing. Vandaar een veelvoud van de gebruikelijke
+ * tussentijd in plaats van één vaste drempel.
+ */
+export function bepaalMaxGat(metingen: readonly Meting[]): number {
+  const tijden = metingen.map(tijdstipVan).sort((a, b) => a - b);
+  const tussentijden: number[] = [];
+  for (let i = 1; i < tijden.length; i++) tussentijden.push(tijden[i]! - tijden[i - 1]!);
+  if (tussentijden.length === 0) return MAX_GAT_DAGEN * 86_400_000;
+
+  tussentijden.sort((a, b) => a - b);
+  const midden = tussentijden[Math.floor(tussentijden.length / 2)]!;
+  const uur = 3_600_000;
+  return Math.min(Math.max(midden * 20, uur), MAX_GAT_DAGEN * 86_400_000);
+}
+
 /** Aantal dagen tussen twee ISO-datums. */
 export function dagenTussen(vroeger: string, later: string): number {
   const ms = Date.parse(later) - Date.parse(vroeger);
@@ -85,13 +112,16 @@ export function dagenTussen(vroeger: string, later: string): number {
  * Splitst de reeks in aaneengesloten stukken. Elk stuk wordt één lijn; tussen
  * de stukken blijft de grafiek leeg.
  */
-export function splitsInReeksen(punten: readonly Punt[]): Punt[][] {
+export function splitsInReeksen(
+  punten: readonly Punt[],
+  maxGatMs = MAX_GAT_DAGEN * 86_400_000,
+): Punt[][] {
   const reeksen: Punt[][] = [];
   let huidig: Punt[] = [];
 
   for (const punt of punten) {
     const vorige = huidig[huidig.length - 1];
-    if (vorige && dagenTussen(vorige.meting.datum, punt.meting.datum) > MAX_GAT_DAGEN) {
+    if (vorige && tijdstipVan(punt.meting) - tijdstipVan(vorige.meting) > maxGatMs) {
       reeksen.push(huidig);
       huidig = [];
     }
@@ -108,7 +138,7 @@ export function bouwPad(punten: readonly Punt[]): string {
     .join(" ");
 }
 
-/** Metingen op volgorde van datum, oplopend. */
+/** Metingen op volgorde van tijdstip, oplopend. */
 export function opDatum(metingen: readonly Meting[]): Meting[] {
-  return [...metingen].sort((a, b) => a.datum.localeCompare(b.datum));
+  return [...metingen].sort((a, b) => tijdstipVan(a) - tijdstipVan(b));
 }

@@ -7,19 +7,19 @@ import {
   NORMENSETTEN,
   type Normenset,
 } from "../src/data/normen.js";
-import type { ParameterJaar } from "../src/data/types.js";
+import type { ParameterSamenvatting } from "../src/data/types.js";
 
 /** Neemt standaard de eenheid waarin de norm geldt. */
 function samenvatting(
-  over: Partial<ParameterJaar> = {},
+  over: Partial<ParameterSamenvatting> = {},
   set: Normenset = "oppervlaktewater",
-): ParameterJaar {
+): ParameterSamenvatting {
   const symbool = over.symbool ?? "P t";
   return {
     symbool,
     omschrijving: "Fosfor, totaal",
     eenheid: NORMEN[set][symbool]?.eenheid ?? "mgP/L",
-    jaar: 2024,
+    bucket: "2024",
     aantal: 6,
     aantalOnderLimiet: 0,
     gemiddelde: 0.1,
@@ -110,7 +110,7 @@ describe("beoordeel — oppervlaktewater", () => {
 });
 
 describe("beoordeel — drinkwater", () => {
-  const drink = (over: Partial<ParameterJaar>) =>
+  const drink = (over: Partial<ParameterSamenvatting>) =>
     beoordeel(samenvatting(over, "drinkwater"), "drinkwater");
 
   it("toetst nitraat tegen de omgerekende drinkwaternorm", () => {

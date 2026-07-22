@@ -5,20 +5,12 @@ import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "./stijl.css";
 
 import { Kaart } from "./ui/kaart.js";
+import { vormSvg } from "./lagen/merk.js";
+import { escape } from "./ui/format.js";
 import { Paneel } from "./ui/paneel.js";
-import {
-  laadMeetplaatsen,
-  zoek,
-  afstand,
-  formatteerAfstand,
-  MEETNET_NAMEN,
-  type LatLon,
-  type Meetnet,
-  type Meetplaats,
-} from "./geo/meetplaatsen.js";
-
-/** Meetnetten waarop filteren zinvol is; de rest zit in de details. */
-const FILTERBAAR: Meetnet[] = ["FYSICOCHEM", "BACTERIO", "WATBODEM", "MACROINV"];
+import { LAGEN, laagprofiel } from "./lagen/index.js";
+import type { LaagId, Meetpunt, Vak } from "./lagen/types.js";
+import { zoek, afstand, formatteerAfstand, type LatLon } from "./geo/meetplaatsen.js";
 
 const element = <T extends HTMLElement>(id: string): T => {
   const gevonden = document.getElementById(id);
@@ -30,93 +22,261 @@ const element = <T extends HTMLElement>(id: string): T => {
  * Alleen het rapport, zonder kaart of zijbalk. Bedoeld voor een eigen tabblad
  * en om af te drukken.
  */
-async function toonRapport(nummer: string): Promise<void> {
+async function toonRapport(laagId: LaagId, puntId: string): Promise<void> {
   const houder = element<HTMLElement>("rapport");
   element<HTMLElement>("app").hidden = true;
   houder.hidden = false;
   document.body.classList.add("is-rapport");
 
-  let meetplaatsen: Meetplaats[];
-  try {
-    meetplaatsen = await laadMeetplaatsen(document.baseURI);
-  } catch (reden) {
-    houder.innerHTML = `<p class="rapport__fout">${
-      reden instanceof Error ? reden.message : "De meetplaatsen konden niet geladen worden."
-    }</p>`;
-    return;
-  }
-
-  const gekozen = meetplaatsen.find((m) => m.nummer === nummer);
-  if (!gekozen) {
-    houder.innerHTML = `<p class="rapport__fout">Meetplaats ${nummer} bestaat niet.
+  const profiel = laagprofiel(laagId);
+  if (!profiel) {
+    houder.innerHTML = `<p class="rapport__fout">Onbekende databron "${laagId}".
       <a href="./">Terug naar de kaart</a></p>`;
     return;
   }
 
-  document.title = `${gekozen.code} — ${gekozen.omschrijving || "meetplaats"} | Waterkwaliteit`;
+  let gekozen: Meetpunt | null | undefined;
+  try {
+    // Een laag die per venster laadt kan niet eerst alles ophalen.
+    gekozen = profiel.puntOpId
+      ? await profiel.puntOpId(puntId)
+      : (await profiel.laadPunten(null)).find((p) => p.id === puntId);
+  } catch (reden) {
+    houder.innerHTML = `<p class="rapport__fout">${
+      reden instanceof Error ? reden.message : "De meetpunten konden niet geladen worden."
+    }</p>`;
+    return;
+  }
+
+  if (!gekozen) {
+    houder.innerHTML = `<p class="rapport__fout">Meetpunt ${puntId} bestaat niet in ${profiel.naam}.
+      <a href="./">Terug naar de kaart</a></p>`;
+    return;
+  }
+
+  document.title = `${gekozen.code} — ${gekozen.omschrijving || "meetpunt"} | ${profiel.naam}`;
   await new Paneel(houder, "rapport").toon(gekozen);
 }
 
 async function start(): Promise<void> {
   const zoekveld = element<HTMLInputElement>("zoek");
   const lijst = element<HTMLElement>("resultaten");
+  const laagbalk = element<HTMLElement>("lagen");
   const filterbalk = element<HTMLElement>("filters");
   const statusregel = element<HTMLElement>("status");
   const locatieKnop = element<HTMLButtonElement>("locatie");
 
   const paneel = new Paneel(element("paneel"));
   const kaart = new Kaart(element("kaart"), {
-    onSelectie: (meetplaats) => void paneel.toon(meetplaats),
+    onSelectie: (punt) => void paneel.toon(punt),
+    onVenster: (venster, zoom) => plannenVensterlagen(venster, zoom),
   });
 
-  let meetplaatsen: Meetplaats[] = [];
-  let zichtbaar: Meetplaats[] = [];
+  /** Alle geladen punten per laag, en welke daarvan na filteren zichtbaar zijn. */
+  const geladen = new Map<LaagId, Meetpunt[]>();
+  const zichtbaar = new Map<LaagId, Meetpunt[]>();
+  const actieveLagen = new Set<LaagId>(LAGEN.map((l) => l.id));
+  /** Actieve puntfilters, als "laag/filter"-sleutels over alle lagen heen. */
+  const actieveFilters = new Set<string>();
   let positie: LatLon | undefined;
-  const actieveFilters = new Set<Meetnet>();
 
-  filterbalk.innerHTML = FILTERBAAR.map(
-    (net) =>
-      `<button type="button" class="filter" data-net="${net}" aria-pressed="false">${MEETNET_NAMEN[net]}</button>`,
-  ).join("");
+  for (const profiel of LAGEN) kaart.voegLaagToe(profiel);
+
+  bouwLaagschakelaars();
+  bouwPuntfilters();
 
   try {
-    statusregel.textContent = "Meetplaatsen laden…";
-    meetplaatsen = await laadMeetplaatsen(document.baseURI);
+    statusregel.textContent = "Meetpunten laden…";
+    await Promise.all(
+      LAGEN.filter((profiel) => !profiel.perVenster).map(async (profiel) => {
+        const punten = await profiel.laadPunten(null);
+        geladen.set(profiel.id, punten);
+      }),
+    );
   } catch (reden) {
     statusregel.textContent =
-      reden instanceof Error ? reden.message : "De meetplaatsen konden niet geladen worden.";
+      reden instanceof Error ? reden.message : "De meetpunten konden niet geladen worden.";
     return;
   }
 
-  kaart.zet(meetplaatsen);
-  zichtbaar = meetplaatsen;
-  toonLijst();
+  pasFiltersToe();
+
+  // ---- opbouw van de linkerkolom ----
+
+  function bouwLaagschakelaars(): void {
+    // Met één laag valt er niets te kiezen; dan is de schakelaar ruis.
+    if (LAGEN.length < 2) return;
+    element<HTMLElement>("lagenblok").hidden = false;
+
+    laagbalk.innerHTML = LAGEN.map(
+      (profiel) => `
+        <button type="button" class="laag" data-laag="${profiel.id}" aria-pressed="true">
+          <span class="laag__merk">${vormSvg(profiel.merk, 16)}</span>
+          <span class="laag__naam">${escape(profiel.naam)}</span>
+          <span class="laag__telling" data-telling="${profiel.id}"></span>
+        </button>`,
+    ).join("");
+
+    laagbalk.querySelectorAll<HTMLButtonElement>("[data-laag]").forEach((knop) => {
+      knop.addEventListener("click", () => {
+        const id = knop.dataset.laag as LaagId;
+        const aan = !actieveLagen.has(id);
+        if (aan) actieveLagen.add(id);
+        else actieveLagen.delete(id);
+        knop.setAttribute("aria-pressed", String(aan));
+        kaart.toonLaag(id, aan);
+        // De filterknoppen van een uitgeschakelde laag horen te verdwijnen.
+        bouwPuntfilters();
+        pasFiltersToe();
+        // Een laag die per venster laadt, heeft nog geen punten als hij aangaat.
+        if (aan && LAGEN.find((l) => l.id === id)?.perVenster) {
+          const nu = kaart.huidigVenster();
+          void laadVensterlagen(nu.venster, nu.zoom);
+        }
+      });
+    });
+  }
+
+  /**
+   * De filterknoppen komen uit de profielen zelf: wat er te filteren valt,
+   * verschilt per bron. Alleen ingeschakelde lagen tonen hun knoppen.
+   */
+  function bouwPuntfilters(): void {
+    filterbalk.innerHTML = LAGEN.filter((profiel) => actieveLagen.has(profiel.id))
+      .flatMap((profiel) =>
+        (profiel.puntfilters ?? []).map((filter) => {
+          const sleutel = `${profiel.id}/${filter.id}`;
+          return `<button type="button" class="filter" data-filter="${escape(sleutel)}"
+                    aria-pressed="${actieveFilters.has(sleutel)}">${escape(filter.label)}</button>`;
+        }),
+      )
+      .join("");
+
+    filterbalk.querySelectorAll<HTMLButtonElement>(".filter").forEach((knop) => {
+      knop.addEventListener("click", () => {
+        const sleutel = knop.dataset.filter!;
+        if (actieveFilters.has(sleutel)) actieveFilters.delete(sleutel);
+        else actieveFilters.add(sleutel);
+        knop.setAttribute("aria-pressed", String(actieveFilters.has(sleutel)));
+        pasFiltersToe();
+      });
+    });
+  }
+
+  function pasFiltersToe(): void {
+    for (const profiel of LAGEN) tekenLaag(profiel.id, false);
+    toonLijst();
+  }
+
+  /** Past de puntfilters van één laag toe en tekent die opnieuw. */
+  function tekenLaag(laagId: LaagId, ookLijst = true): void {
+    const profiel = LAGEN.find((l) => l.id === laagId);
+    if (!profiel) return;
+
+    const alle = geladen.get(profiel.id) ?? [];
+    const aan = (profiel.puntfilters ?? []).filter((f) =>
+      actieveFilters.has(`${profiel.id}/${f.id}`),
+    );
+    // Geen filter aan betekent alles tonen, niet niets.
+    const na = aan.length === 0 ? alle : alle.filter((punt) => aan.some((f) => f.past(punt)));
+
+    zichtbaar.set(profiel.id, na);
+    kaart.zet(profiel.id, na);
+
+    const telling = laagbalk.querySelector(`[data-telling="${profiel.id}"]`);
+    if (telling) telling.textContent = String(na.length);
+    if (ookLijst) toonLijst();
+  }
+
+  // ---- lagen die per kaartvenster laden ----
+
+  /**
+   * Grondwater staat niet vooraf in een bestand: DOV filtert server-side op een
+   * venster, dus we halen alleen op wat in beeld is. Dat vraagt wel wat
+   * omzichtigheid. Slepen mag geen stapel aanroepen opleveren, en een antwoord
+   * dat te laat binnenkomt mag een nieuwer antwoord niet overschrijven.
+   */
+  const vensterlagen = LAGEN.filter((profiel) => profiel.perVenster);
+  const lopendPerLaag = new Map<LaagId, AbortController>();
+  let vensterTimer: ReturnType<typeof setTimeout> | undefined;
+
+  function plannenVensterlagen(venster: Vak, zoom: number): void {
+    if (vensterlagen.length === 0) return;
+    // Leaflet vuurt herhaaldelijk tijdens het slepen; wacht tot het stil valt.
+    clearTimeout(vensterTimer);
+    vensterTimer = setTimeout(() => void laadVensterlagen(venster, zoom), 400);
+  }
+
+  async function laadVensterlagen(venster: Vak, zoom: number): Promise<void> {
+    for (const profiel of vensterlagen) {
+      if (!actieveLagen.has(profiel.id)) continue;
+
+      if (zoom < (profiel.minimumZoom ?? 0)) {
+        // Te ver uitgezoomd: liever niets tonen dan duizenden punten halen.
+        lopendPerLaag.get(profiel.id)?.abort();
+        geladen.set(profiel.id, []);
+        tekenLaag(profiel.id);
+        statusregel.textContent = `Zoom verder in om ${profiel.naam.toLowerCase()} te zien.`;
+        continue;
+      }
+
+      lopendPerLaag.get(profiel.id)?.abort();
+      const beheerser = new AbortController();
+      lopendPerLaag.set(profiel.id, beheerser);
+
+      try {
+        const punten = await profiel.laadPunten(venster, beheerser.signal);
+        if (beheerser.signal.aborted) return;
+        geladen.set(profiel.id, punten);
+        tekenLaag(profiel.id);
+      } catch (reden) {
+        if (beheerser.signal.aborted) return;
+        statusregel.textContent =
+          reden instanceof Error ? reden.message : `${profiel.naam} kon niet geladen worden.`;
+      }
+    }
+  }
+
+  // ---- resultatenlijst ----
+
+  /** De punten van alle ingeschakelde lagen, door elkaar. */
+  function zichtbarePunten(): Meetpunt[] {
+    return LAGEN.filter((profiel) => actieveLagen.has(profiel.id)).flatMap(
+      (profiel) => zichtbaar.get(profiel.id) ?? [],
+    );
+  }
 
   function toonLijst(): void {
+    const punten = zichtbarePunten();
     const term = zoekveld.value;
-    const treffers = zoek(zichtbaar, term, positie, 60);
+    const treffers = zoek(punten, term, positie, 60);
 
     statusregel.textContent = term
-      ? `${treffers.length === 60 ? "meer dan 60" : treffers.length} van ${zichtbaar.length} meetplaatsen`
-      : `${zichtbaar.length} meetplaatsen${positie ? ", dichtstbijzijnde eerst" : ""}`;
+      ? `${treffers.length === 60 ? "meer dan 60" : treffers.length} van ${punten.length} meetpunten`
+      : `${punten.length} meetpunten${positie ? ", dichtstbijzijnde eerst" : ""}`;
 
     if (treffers.length === 0) {
-      lijst.innerHTML = '<li class="lijst__leeg">Niets gevonden. Probeer een gemeente of nummer.</li>';
+      lijst.innerHTML =
+        '<li class="lijst__leeg">Niets gevonden. Probeer een gemeente of nummer.</li>';
       return;
     }
 
     lijst.innerHTML = treffers
-      .map((meetplaats) => {
-        const meter = positie ? afstand(positie, meetplaats) : null;
+      .map((punt) => {
+        const profiel = laagprofiel(punt.laag)!;
+        const meter = positie ? afstand(positie, punt) : null;
         return `
           <li>
-            <button type="button" class="treffer" data-nummer="${escape(meetplaats.nummer)}">
-              <span class="treffer__code">${escape(meetplaats.code)}</span>
-              <span class="treffer__oms">${escape(meetplaats.omschrijving || "Geen omschrijving")}</span>
+            <button type="button" class="treffer" data-laag="${escape(punt.laag)}" data-punt="${escape(punt.id)}">
+              <span class="treffer__code">
+                <span class="treffer__merk">${vormSvg(profiel.merk, 11)}</span>${escape(punt.code)}
+              </span>
+              <span class="treffer__oms">${escape(punt.omschrijving || "Geen omschrijving")}</span>
               <span class="treffer__meta">
-                ${escape(meetplaats.gemeente ?? "onbekende gemeente")}${
-                  meter === null ? "" : ` · ${formatteerAfstand(meter)}`
-                }
+                ${[punt.gemeente, meter === null ? null : formatteerAfstand(meter)]
+                  .filter(Boolean)
+                  .map((deel) => escape(String(deel)))
+                  .join(" · ")}
               </span>
             </button>
           </li>`;
@@ -125,24 +285,15 @@ async function start(): Promise<void> {
 
     lijst.querySelectorAll<HTMLButtonElement>(".treffer").forEach((knop) => {
       knop.addEventListener("click", () => {
-        const gekozen = meetplaatsen.find((m) => m.nummer === knop.dataset.nummer);
+        const gekozen = punten.find(
+          (p) => p.laag === knop.dataset.laag && p.id === knop.dataset.punt,
+        );
         if (gekozen) kaart.selecteer(gekozen, true);
       });
     });
   }
 
   zoekveld.addEventListener("input", toonLijst);
-
-  filterbalk.querySelectorAll<HTMLButtonElement>(".filter").forEach((knop) => {
-    knop.addEventListener("click", () => {
-      const net = knop.dataset.net as Meetnet;
-      if (actieveFilters.has(net)) actieveFilters.delete(net);
-      else actieveFilters.add(net);
-      knop.setAttribute("aria-pressed", String(actieveFilters.has(net)));
-      zichtbaar = kaart.filter(actieveFilters);
-      toonLijst();
-    });
-  });
 
   locatieKnop.addEventListener("click", () => {
     if (!navigator.geolocation) {
@@ -167,24 +318,38 @@ async function start(): Promise<void> {
     );
   });
 
-  // Diepe link: /?meetplaats=65000 opent dat punt meteen.
-  const gevraagd = new URLSearchParams(location.search).get("meetplaats");
+  // Diepe link: ?laag=…&punt=… opent dat punt meteen.
+  const gevraagd = leesDiepeLink(new URLSearchParams(location.search));
   if (gevraagd) {
-    const genormaliseerd = gevraagd.toUpperCase().replace(/^(OW|WB)/, "");
-    const gekozen = meetplaatsen.find((m) => m.nummer === genormaliseerd);
-    if (gekozen) kaart.selecteer(gekozen, true);
+    const punt = (geladen.get(gevraagd.laag) ?? []).find((p) => p.id === gevraagd.punt);
+    if (punt) kaart.selecteer(punt, true);
   }
 }
 
-function escape(tekst: string): string {
-  return tekst.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+/**
+ * Leest de diepe link. `?meetplaats=65000` blijft werken: die vorm staat in
+ * links die mensen al gedeeld hebben.
+ */
+function leesDiepeLink(vraag: URLSearchParams): { laag: LaagId; punt: string } | null {
+  const punt = vraag.get("punt");
+  const laag = vraag.get("laag");
+  if (punt && laag && laagprofiel(laag as LaagId)) {
+    return { laag: laag as LaagId, punt };
+  }
+
+  const meetplaats = vraag.get("meetplaats");
+  if (meetplaats) {
+    return { laag: "oppervlaktewater", punt: meetplaats.toUpperCase().replace(/^(OW|WB)/, "") };
+  }
+  return null;
 }
 
-const vraag = new URLSearchParams(location.search);
-const gevraagdeMeetplaats = vraag.get("meetplaats");
 
-if (vraag.get("weergave") === "rapport" && gevraagdeMeetplaats) {
-  void toonRapport(gevraagdeMeetplaats.toUpperCase().replace(/^(OW|WB)/, ""));
+const vraag = new URLSearchParams(location.search);
+const diep = leesDiepeLink(vraag);
+
+if (vraag.get("weergave") === "rapport" && diep) {
+  void toonRapport(diep.laag, diep.punt);
 } else {
   void start();
 }

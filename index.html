@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Waterkwaliteit in Vlaanderen — klik een meetpunt</title>
+    <title>Milieumetingen in je buurt — klik een meetpunt</title>
     <meta
       name="description"
-      content="Bekijk de analyseresultaten van de Vlaamse meetplaatsen oppervlaktewater door op de kaart een punt aan te klikken."
+      content="Bekijk de meetresultaten van waterlopen en luchtmeetstations door op de kaart een punt aan te klikken."
     />
   </head>
   <body>
@@ -16,8 +16,9 @@
     <div class="app" id="app">
       <aside class="zijbalk">
         <header class="zijbalk__kop">
-          <h1>Waterkwaliteit in Vlaanderen</h1>
-          <p>Klik een meetpunt op de kaart, of zoek op gemeente, nummer of waterloop.</p>
+          <h1>Milieumetingen in je buurt</h1>
+          <p>Waterkwaliteit in Vlaanderen en luchtkwaliteit in heel België.
+            Klik een meetpunt op de kaart, of zoek op gemeente, nummer of waterloop.</p>
         </header>
 
         <div class="zoekbalk">
@@ -33,14 +34,18 @@
           </button>
         </div>
 
+        <div id="lagenblok" class="lagenblok" hidden>
+          <span class="paneel__label" id="lagenlabel">Databronnen</span>
+          <div id="lagen" class="lagen" role="group" aria-labelledby="lagenlabel"></div>
+        </div>
         <div id="filters" class="filters" role="group" aria-label="Filter op meetnet"></div>
         <p id="status" class="status" role="status"></p>
 
         <ul id="resultaten" class="lijst"></ul>
 
         <footer class="zijbalk__voet">
-          Meetplaatsen: Digitaal Vlaanderen. Resultaten: Vlaamse Milieumaatschappij.
-          Deze toepassing is geen officiële VMM-website.
+          Meetplaatsen: Digitaal Vlaanderen. Waterresultaten: Vlaamse Milieumaatschappij.
+          Luchtmetingen: IRCELINE. Deze toepassing is geen officiële website van een van hen.
         </footer>
       </aside>
 

@@ -1,4 +1,4 @@
-import type { Oordeel, OordeelKlasse, ParameterJaar } from "../data/types.js";
+import type { Oordeel, OordeelKlasse, ParameterSamenvatting } from "../data/types.js";
 import { kleinLetter, sommMaakOp } from "./format.js";
 
 /**
@@ -6,13 +6,15 @@ import { kleinLetter, sommMaakOp } from "./format.js";
  * leest, dus hij mag nooit meer beweren dan er getoetst is.
  */
 export function samenvattingsZin(
-  parameters: readonly ParameterJaar[],
+  parameters: readonly ParameterSamenvatting[],
   oordelen: ReadonlyMap<string, Oordeel>,
 ): string {
   const namenVan = (klasse: OordeelKlasse) =>
     parameters
       .filter((p) => oordelen.get(p.symbool)?.klasse === klasse)
-      .map((p) => kleinLetter(p.omschrijving.split(",")[0]!));
+      // Op ", " en niet op ",": dat kort "Fosfor, totaal" in tot "fosfor",
+      // maar laat de decimale komma van "Fijn stof (PM2,5)" met rust.
+      .map((p) => kleinLetter(p.omschrijving.split(", ")[0]!));
 
   const buiten = namenVan("buiten-norm");
   const grens = namenVan("op-grens");
@@ -25,7 +27,9 @@ export function samenvattingsZin(
   }
 
   if (buiten.length === 0 && grens.length === 0) {
-    return "Alle getoetste parameters blijven binnen de basiskwaliteitsnorm.";
+    // Neutraal geformuleerd: "basiskwaliteitsnorm" is een VLAREM-begrip dat
+    // bij lucht en grondwater niet bestaat.
+    return "Alle getoetste parameters blijven binnen de norm.";
   }
 
   if (buiten.length === 0) {

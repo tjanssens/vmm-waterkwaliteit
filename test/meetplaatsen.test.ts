@@ -9,6 +9,8 @@ import {
 } from "../src/geo/meetplaatsen.js";
 
 const punt = (over: Partial<Meetplaats> & Pick<Meetplaats, "nummer">): Meetplaats => ({
+  laag: "oppervlaktewater",
+  id: over.nummer,
   code: `OW${over.nummer}`,
   matrix: "OW",
   omschrijving: "",
@@ -101,6 +103,24 @@ describe("zoek", () => {
   it("zet een exacte nummertreffer bovenaan", () => {
     const extra = [...punten, punt({ nummer: "650001", omschrijving: "Elders" })];
     expect(zoek(extra, "65000")[0]!.nummer).toBe("65000");
+  });
+
+  it("zet genummerde meetplaatsen vóór meetplaatsen met een naam", () => {
+    // Niet elk meetplaatsnummer is een getal: "Timbers 15" bestaat echt.
+    // Wordt het nummer uit de code teruggerekend in plaats van gelezen, dan
+    // blijft van "OWTimbers 15" de tekst " 15" over — en die spatie sorteert
+    // vóór elk cijfer, waardoor zulke punten de lijst aanvoeren.
+    const extra = [punt({ nummer: "Timbers 15", omschrijving: "Noordzee" }), ...punten];
+    expect(zoek(extra, "")[0]!.nummer).toBe("65000");
+  });
+
+  it("sorteert op nummer en niet op de prefix van de code", () => {
+    // Anders zou elk OW-punt vóór elk WB-punt staan in plaats van op volgorde.
+    const gemengd = [
+      punt({ nummer: "200" }),
+      { ...punt({ nummer: "100" }), code: "WB100", matrix: "WB" as const },
+    ];
+    expect(zoek(gemengd, "").map((m) => m.nummer)).toEqual(["100", "200"]);
   });
 
   it("sorteert op afstand wanneer een positie bekend is", () => {

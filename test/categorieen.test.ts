@@ -4,13 +4,13 @@ import { fileURLToPath } from "node:url";
 import { parseAnalyseresultaten } from "../src/data/csv.js";
 import { vatSamen } from "../src/data/aggregate.js";
 import { categorieVan, deelIn } from "../src/data/categorieen.js";
-import type { ParameterJaar } from "../src/data/types.js";
+import type { ParameterSamenvatting } from "../src/data/types.js";
 
-const parameter = (symbool: string, omschrijving = symbool): ParameterJaar => ({
+const parameter = (symbool: string, omschrijving = symbool): ParameterSamenvatting => ({
   symbool,
   omschrijving,
   eenheid: "mg/L",
-  jaar: 2024,
+  bucket: "2024",
   aantal: 1,
   aantalOnderLimiet: 0,
   gemiddelde: 1,
@@ -53,17 +53,24 @@ describe("deelIn", () => {
     expect(ingedeeld.map((c) => c.id)).toEqual(["zuurstof", "fysisch"]);
   });
 
-  it("waarschuwt bij metalen dat het totaalgehalte niet toetsbaar is", () => {
+  it("waarschuwt bij metalen, met een andere tekst per normenset", () => {
+    // Bij oppervlaktewater is het totaalgehalte gemeten terwijl de norm op de
+    // opgeloste fractie slaat; bij grondwater is het precies andersom. Eén
+    // vaste tekst zou dus in de helft van de gevallen onwaar zijn.
     const metalen = deelIn([parameter("Cd t")])[0]!;
+    const voor = (set: string) =>
+      (metalen.waarschuwingen ?? []).find((w) => w.voor === set)?.tekst ?? "";
 
-    expect(metalen.waarschuwing).toMatch(/opgeloste fractie/i);
+    expect(voor("oppervlaktewater")).toMatch(/totaalgehalte gemeten/i);
+    expect(voor("grondwater")).toMatch(/0,45 µm gefiltreerd/i);
+    expect(voor("oppervlaktewater")).not.toBe(voor("grondwater"));
   });
 
   it("verdeelt alle 46 parameters van OW65000 in 2024 zonder verlies", () => {
     const metingen = parseAnalyseresultaten(
       readFileSync(fileURLToPath(new URL("./fixtures/ow65000.tsv", import.meta.url)), "utf8"),
     );
-    const van2024 = vatSamen(metingen).filter((p) => p.jaar === 2024);
+    const van2024 = vatSamen(metingen).filter((p) => p.bucket === "2024");
     const ingedeeld = deelIn(van2024);
     const totaal = ingedeeld.reduce((som, c) => som + c.parameters.length, 0);
 

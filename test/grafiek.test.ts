@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
+  bepaalMaxGat,
   bouwPad,
   dagenTussen,
   kiesTicks,
   maakSchaal,
   opDatum,
   splitsInReeksen,
+  tijdstipVan,
   type Punt,
 } from "../src/ui/grafiek.js";
 import type { Meting } from "../src/data/types.js";
@@ -154,5 +156,64 @@ describe("opDatum", () => {
     opDatum(origineel);
 
     expect(origineel[0]!.datum).toBe("2024-06-01");
+  });
+});
+
+/** Uurmeting, zoals het luchtmeetnet ze levert. */
+const uurmeting = (datum: string, tijdstip: string, waarde = 1): Meting => ({
+  ...meting(datum, waarde),
+  tijdstip,
+  symbool: "O3",
+  omschrijving: "Ozon",
+  eenheid: "µg/m³",
+});
+
+describe("tijdstipVan", () => {
+  it("telt het uur mee", () => {
+    // Zonder dit vallen de 24 uurwaarden van een dag op dezelfde x-positie:
+    // de grafiek toonde verticale kolommen in plaats van een verloop.
+    const ochtend = tijdstipVan(uurmeting("2026-07-22", "08:00:00"));
+    const avond = tijdstipVan(uurmeting("2026-07-22", "20:00:00"));
+
+    expect(avond - ochtend).toBe(12 * 3_600_000);
+  });
+
+  it("valt terug op middernacht wanneer er geen tijdstip is", () => {
+    expect(tijdstipVan(meting("2024-05-01"))).toBe(Date.parse("2024-05-01T00:00:00Z"));
+  });
+});
+
+describe("opDatum", () => {
+  it("sorteert uurmetingen binnen dezelfde dag op tijdstip", () => {
+    const gesorteerd = opDatum([
+      uurmeting("2026-07-22", "20:00:00", 3),
+      uurmeting("2026-07-22", "08:00:00", 1),
+      uurmeting("2026-07-22", "14:00:00", 2),
+    ]);
+
+    expect(gesorteerd.map((m) => m.waarde)).toEqual([1, 2, 3]);
+  });
+});
+
+describe("bepaalMaxGat", () => {
+  it("staat bij maandelijkse staalnames een gat van maanden toe", () => {
+    const gat = bepaalMaxGat([meting("2024-01-01"), meting("2024-02-01"), meting("2024-03-01")]);
+
+    expect(gat / 86_400_000).toBeGreaterThan(60);
+  });
+
+  it("breekt bij uurmetingen al na een dag of wat", () => {
+    // Een rechte lijn over een storing van een week suggereert metingen die
+    // niemand gedaan heeft.
+    const uren = Array.from({ length: 10 }, (_, i) =>
+      uurmeting("2026-07-22", `${String(i).padStart(2, "0")}:00:00`),
+    );
+    const gat = bepaalMaxGat(uren);
+
+    expect(gat / 86_400_000).toBeLessThan(2);
+  });
+
+  it("laat één enkele meting niet crashen", () => {
+    expect(bepaalMaxGat([meting("2024-01-01")])).toBeGreaterThan(0);
   });
 });

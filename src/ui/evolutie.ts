@@ -1,14 +1,16 @@
-import type { Meting, ParameterJaar } from "../data/types.js";
+import type { Meting, ParameterSamenvatting } from "../data/types.js";
 import { NORMEN, type Normenset } from "../data/normen.js";
 import {
+  bepaalMaxGat,
   bouwPad,
   kiesTicks,
   maakSchaal,
   opDatum,
   splitsInReeksen,
+  tijdstipVan,
   type Punt,
 } from "./grafiek.js";
-import { formatteerDatum, formatteerGetal, formatteerWaarde } from "./format.js";
+import { escape, formatteerGetal, formatteerMoment, formatteerWaarde } from "./format.js";
 
 const BREEDTE = 720;
 const HOOGTE = 300;
@@ -21,7 +23,7 @@ const VLAK = {
 };
 
 export interface EvolutieGegevens {
-  parameter: ParameterJaar;
+  parameter: ParameterSamenvatting;
   /** Alle metingen van deze parameter, over alle opgehaalde jaren. */
   metingen: Meting[];
   /** Tegen welke normenset de lijn in de grafiek getekend wordt. */
@@ -108,10 +110,10 @@ export class EvolutieVenster {
     svg.addEventListener("pointerleave", verberg);
   }
 
-  private inhoud(parameter: ParameterJaar, metingen: Meting[], set: Normenset): string {
+  private inhoud(parameter: ParameterSamenvatting, metingen: Meting[], set: Normenset): string {
     const norm = NORMEN[set][parameter.symbool];
     const normGeldt = norm !== undefined && norm.eenheid === parameter.eenheid;
-    const jaren = [...new Set(metingen.map((m) => m.jaar))];
+    const bereik = this.bereikTekst(metingen);
 
     return `
       <article class="evolutie__kader">
@@ -121,7 +123,7 @@ export class EvolutieVenster {
           <h2 class="evolutie__titel">${escape(parameter.omschrijving)}</h2>
           <p class="evolutie__meta">
             <span class="parameter__symbool">${escape(parameter.symbool)}</span>
-            <span>${metingen.length} metingen in ${jaren.length} ${jaren.length === 1 ? "meetjaar" : "meetjaren"}</span>
+            <span>${metingen.length} metingen ${escape(bereik)}</span>
             <span>eenheid ${escape(parameter.eenheid)}</span>
           </p>
         </header>
@@ -133,7 +135,7 @@ export class EvolutieVenster {
   }
 
   private grafiek(
-    parameter: ParameterJaar,
+    parameter: ParameterSamenvatting,
     metingen: Meting[],
     norm?: { ondergrens?: number; bovengrens?: number; label: string },
   ): string {
@@ -146,18 +148,18 @@ export class EvolutieVenster {
     // De normlijn moet in beeld passen, anders lijkt hij te ontbreken.
     const yWaarden = [...waarden, ...grenzen, 0];
 
-    const tijden = metingen.map((m) => Date.parse(m.datum));
+    const tijden = metingen.map(tijdstipVan);
     const x = maakSchaal(tijden, VLAK.breedte);
     const y = maakSchaal(yWaarden, VLAK.hoogte, true, 0.08);
 
     const punten: Punt[] = metingen.map((meting) => ({
-      x: x.naar(Date.parse(meting.datum)),
+      x: x.naar(tijdstipVan(meting)),
       y: y.naar(meting.waarde),
       meting,
     }));
 
     const yTicks = kiesTicks(y.min, y.max, 5);
-    const jaarTicks = this.jaarTicks(metingen, x);
+    const tijdTicks = this.tijdTicks(metingen, x);
 
     const rasterY = yTicks
       .map(
@@ -167,7 +169,7 @@ export class EvolutieVenster {
       )
       .join("");
 
-    const asX = jaarTicks
+    const asX = tijdTicks
       .map(
         ({ positie, label }) =>
           `<text class="aslabel aslabel--x" x="${positie.toFixed(1)}" y="${VLAK.hoogte + 22}">${label}</text>`,
@@ -182,7 +184,7 @@ export class EvolutieVenster {
       )
       .join("");
 
-    const lijnen = splitsInReeksen(punten)
+    const lijnen = splitsInReeksen(punten, bepaalMaxGat(metingen))
       .filter((reeks) => reeks.length > 1)
       .map((reeks) => `<path class="reeks" d="${bouwPad(reeks)}"/>`)
       .join("");
@@ -191,7 +193,7 @@ export class EvolutieVenster {
       .map((p) => {
         const onder = p.meting.onderDetectielimiet;
         const waarde = `${formatteerWaarde(p.meting.waarde, onder)} ${parameter.eenheid}`;
-        const titel = `${formatteerDatum(p.meting.datum)}: ${waarde}${onder ? " (onder detectielimiet)" : ""}`;
+        const titel = `${formatteerMoment(p.meting.datum, p.meting.tijdstip)}: ${waarde}${onder ? " (onder detectielimiet)" : ""}`;
         return `<circle class="punt ${onder ? "punt--limiet" : ""}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4.5"><title>${escape(titel)}</title></circle>`;
       })
       .join("");
@@ -203,7 +205,7 @@ export class EvolutieVenster {
         const onder = p.meting.onderDetectielimiet;
         return `<circle class="trefvlak" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="13"
                   data-punt="${i}"
-                  data-datum="${escape(formatteerDatum(p.meting.datum))}"
+                  data-datum="${escape(formatteerMoment(p.meting.datum, p.meting.tijdstip))}"
                   data-waarde="${escape(formatteerWaarde(p.meting.waarde, onder))} ${escape(parameter.eenheid)}"
                   data-limiet="${onder ? "1" : ""}"
                   data-x="${p.x.toFixed(1)}" data-y="${p.y.toFixed(1)}"/>`;
@@ -231,17 +233,62 @@ export class EvolutieVenster {
       </div>`;
   }
 
-  /** Eén label per meetjaar, op de eerste meting van dat jaar. */
-  private jaarTicks(metingen: Meting[], x: { naar(w: number): number }) {
-    const gezien = new Set<number>();
-    const ticks: { positie: number; label: string }[] = [];
+  /**
+   * Labels langs de tijdas. Over meerdere jaren is het jaartal het duidelijkst,
+   * maar een luchtstation levert 168 metingen binnen één week — dan zou er één
+   * label "2026" staan en verder niets.
+   */
+  private tijdTicks(metingen: Meting[], x: { naar(w: number): number }) {
+    const tijden = metingen.map(tijdstipVan);
+    const eerste = Math.min(...tijden);
+    const laatste = Math.max(...tijden);
+    const dagen = (laatste - eerste) / 86_400_000;
 
-    for (const meting of metingen) {
-      if (gezien.has(meting.jaar)) continue;
-      gezien.add(meting.jaar);
-      ticks.push({ positie: x.naar(Date.parse(meting.datum)), label: String(meting.jaar) });
+    if (dagen > 400) {
+      // Eén label per meetjaar, op de eerste meting van dat jaar.
+      const gezien = new Set<number>();
+      const ticks: { positie: number; label: string }[] = [];
+      for (const meting of metingen) {
+        if (gezien.has(meting.jaar)) continue;
+        gezien.add(meting.jaar);
+        ticks.push({ positie: x.naar(tijdstipVan(meting)), label: String(meting.jaar) });
+      }
+      return ticks;
     }
-    return ticks;
+
+    const opmaak: Intl.DateTimeFormatOptions =
+      dagen <= 3
+        ? { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }
+        : dagen <= 70
+          ? { day: "numeric", month: "short" }
+          : { month: "short", year: "numeric" };
+    const formatteer = new Intl.DateTimeFormat("nl-BE", { ...opmaak, timeZone: "UTC" });
+
+    const aantal = 5;
+    return Array.from({ length: aantal }, (_, i) => {
+      const tijd = eerste + ((laatste - eerste) * i) / (aantal - 1);
+      return { positie: x.naar(tijd), label: formatteer.format(new Date(tijd)) };
+    });
+  }
+
+  /** "tussen 15 en 22 juli 2026", of "in 2017 – 2024" over meerdere jaren. */
+  private bereikTekst(metingen: Meting[]): string {
+    const tijden = metingen.map(tijdstipVan);
+    const eerste = new Date(Math.min(...tijden));
+    const laatste = new Date(Math.max(...tijden));
+
+    if (eerste.getUTCFullYear() !== laatste.getUTCFullYear()) {
+      return `van ${eerste.getUTCFullYear()} tot ${laatste.getUTCFullYear()}`;
+    }
+    const dag = new Intl.DateTimeFormat("nl-BE", {
+      day: "numeric",
+      month: "long",
+      timeZone: "UTC",
+    });
+    const van = dag.format(eerste);
+    const tot = dag.format(laatste);
+    const jaar = laatste.getUTCFullYear();
+    return van === tot ? `op ${tot} ${jaar}` : `van ${van} tot ${tot} ${jaar}`;
   }
 
   private legende(metingen: Meting[], norm?: { label: string }): string {
@@ -263,7 +310,7 @@ export class EvolutieVenster {
       .map(
         (meting) => `
         <tr>
-          <td class="datum">${escape(formatteerDatum(meting.datum))}</td>
+          <td class="datum">${escape(formatteerMoment(meting.datum, meting.tijdstip))}</td>
           <td class="num waarde">${escape(formatteerWaarde(meting.waarde, meting.onderDetectielimiet))}</td>
           <td>${meting.onderDetectielimiet ? '<span class="badge badge--geen-norm">niet aangetoond</span>' : ""}</td>
         </tr>`,
@@ -283,10 +330,3 @@ export class EvolutieVenster {
   }
 }
 
-function escape(tekst: string): string {
-  return tekst
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
