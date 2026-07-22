@@ -6,7 +6,9 @@ import type { Meting } from "./types.js";
  * de dev-middleware in vite.config.ts. Zet VITE_PROXY_URL bij de build.
  */
 const DEV_PAD = "/api/resultaten";
-const PROXY = import.meta.env.VITE_PROXY_URL ?? DEV_PAD;
+// Een niet-ingestelde GitHub-variabele komt als lege string binnen, niet als
+// undefined; ?? zou daar overheen kijken.
+const PROXY = import.meta.env.VITE_PROXY_URL?.trim() || DEV_PAD;
 
 /**
  * Zonder VITE_PROXY_URL valt de app terug op het dev-pad, dat alleen bestaat
