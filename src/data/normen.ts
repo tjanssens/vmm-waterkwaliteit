@@ -19,7 +19,7 @@ export const BRONNEN = {
   },
   drinkwaterVlaanderen: {
     naam:
-      "Besluit van de Vlaamse Regering van 20 januari 2023 over de kwaliteit, kwantiteit en levering van water bestemd voor menselijke consumptie",
+      "Kwaliteitseisen van het drinkwater (VMM, oktober 2024) — bijlage I van het Vlaamse drinkwaterbesluit van 20 januari 2023",
     url: "https://vmm.vlaanderen.be/beleid/waterbeleid/drinkwater/kwaliteit",
   },
 } as const;
@@ -219,6 +219,10 @@ const DRINKWATER: Readonly<Record<string, Norm>> = {
     toets: "indicatorparameter",
     bron: "drinkwater",
   },
+  // De Vlaamse tabel noemt zowel "> 6,5 en < 9,2" als "≥ 6,5 en ≤ 9,5"; we
+  // nemen de ruimste, die ook in de Europese richtlijn staat. Vlaams
+  // oppervlaktewater komt nergens in de buurt van die bovengrens, dus het
+  // verschil verandert geen enkel oordeel.
   "pH": {
     ondergrens: 6.5,
     bovengrens: 9.5,
@@ -262,8 +266,14 @@ const DRINKWATER: Readonly<Record<string, Norm>> = {
   "Pb t": { bovengrens: 10, eenheid: "µg/L", label: "≤ 10 µg/L (wordt 5 in 2036)", toets: "parameterwaarde", bron: "drinkwater" },
   "Ni t": { bovengrens: 20, eenheid: "µg/L", label: "≤ 20 µg/L", toets: "parameterwaarde", bron: "drinkwater" },
   "Se t": { bovengrens: 20, eenheid: "µg/L", label: "≤ 20 µg/L", toets: "parameterwaarde", bron: "drinkwater" },
+  "Hg t": { bovengrens: 1, eenheid: "µg/L", label: "≤ 1,0 µg/L", toets: "parameterwaarde", bron: "drinkwaterVlaanderen" },
+  "U t": { bovengrens: 30, eenheid: "µg/L", label: "≤ 30 µg/L", toets: "parameterwaarde", bron: "drinkwaterVlaanderen" },
   "Fe t": { bovengrens: 200, eenheid: "µg/L", label: "≤ 200 µg/L", toets: "indicatorparameter", bron: "drinkwater" },
   "Mn t": { bovengrens: 50, eenheid: "µg/L", label: "≤ 50 µg/L", toets: "indicatorparameter", bron: "drinkwater" },
+  "Al t": { bovengrens: 200, eenheid: "µg/L", label: "≤ 200 µg/L", toets: "indicatorparameter", bron: "drinkwaterVlaanderen" },
+  // De leverancier streeft naar 200 µg/L bij de uitgang van de installatie.
+  "Zn t": { bovengrens: 5000, eenheid: "µg/L", label: "≤ 5000 µg/L", toets: "indicatorparameter", bron: "drinkwaterVlaanderen" },
+  "T": { bovengrens: 25, eenheid: "°C", label: "≤ 25 °C", toets: "indicatorparameter", bron: "drinkwaterVlaanderen" },
 
   // PFAS: 0,10 µg/L voor de som van twintig PFAS = 100 ng/L.
   "PFAS-20": {

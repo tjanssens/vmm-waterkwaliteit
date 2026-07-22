@@ -100,11 +100,18 @@ Twee sets in `src/data/normen.ts`, elk met bron per norm:
   Besluit van de Vlaamse Regering van 20 januari 2023. Ter vergelijking; geldt
   aan de kraan, niet in een beek. De uitleg in de UI zegt dat expliciet.
 
-De drinkwaterwaarden komen uit de geverifieerde tekst van 2020/2184 op EUR-Lex,
-niet uit de ingetrokken richtlijn 98/83. Dat onderscheid is niet academisch:
-antimoon ging van 5 naar 10 µg/L, boor van 1,0 naar 1,5 mg/L en seleen van 10
-naar 20 µg/L. Lood (5) en chroom (25) gelden pas vanaf 12 januari 2036; tot dan
-10 respectievelijk 50, en dát zijn de waarden die de app toepast.
+De drinkwaterwaarden zijn geverifieerd tegen twee bronnen: de tekst van
+2020/2184 op EUR-Lex en de VMM-brochure "Kwaliteitseisen van het drinkwater"
+(oktober 2024), die bijlage I van het Vlaamse drinkwaterbesluit weergeeft. Beide
+komen overeen. Ze komen níét uit de ingetrokken richtlijn 98/83 — dat verschil
+is niet academisch: antimoon ging van 5 naar 10 µg/L, boor van 1,0 naar 1,5 mg/L
+en seleen van 10 naar 20 µg/L. Lood (5) en chroom (25) gelden pas vanaf
+12 januari 2036; tot dan 10 respectievelijk 50, en dát past de app toe.
+
+Eén onduidelijkheid in de Vlaamse tabel: die noemt voor pH zowel
+"> 6,5 en < 9,2" als "≥ 6,5 en ≤ 9,5". We nemen de ruimste, die ook Europees
+geldt. Vlaams oppervlaktewater komt nergens bij die bovengrens, dus het
+verandert geen oordeel.
 
 Bij het opzoeken bleken eerdere gokwaarden fout: totaal stikstof is 4 mgN/L
 (niet 6), nitraat 5,65–10 (niet 11,3), pH 5,5–9,0 (niet 6,5–8,5). Voor ammonium

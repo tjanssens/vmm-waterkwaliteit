@@ -144,8 +144,24 @@ describe("beoordeel — drinkwater", () => {
     });
   });
 
-  it("vermeldt ook de Vlaamse omzetting als bron", () => {
-    expect(bronnenVoor("drinkwater").some((b) => b.naam.includes("Vlaamse Regering"))).toBe(true);
+  it("vermeldt ook de Vlaamse bron", () => {
+    expect(bronnenVoor("drinkwater").some((b) => b.naam.includes("drinkwaterbesluit"))).toBe(true);
+  });
+
+  describe("parameters uit de Vlaamse tabel die de databank ook meet", () => {
+    it.each([
+      ["Hg t", 1],
+      ["U t", 30],
+      ["Al t", 200],
+      ["Zn t", 5000],
+      ["T", 25],
+    ])("kent %s met parameterwaarde %i", (symbool, verwacht) => {
+      expect(NORMEN.drinkwater[symbool]?.bovengrens).toBe(verwacht);
+    });
+
+    it("toetst kwik tegen 1,0 µg/L", () => {
+      expect(drink({ symbool: "Hg t", gemiddelde: 1.5 }).klasse).toBe("buiten-norm");
+    });
   });
 
   it("toetst de som van PFAS tegen 100 ng/L", () => {
