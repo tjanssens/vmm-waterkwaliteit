@@ -26,7 +26,7 @@ interface RuweReeks {
  * Wat hier niet in staat, komt onder zijn eigen label door — beter een ruwe
  * naam tonen dan een meting laten vallen.
  */
-const STOFFEN: Readonly<Record<string, { symbool: string; naam: string }>> = {
+export const STOFFEN: Readonly<Record<string, { symbool: string; naam: string }>> = {
   "Nitrogen dioxide": { symbool: "NO2", naam: "Stikstofdioxide" },
   "Nitrogen monoxide": { symbool: "NO", naam: "Stikstofmonoxide" },
   Ozone: { symbool: "O3", naam: "Ozon" },

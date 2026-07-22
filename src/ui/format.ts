@@ -52,6 +52,15 @@ export function kleinLetter(naam: string): string {
   return naam[0]!.toLowerCase() + naam.slice(1);
 }
 
+/**
+ * Telwoord plus zelfstandig naamwoord, met het enkelvoud bij één: "1 parameter"
+ * en niet "1 parameters". Het meervoud is standaard het woord plus een s, want
+ * dat klopt voor alles waar we tot nu toe op tellen.
+ */
+export function meervoud(aantal: number, enkelvoud: string, meervoudsvorm?: string): string {
+  return `${aantal} ${aantal === 1 ? enkelvoud : (meervoudsvorm ?? `${enkelvoud}s`)}`;
+}
+
 /** Somt op zoals in lopende tekst: "a, b en c". */
 export function sommMaakOp(delen: readonly string[]): string {
   if (delen.length === 0) return "";

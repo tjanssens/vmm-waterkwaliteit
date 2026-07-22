@@ -133,6 +133,11 @@ const VAST: Readonly<Record<string, CategorieId>> = {
   "CO2": "gassen",
   "NH3": "gassen",
 
+  // Gasvormig kwik is een metaal, ook al meten we het in de lucht. De
+  // waarschuwing bij deze categorie gaat over water en verschijnt hier niet,
+  // want die hangt aan de normenset.
+  "Hg": "metalen",
+
   "C6H6": "vos",
   "C7H8": "vos",
   "C8H10": "vos",

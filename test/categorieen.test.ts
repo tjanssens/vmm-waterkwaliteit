@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { parseAnalyseresultaten } from "../src/data/csv.js";
 import { vatSamen } from "../src/data/aggregate.js";
 import { categorieVan, deelIn } from "../src/data/categorieen.js";
+import { STOFFEN } from "../src/data/lucht.js";
 import type { ParameterSamenvatting } from "../src/data/types.js";
 
 const parameter = (symbool: string, omschrijving = symbool): ParameterSamenvatting => ({
@@ -43,6 +44,17 @@ describe("categorieVan", () => {
 
   it("plaatst een onbekende parameter bij overige in plaats van te raden", () => {
     expect(categorieVan(parameter("XYZ123"))).toBe("overige");
+  });
+
+  it("geeft elke stof die het luchtmeetnet meet een echte categorie", () => {
+    // IRCELINE meet 23 stoffen en die lijst staat handmatig in STOFFEN. Wordt
+    // er één toegevoegd zonder categorie, dan verdwijnt ze niet — ze zakt naar
+    // "Overige parameters", en daar zoekt niemand naar ozon of kwik.
+    const zonder = Object.values(STOFFEN)
+      .filter(({ symbool, naam }) => categorieVan(parameter(symbool, naam)) === "overige")
+      .map((s) => s.symbool);
+
+    expect(zonder).toEqual([]);
   });
 });
 

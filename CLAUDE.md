@@ -153,7 +153,7 @@ Deze zijn met tests afgedekt. Verwijder die tests niet zonder reden.
 
 ## Normen
 
-Vijf sets in `src/data/normen.ts`, elk met bron per norm. Elke waarde is in de
+Zes sets in `src/data/normen.ts`, elk met bron per norm. Elke waarde is in de
 primaire bron opgezocht en met een tweede bron nagerekend — dat is geen
 formaliteit:
 
@@ -178,11 +178,25 @@ Aandachtspunten:
 - **Richtlijn (EU) 2024/2881 verstrengt de luchtnormen** maar geldt pas vanaf
   1 januari 2030. We toetsen aan wat vandaag geldt.
 
+## Elke parameter blijft zichtbaar
+
+Geen enkele bron wordt gefilterd op een lijst die wij bijhouden — wat de bron
+meet, komt op het scherm. `categorieVan` valt terug op "Overige parameters" en
+`deelIn` verliest niets; dat is met tellingen per bron nagegaan (108 = 108 bij
+grondwater, 46 = 46 bij oppervlaktewater). Bij lucht dekken de 23 stoffen in
+`STOFFEN` exact de 23 fenomenen van IRCELINE, en wat er niet in staat komt onder
+zijn eigen Engelse label door in plaats van te verdwijnen.
+
+De stille fout hier is niet verlies maar verbanning: een nieuwe stof die geen
+categorie krijgt, zakt naar "Overige" waar niemand naar ozon of kwik zoekt. Een
+test bewaakt dat voor de luchtstoffen.
+
 ## Openstaand
 
-- De **VLAREM-grondwaterkwaliteitsnormen** ontbreken nog; grondwater wordt nu
-  alleen aan de drinkwaternormen getoetst.
-- PFAS heeft in VLAREM II alleen een norm voor PFOS. DOV rapporteert wel een
-  parametergroep `Grondwater_chemisch_PFAS`, nog niet ontsloten.
 - Een parameterfilter op de kaart ("toon enkel punten die PFOS meten") vraagt een
   index per meetpunt.
+- Bijlage 2.4.1 noemt normen voor barium, antimoon, seleen, cyanide, minerale
+  oliën, fenolen, PAK's en gechloreerde ethenen. DOV's parameternaam daarvoor is
+  niet vastgesteld, en een norm op een gegokte sleutel toetst stilzwijgend niets.
+- De **drempelwaarden per grondwaterlichaam** uit de Kaderrichtlijn Water
+  verschillen per waterlichaam; DOV laat dat veld vaak leeg.

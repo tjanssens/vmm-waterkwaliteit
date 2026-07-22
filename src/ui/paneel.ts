@@ -20,6 +20,7 @@ import {
   formatteerDatum,
   formatteerDatumKort,
   formatteerWaarde,
+  meervoud,
   sommMaakOp,
 } from "./format.js";
 import { samenvattingsZin } from "./samenvatting.js";
@@ -390,7 +391,7 @@ export class Paneel {
     return `
       <section class="paneel__oordeel">
         <p>In ${escape(toestand.gekozen.label)} werd hier ${aantalMetingen} keer een waarde gemeten,
-        verdeeld over ${parameters.length} parameters. ${escape(zin)}</p>
+        verdeeld over ${meervoud(parameters.length, "parameter")}. ${escape(zin)}</p>
         <div class="chips">
           ${chips}
           ${allesAan ? "" : '<button type="button" class="stille-knop" data-actie="filters-wissen">Toon alles</button>'}
@@ -487,7 +488,7 @@ export class Paneel {
             <button type="button" class="categorie__kop" aria-expanded="${heeftAandacht}">
               <span class="caret" aria-hidden="true"></span>
               <span class="categorie__naam">${escape(categorie.naam)}</span>
-              <span class="categorie__aantal">${categorie.parameters.length} parameters</span>
+              <span class="categorie__aantal">${meervoud(categorie.parameters.length, "parameter")}</span>
             </button>
             <div class="categorie__body">
               ${(categorie.waarschuwingen ?? [])

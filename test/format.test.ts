@@ -6,8 +6,23 @@ import {
   formatteerGetal,
   formatteerWaarde,
   kleinLetter,
+  meervoud,
   sommMaakOp,
 } from "../src/ui/format.js";
+
+describe("meervoud", () => {
+  it.each([
+    [0, "0 parameters"],
+    [1, "1 parameter"],
+    [2, "2 parameters"],
+  ])("schrijft %i als %s", (aantal, verwacht) => {
+    expect(meervoud(aantal, "parameter")).toBe(verwacht);
+  });
+
+  it("neemt een onregelmatig meervoud over", () => {
+    expect(meervoud(2, "meting", "metingen")).toBe("2 metingen");
+  });
+});
 
 describe("formatteerGetal", () => {
   it("gebruikt de komma als decimaalteken", () => {
