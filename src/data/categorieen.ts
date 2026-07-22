@@ -1,4 +1,4 @@
-import type { ParameterJaar } from "./types.js";
+import type { ParameterSamenvatting } from "./types.js";
 import { isTotaalgehalte } from "./normen.js";
 
 export interface Categorie {
@@ -9,7 +9,7 @@ export interface Categorie {
 }
 
 export interface IngedeeldeCategorie extends Categorie {
-  parameters: ParameterJaar[];
+  parameters: ParameterSamenvatting[];
 }
 
 const CATEGORIEEN = [
@@ -66,7 +66,7 @@ const VAST: Readonly<Record<string, CategorieId>> = {
 /** PFAS-symbolen zijn te talrijk om op te sommen; ze delen een vorm. */
 const PFAS = /^(PF[A-Z]{2,4}|\d+:\d+\s?FT[SA]|[A-Za-z]*PFOS|[A-Za-z]*PFOA)/;
 
-export function categorieVan(parameter: ParameterJaar): CategorieId {
+export function categorieVan(parameter: ParameterSamenvatting): CategorieId {
   const vast = VAST[parameter.symbool];
   if (vast) return vast;
   if (PFAS.test(parameter.symbool)) return "pfas";
@@ -75,7 +75,7 @@ export function categorieVan(parameter: ParameterJaar): CategorieId {
 }
 
 /** Deelt de parameters in, en laat lege categorieën weg. */
-export function deelIn(parameters: ParameterJaar[]): IngedeeldeCategorie[] {
+export function deelIn(parameters: ParameterSamenvatting[]): IngedeeldeCategorie[] {
   return CATEGORIEEN.map((categorie) => ({
     ...categorie,
     parameters: parameters

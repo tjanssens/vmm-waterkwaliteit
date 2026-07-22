@@ -1,4 +1,4 @@
-import type { Oordeel, ParameterJaar } from "./types.js";
+import type { Oordeel, ParameterSamenvatting } from "./types.js";
 
 /**
  * Waar de drempelwaarden vandaan komen. Elke norm verwijst naar één bron,
@@ -321,7 +321,7 @@ export function isTotaalgehalte(symbool: string): boolean {
 }
 
 export function beoordeel(
-  parameter: ParameterJaar,
+  parameter: ParameterSamenvatting,
   set: Normenset = "oppervlaktewater",
 ): Oordeel {
   const norm = NORMEN[set][parameter.symbool];

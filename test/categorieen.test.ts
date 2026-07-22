@@ -4,13 +4,13 @@ import { fileURLToPath } from "node:url";
 import { parseAnalyseresultaten } from "../src/data/csv.js";
 import { vatSamen } from "../src/data/aggregate.js";
 import { categorieVan, deelIn } from "../src/data/categorieen.js";
-import type { ParameterJaar } from "../src/data/types.js";
+import type { ParameterSamenvatting } from "../src/data/types.js";
 
-const parameter = (symbool: string, omschrijving = symbool): ParameterJaar => ({
+const parameter = (symbool: string, omschrijving = symbool): ParameterSamenvatting => ({
   symbool,
   omschrijving,
   eenheid: "mg/L",
-  jaar: 2024,
+  bucket: "2024",
   aantal: 1,
   aantalOnderLimiet: 0,
   gemiddelde: 1,
@@ -63,7 +63,7 @@ describe("deelIn", () => {
     const metingen = parseAnalyseresultaten(
       readFileSync(fileURLToPath(new URL("./fixtures/ow65000.tsv", import.meta.url)), "utf8"),
     );
-    const van2024 = vatSamen(metingen).filter((p) => p.jaar === 2024);
+    const van2024 = vatSamen(metingen).filter((p) => p.bucket === "2024");
     const ingedeeld = deelIn(van2024);
     const totaal = ingedeeld.reduce((som, c) => som + c.parameters.length, 0);
 

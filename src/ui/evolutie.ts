@@ -1,4 +1,4 @@
-import type { Meting, ParameterJaar } from "../data/types.js";
+import type { Meting, ParameterSamenvatting } from "../data/types.js";
 import { NORMEN, type Normenset } from "../data/normen.js";
 import {
   bouwPad,
@@ -21,7 +21,7 @@ const VLAK = {
 };
 
 export interface EvolutieGegevens {
-  parameter: ParameterJaar;
+  parameter: ParameterSamenvatting;
   /** Alle metingen van deze parameter, over alle opgehaalde jaren. */
   metingen: Meting[];
   /** Tegen welke normenset de lijn in de grafiek getekend wordt. */
@@ -108,7 +108,7 @@ export class EvolutieVenster {
     svg.addEventListener("pointerleave", verberg);
   }
 
-  private inhoud(parameter: ParameterJaar, metingen: Meting[], set: Normenset): string {
+  private inhoud(parameter: ParameterSamenvatting, metingen: Meting[], set: Normenset): string {
     const norm = NORMEN[set][parameter.symbool];
     const normGeldt = norm !== undefined && norm.eenheid === parameter.eenheid;
     const jaren = [...new Set(metingen.map((m) => m.jaar))];
@@ -133,7 +133,7 @@ export class EvolutieVenster {
   }
 
   private grafiek(
-    parameter: ParameterJaar,
+    parameter: ParameterSamenvatting,
     metingen: Meting[],
     norm?: { ondergrens?: number; bovengrens?: number; label: string },
   ): string {

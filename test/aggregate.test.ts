@@ -36,7 +36,7 @@ describe("vatSamen", () => {
     expect(samenvatting).toHaveLength(1);
     expect(samenvatting[0]).toMatchObject({
       symbool: "P t",
-      jaar: 2024,
+      bucket: "2024",
       aantal: 3,
       minimum: 0.1,
       maximum: 0.3,
@@ -62,7 +62,7 @@ describe("vatSamen", () => {
     ]);
 
     expect(samenvatting).toHaveLength(2);
-    expect(samenvatting.map((s) => s.jaar)).toEqual([2017, 2024]);
+    expect(samenvatting.map((s) => s.bucket)).toEqual(["2017", "2024"]);
   });
 
   it("houdt parameters met dezelfde naam maar een andere eenheid uit elkaar", () => {
@@ -109,11 +109,11 @@ describe("vatSamen", () => {
     });
 
     it("vat 2024 samen in 46 parameters", () => {
-      expect(samenvatting.filter((s) => s.jaar === 2024)).toHaveLength(46);
+      expect(samenvatting.filter((s) => s.bucket === "2024")).toHaveLength(46);
     });
 
     it("berekent het jaargemiddelde voor orthofosfaat in 2024", () => {
-      const opo4 = samenvatting.find((s) => s.symbool === "oPO4 f" && s.jaar === 2024)!;
+      const opo4 = samenvatting.find((s) => s.symbool === "oPO4 f" && s.bucket === "2024")!;
 
       expect(opo4.aantal).toBe(6);
       expect(opo4.gemiddelde).toBeCloseTo(0.0984, 4);
@@ -122,7 +122,7 @@ describe("vatSamen", () => {
     });
 
     it("ziet dat cadmium in 2024 nooit is aangetoond", () => {
-      const cadmium = samenvatting.find((s) => s.symbool === "Cd t" && s.jaar === 2024)!;
+      const cadmium = samenvatting.find((s) => s.symbool === "Cd t" && s.bucket === "2024")!;
 
       expect(cadmium.aantalOnderLimiet).toBe(6);
       expect(cadmium.volledigOnderLimiet).toBe(true);

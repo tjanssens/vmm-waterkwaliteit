@@ -1,4 +1,4 @@
-import { vatSamen, meetjaren } from "../data/aggregate.js";
+import { vatSamen } from "../data/aggregate.js";
 import {
   beoordeel,
   BRONNEN,
@@ -7,25 +7,20 @@ import {
   NORMENSETTEN,
   type Normenset,
 } from "../data/normen.js";
-import { bronUrls } from "../data/client.js";
 import { deelIn } from "../data/categorieen.js";
-import { haalResultaten, DatabankFout } from "../data/client.js";
+import { DatabankFout } from "../data/client.js";
 import { FormaatFout } from "../data/csv.js";
-import type { Meting, Oordeel, OordeelKlasse, ParameterJaar } from "../data/types.js";
-import type { Meetplaats } from "../geo/meetplaatsen.js";
-import { MEETNET_NAMEN } from "../geo/meetplaatsen.js";
+import type { Meting, Oordeel, OordeelKlasse, ParameterSamenvatting } from "../data/types.js";
+import type { Laagprofiel, Meetpunt, Periode } from "../lagen/types.js";
+import { vormSvg } from "../lagen/merk.js";
 import {
   formatteerBereik,
   formatteerDatum,
   formatteerDatumKort,
   formatteerWaarde,
-  sommMaakOp,
 } from "./format.js";
 import { samenvattingsZin } from "./samenvatting.js";
 import { EvolutieVenster } from "./evolutie.js";
-
-/** Hoeveel jaargangen we standaard ophalen; alles ophalen duurt ~12 s. */
-const STANDAARD_JAREN = 5;
 
 const KLASSE_LABELS: Record<OordeelKlasse, string> = {
   "buiten-norm": "buiten norm",
@@ -37,12 +32,14 @@ const KLASSE_LABELS: Record<OordeelKlasse, string> = {
 const KLASSE_VOLGORDE: OordeelKlasse[] = ["buiten-norm", "op-grens", "conform", "geen-norm"];
 
 interface Toestand {
-  meetplaats: Meetplaats;
+  punt: Meetpunt;
+  profiel: Laagprofiel;
   metingen: Meting[];
-  jaren: number[];
-  gekozenJaar: number;
+  periodes: Periode[];
+  gekozen: Periode;
   filters: Set<OordeelKlasse>;
-  volledigeHistoriek: boolean;
+  /** Of de ruimere historiek al opgehaald is; alleen bij een tijdas uit data. */
+  uitgebreid: boolean;
   normenset: Normenset;
   /** Vrije tekst waarop de parametertabel gefilterd wordt. */
   zoekterm: string;
@@ -72,94 +69,133 @@ export class Paneel {
     this.houder.innerHTML = "";
   }
 
-  async toon(meetplaats: Meetplaats): Promise<void> {
-    this.lopend?.abort();
-    const beheerser = new AbortController();
-    this.lopend = beheerser;
-
+  async toon(punt: Meetpunt, profiel: Laagprofiel): Promise<void> {
+    const beheerser = this.begin();
     this.houder.hidden = false;
-    this.toonLaden(meetplaats, STANDAARD_JAREN);
 
-    const nu = new Date().getFullYear();
-    const jaren = Array.from({ length: STANDAARD_JAREN }, (_, i) => nu - i);
+    const tijdas = profiel.tijdas;
+    if (tijdas.soort === "per-periode") {
+      await this.haalPeriode(punt, profiel, tijdas.standaard(), beheerser);
+      return;
+    }
 
+    this.toonLaden(punt, profiel, tijdas.ladenTekst());
     try {
-      const metingen = await haalResultaten(
-        { meetplaats: meetplaats.code, matrix: meetplaats.matrix, jaren },
-        beheerser.signal,
-      );
+      const metingen = await tijdas.haal(punt, beheerser.signal);
       if (beheerser.signal.aborted) return;
-      this.zetToestand(meetplaats, metingen, false);
+      this.zetToestand(punt, profiel, metingen, false);
     } catch (reden) {
       if (beheerser.signal.aborted) return;
-      this.toonFout(meetplaats, reden);
+      this.toonFout(punt, profiel, reden);
     }
   }
 
-  private async haalVolledigeHistoriek(): Promise<void> {
-    const huidig = this.toestand;
-    if (!huidig) return;
-
+  private begin(): AbortController {
     this.lopend?.abort();
     const beheerser = new AbortController();
     this.lopend = beheerser;
+    return beheerser;
+  }
 
-    this.toonLaden(huidig.meetplaats, 20);
+  /** Voor lagen waar de periodekeuze bepaalt wát er opgehaald wordt. */
+  private async haalPeriode(
+    punt: Meetpunt,
+    profiel: Laagprofiel,
+    periode: Periode,
+    beheerser: AbortController,
+  ): Promise<void> {
+    const tijdas = profiel.tijdas;
+    if (tijdas.soort !== "per-periode") return;
 
-    const nu = new Date().getFullYear();
-    const jaren = Array.from({ length: 20 }, (_, i) => nu - i);
-
+    this.toonLaden(punt, profiel, tijdas.ladenTekst(periode));
     try {
-      const metingen = await haalResultaten(
-        { meetplaats: huidig.meetplaats.code, matrix: huidig.meetplaats.matrix, jaren },
-        beheerser.signal,
-      );
+      const metingen = await tijdas.haal(punt, periode, beheerser.signal);
       if (beheerser.signal.aborted) return;
-      this.zetToestand(huidig.meetplaats, metingen, true);
+      this.zetToestand(punt, profiel, metingen, false, periode);
     } catch (reden) {
       if (beheerser.signal.aborted) return;
-      this.toonFout(huidig.meetplaats, reden);
+      this.toonFout(punt, profiel, reden);
     }
   }
 
-  private zetToestand(meetplaats: Meetplaats, metingen: Meting[], volledig: boolean): void {
-    const jaren = meetjaren(metingen);
+  private async breidUit(): Promise<void> {
+    const huidig = this.toestand;
+    const tijdas = huidig?.profiel.tijdas;
+    if (!huidig || tijdas?.soort !== "uit-data" || !tijdas.uitbreiden) return;
+
+    const beheerser = this.begin();
+    this.toonLaden(huidig.punt, huidig.profiel, tijdas.uitbreiden.ladenTekst());
+
+    try {
+      const metingen = await tijdas.uitbreiden.haal(huidig.punt, beheerser.signal);
+      if (beheerser.signal.aborted) return;
+      this.zetToestand(huidig.punt, huidig.profiel, metingen, true);
+    } catch (reden) {
+      if (beheerser.signal.aborted) return;
+      this.toonFout(huidig.punt, huidig.profiel, reden);
+    }
+  }
+
+  private zetToestand(
+    punt: Meetpunt,
+    profiel: Laagprofiel,
+    metingen: Meting[],
+    uitgebreid: boolean,
+    gekozen?: Periode,
+  ): void {
+    const tijdas = profiel.tijdas;
+    const periodes = tijdas.soort === "uit-data" ? tijdas.periodes(metingen) : tijdas.periodes();
+
+    // De knoppenrij loopt oplopend, dus de laatste is de recentste — en dat
+    // is wat de gebruiker wil zien.
+    const standaard = gekozen ?? periodes[periodes.length - 1] ?? { id: "", label: "" };
+
     this.toestand = {
-      meetplaats,
+      punt,
+      profiel,
       metingen,
-      jaren,
-      gekozenJaar: jaren[0] ?? 0,
+      periodes,
+      gekozen: standaard,
       filters: new Set(KLASSE_VOLGORDE),
-      volledigeHistoriek: volledig,
-      normenset: this.toestand?.normenset ?? "oppervlaktewater",
+      uitgebreid,
+      normenset: this.behoudNormenset(profiel),
       zoekterm: "",
     };
     this.teken();
   }
 
+  /**
+   * Bij het wisselen tussen punten van dezelfde laag houdt de gebruiker zijn
+   * normenkeuze; bij een andere laag bestaat die keuze daar niet meer.
+   */
+  private behoudNormenset(profiel: Laagprofiel): Normenset {
+    const vorige = this.toestand?.normenset;
+    if (vorige && profiel.normensetten.includes(vorige)) return vorige;
+    return profiel.standaardNormenset;
+  }
+
   // ---- weergave ----
 
-  private toonLaden(meetplaats: Meetplaats, jaren: number): void {
+  private toonLaden(punt: Meetpunt, profiel: Laagprofiel, tekst: string): void {
     this.houder.innerHTML = `
-      ${this.kopHtml(meetplaats)}
+      ${this.kopHtml(punt, profiel)}
       <div class="paneel__laden" role="status">
         <span class="spinner" aria-hidden="true"></span>
-        <p>Resultaten van de laatste ${jaren} jaar ophalen bij de VMM-databank…</p>
-        <p class="paneel__hint">De eerste keer duurt dit ongeveer ${jaren > 10 ? "twaalf" : "acht"} seconden.</p>
+        <p>${escape(tekst)}</p>
       </div>`;
     this.koppelSluiten();
   }
 
-  private toonFout(meetplaats: Meetplaats, reden: unknown): void {
+  private toonFout(punt: Meetpunt, profiel: Laagprofiel, reden: unknown): void {
     const uitleg =
       reden instanceof FormaatFout
-        ? "De databank gaf een antwoord in een onbekend formaat. Waarschijnlijk is er iets veranderd aan de VMM-zijde."
+        ? "De bron gaf een antwoord in een onbekend formaat. Waarschijnlijk is er iets veranderd aan de kant van de leverancier."
         : reden instanceof DatabankFout
           ? reden.message
           : "Er ging iets mis bij het ophalen van de resultaten.";
 
     this.houder.innerHTML = `
-      ${this.kopHtml(meetplaats)}
+      ${this.kopHtml(punt, profiel)}
       <div class="paneel__fout" role="alert">
         <p>${escape(uitleg)}</p>
         <button type="button" class="knop" data-actie="opnieuw">Opnieuw proberen</button>
@@ -167,7 +203,7 @@ export class Paneel {
     this.koppelSluiten();
     this.houder
       .querySelector('[data-actie="opnieuw"]')
-      ?.addEventListener("click", () => void this.toon(meetplaats));
+      ?.addEventListener("click", () => void this.toon(punt, profiel));
   }
 
   private teken(): void {
@@ -175,22 +211,14 @@ export class Paneel {
     if (!toestand) return;
 
     if (toestand.metingen.length === 0) {
-      this.houder.innerHTML = `
-        ${this.kopHtml(toestand.meetplaats)}
-        <div class="paneel__leeg">
-          <p>Voor deze meetplaats zijn geen analyseresultaten beschikbaar
-          ${toestand.volledigeHistoriek ? "over de laatste twintig jaar" : `over de laatste ${STANDAARD_JAREN} jaar`}.</p>
-          <p class="paneel__hint">Meetplaatsen blijven op de kaart staan nadat ze uit een meetnet zijn gehaald.</p>
-          ${toestand.volledigeHistoriek ? "" : '<button type="button" class="knop" data-actie="historiek">Volledige historiek zoeken</button>'}
-        </div>`;
-      this.koppelSluiten();
-      this.koppelHistoriek();
+      this.toonLeeg(toestand);
       return;
     }
 
-    const vanJaar = vatSamen(toestand.metingen).filter((p) => p.jaar === toestand.gekozenJaar);
+    const alles = vatSamen(toestand.metingen, this.bucket(toestand));
+    const vanPeriode = alles.filter((p) => p.bucket === toestand.gekozen.id);
     const oordelen = new Map(
-      vanJaar.map((p) => [p.symbool, beoordeel(p, toestand.normenset)] as const),
+      vanPeriode.map((p) => [p.symbool, beoordeel(p, toestand.normenset)] as const),
     );
 
     const tellingen = new Map<OordeelKlasse, number>();
@@ -204,103 +232,68 @@ export class Paneel {
     const allesAan = toestand.filters.size === aanwezig.length;
 
     this.houder.innerHTML = `
-      ${this.kopHtml(toestand.meetplaats)}
-      ${this.jarenHtml(toestand)}
-      ${this.samenvattingHtml(toestand, vanJaar, oordelen, tellingen, aanwezig, allesAan)}
-      ${this.gereedschapHtml(toestand, vanJaar)}
-      ${this.categorieenHtml(toestand, vanJaar, oordelen)}
+      ${this.kopHtml(toestand.punt, toestand.profiel)}
+      ${this.periodesHtml(toestand)}
+      ${this.samenvattingHtml(toestand, vanPeriode, oordelen, tellingen, aanwezig, allesAan)}
+      ${this.gereedschapHtml(toestand, vanPeriode)}
+      ${this.categorieenHtml(toestand, alles, vanPeriode, oordelen)}
       ${this.voetHtml(toestand)}`;
 
     this.koppelSluiten();
-    this.koppelHistoriek();
-
-    this.houder.querySelectorAll<HTMLButtonElement>("[data-jaar]").forEach((knop) => {
-      knop.addEventListener("click", () => {
-        toestand.gekozenJaar = Number(knop.dataset.jaar);
-        this.teken();
-      });
-    });
-
-    this.houder.querySelectorAll<HTMLButtonElement>("[data-filter]").forEach((knop) => {
-      knop.addEventListener("click", () => {
-        const klasse = knop.dataset.filter as OordeelKlasse;
-        if (allesAan) toestand.filters = new Set([klasse]);
-        else if (toestand.filters.has(klasse)) {
-          if (toestand.filters.size === 1) toestand.filters = new Set(aanwezig);
-          else toestand.filters.delete(klasse);
-        } else toestand.filters.add(klasse);
-        this.teken();
-      });
-    });
-
-    this.houder.querySelector('[data-actie="filters-wissen"]')?.addEventListener("click", () => {
-      toestand.filters = new Set(aanwezig);
-      this.teken();
-    });
-
-    this.houder.querySelectorAll<HTMLButtonElement>("[data-normenset]").forEach((knop) => {
-      knop.addEventListener("click", () => {
-        toestand.normenset = knop.dataset.normenset as Normenset;
-        // De klassen verschillen per set; begin weer met alles zichtbaar.
-        toestand.filters = new Set(KLASSE_VOLGORDE);
-        this.teken();
-      });
-    });
-
-    const zoekveld = this.houder.querySelector<HTMLInputElement>("[data-parameterzoek]");
-    if (zoekveld) {
-      zoekveld.addEventListener("input", () => {
-        toestand.zoekterm = zoekveld.value;
-        this.teken();
-        // Na hertekenen is het veld vervangen; zet de cursor terug.
-        const nieuw = this.houder.querySelector<HTMLInputElement>("[data-parameterzoek]");
-        nieuw?.focus();
-        nieuw?.setSelectionRange(nieuw.value.length, nieuw.value.length);
-      });
-    }
-
-    this.houder.querySelectorAll<HTMLButtonElement>("[data-evolutie]").forEach((knop) => {
-      knop.addEventListener("click", () => {
-        const symbool = knop.dataset.evolutie!;
-        const parameter = vanJaar.find((p) => p.symbool === symbool);
-        if (!parameter) return;
-        // Bewust álle opgehaalde jaren, niet enkel het gekozen: het verloop
-        // over de jaren is juist wat je hier wil zien.
-        this.venster.toon({
-          parameter,
-          metingen: toestand.metingen.filter((m) => m.symbool === symbool),
-          normenset: toestand.normenset,
-        });
-      });
-    });
-
-    this.houder.querySelectorAll<HTMLButtonElement>(".categorie__kop").forEach((knop) => {
-      knop.addEventListener("click", () => {
-        const sectie = knop.closest(".categorie");
-        const open = sectie?.getAttribute("data-open") === "1";
-        sectie?.setAttribute("data-open", open ? "0" : "1");
-        knop.setAttribute("aria-expanded", String(!open));
-      });
-    });
+    this.koppelUitbreiden();
+    this.koppelPeriodes(toestand);
+    this.koppelFilters(toestand, aanwezig, allesAan);
+    this.koppelNormenset(toestand);
+    this.koppelZoek(toestand);
+    this.koppelEvolutie(toestand, vanPeriode);
+    this.koppelCategorieen();
   }
 
-  private kopHtml(meetplaats: Meetplaats): string {
-    const netten = meetplaats.meetnetten.map((n) => MEETNET_NAMEN[n]);
+  private toonLeeg(toestand: Toestand): void {
+    const tijdas = toestand.profiel.tijdas;
+    const kanUitbreiden = tijdas.soort === "uit-data" && tijdas.uitbreiden && !toestand.uitgebreid;
+
+    this.houder.innerHTML = `
+      ${this.kopHtml(toestand.punt, toestand.profiel)}
+      <div class="paneel__leeg">
+        <p>${escape(toestand.profiel.leegTekst(toestand.uitgebreid))}</p>
+        <p class="paneel__hint">Meetpunten blijven op de kaart staan nadat ze uit een meetnet zijn gehaald.</p>
+        ${kanUitbreiden ? '<button type="button" class="knop" data-actie="uitbreiden">Volledige historiek zoeken</button>' : ""}
+      </div>`;
+    this.koppelSluiten();
+    this.koppelUitbreiden();
+  }
+
+  /**
+   * Bij een tijdas per periode valt alles in één emmer, want de keuze bepaalt
+   * al wat er opgehaald is; die emmer heet dan naar de periode zelf.
+   */
+  private bucket(toestand: Toestand) {
+    const tijdas = toestand.profiel.tijdas;
+    if (tijdas.soort === "uit-data") return tijdas.bucketVan;
+    const id = toestand.gekozen.id;
+    return () => id;
+  }
+
+  private kopHtml(punt: Meetpunt, profiel: Laagprofiel): string {
+    const feiten = profiel
+      .feiten(punt)
+      .map(([label, waarde]) => `<div><dt>${escape(label)}</dt><dd>${escape(waarde)}</dd></div>`)
+      .join("");
+
     return `
       <header class="paneel__kop">
-        <div class="paneel__acties">${this.actiesHtml(meetplaats)}</div>
-        <p class="paneel__eyebrow">Meetplaats oppervlaktewater</p>
-        <h2 class="paneel__code">${escape(meetplaats.code)}</h2>
-        <p class="paneel__plaats">${escape(meetplaats.omschrijving)}</p>
-        <dl class="paneel__feiten">
-          ${meetplaats.gemeente ? `<div><dt>Gemeente</dt><dd>${escape(meetplaats.gemeente)}</dd></div>` : ""}
-          <div><dt>Meetplaatsnummer</dt><dd>${escape(meetplaats.nummer)}</dd></div>
-          ${netten.length ? `<div><dt>Meetnetten</dt><dd>${escape(sommMaakOp(netten))}</dd></div>` : ""}
-        </dl>
+        <div class="paneel__acties">${this.actiesHtml(punt)}</div>
+        <p class="paneel__eyebrow">
+          <span class="laagmerk">${vormSvg(profiel.merk, 11)}</span>${escape(profiel.eyebrow)}
+        </p>
+        <h2 class="paneel__code">${escape(punt.code)}</h2>
+        <p class="paneel__plaats">${escape(punt.omschrijving)}</p>
+        <dl class="paneel__feiten">${feiten}</dl>
       </header>`;
   }
 
-  private actiesHtml(meetplaats: Meetplaats): string {
+  private actiesHtml(punt: Meetpunt): string {
     if (this.modus === "rapport") {
       return `
         <a class="paneel__nieuwtab" href="./">Naar de kaart</a>
@@ -308,44 +301,47 @@ export class Paneel {
     }
     return `
       <a class="paneel__nieuwtab"
-         href="?meetplaats=${encodeURIComponent(meetplaats.nummer)}&weergave=rapport"
+         href="?laag=${encodeURIComponent(punt.laag)}&punt=${encodeURIComponent(punt.id)}&weergave=rapport"
          target="_blank" rel="noopener"
-         title="Open het rapport van ${escape(meetplaats.code)} in een nieuw tabblad">Rapport ↗</a>
+         title="Open het rapport van ${escape(punt.code)} in een nieuw tabblad">Rapport ↗</a>
       <button type="button" class="paneel__sluit" data-actie="sluiten" aria-label="Paneel sluiten">×</button>`;
   }
 
-  private jarenHtml(toestand: Toestand): string {
-    const knoppen = toestand.jaren
-      .slice()
-      .sort((a, b) => a - b)
+  private periodesHtml(toestand: Toestand): string {
+    const tijdas = toestand.profiel.tijdas;
+    const label = tijdas.soort === "uit-data" ? "Meetjaar" : "Periode";
+
+    const knoppen = toestand.periodes
       .map(
-        (jaar) =>
-          `<button type="button" class="jaar" data-jaar="${jaar}" aria-pressed="${jaar === toestand.gekozenJaar}">${jaar}</button>`,
+        (periode) =>
+          `<button type="button" class="jaar" data-periode="${escape(periode.id)}"
+             aria-pressed="${periode.id === toestand.gekozen.id}">${escape(periode.label)}</button>`,
       )
       .join("");
 
+    const uitbreidKnop =
+      tijdas.soort === "uit-data" && tijdas.uitbreiden && !toestand.uitgebreid
+        ? `<button type="button" class="knop knop--stil" data-actie="uitbreiden">${escape(tijdas.uitbreiden.label)}</button>`
+        : "";
+
     return `
       <div class="paneel__jaren">
-        <span class="paneel__label" id="jaarlabel">Meetjaar</span>
-        <div class="jaren" role="group" aria-labelledby="jaarlabel">${knoppen}</div>
-        ${
-          toestand.volledigeHistoriek
-            ? ""
-            : '<button type="button" class="knop knop--stil" data-actie="historiek">Volledige historiek</button>'
-        }
+        <span class="paneel__label" id="periodelabel">${label}</span>
+        <div class="jaren" role="group" aria-labelledby="periodelabel">${knoppen}</div>
+        ${uitbreidKnop}
       </div>`;
   }
 
   private samenvattingHtml(
     toestand: Toestand,
-    parameters: ParameterJaar[],
+    parameters: ParameterSamenvatting[],
     oordelen: Map<string, Oordeel>,
     tellingen: Map<OordeelKlasse, number>,
     aanwezig: OordeelKlasse[],
     allesAan: boolean,
   ): string {
     const zin = samenvattingsZin(parameters, oordelen);
-    const aantalMetingen = toestand.metingen.filter((m) => m.jaar === toestand.gekozenJaar).length;
+    const aantalMetingen = parameters.reduce((som, p) => som + p.aantal, 0);
 
     const chips = aanwezig
       .map(
@@ -358,11 +354,12 @@ export class Paneel {
 
     const gefilterd = allesAan
       ? "Klik een label om enkel die parameters te tonen."
-      : `Gefilterd op: ${sommMaakOp([...toestand.filters].map((k) => KLASSE_LABELS[k]))}.`;
+      : `Gefilterd op: ${[...toestand.filters].map((k) => KLASSE_LABELS[k]).join(", ")}.`;
 
     return `
       <section class="paneel__oordeel">
-        <p>In ${toestand.gekozenJaar} werd hier ${aantalMetingen} keer een waarde gemeten, verdeeld over ${parameters.length} parameters. ${escape(zin)}</p>
+        <p>In ${escape(toestand.gekozen.label)} werd hier ${aantalMetingen} keer een waarde gemeten,
+        verdeeld over ${parameters.length} parameters. ${escape(zin)}</p>
         <div class="chips">
           ${chips}
           ${allesAan ? "" : '<button type="button" class="stille-knop" data-actie="filters-wissen">Toon alles</button>'}
@@ -372,8 +369,8 @@ export class Paneel {
   }
 
   /** Zoekveld op parameter plus de keuze van de normenset. */
-  private gereedschapHtml(toestand: Toestand, parameters: ParameterJaar[]): string {
-    const knoppen = (Object.keys(NORMENSETTEN) as Normenset[])
+  private gereedschapHtml(toestand: Toestand, parameters: ParameterSamenvatting[]): string {
+    const knoppen = toestand.profiel.normensetten
       .map((set) => {
         const getoetst = parameters.filter((p) => NORMEN[set][p.symbool]).length;
         return `<button type="button" class="normknop" data-normenset="${set}"
@@ -403,7 +400,8 @@ export class Paneel {
 
   private categorieenHtml(
     toestand: Toestand,
-    parameters: ParameterJaar[],
+    alles: ParameterSamenvatting[],
+    parameters: ParameterSamenvatting[],
     oordelen: Map<string, Oordeel>,
   ): string {
     const term = toestand.zoekterm.trim().toLowerCase();
@@ -418,11 +416,13 @@ export class Paneel {
 
     if (zichtbaar.length === 0) {
       return `<p class="paneel__leeg">${
-        term ? `Geen parameter gevonden voor "${escape(toestand.zoekterm)}".` : "Geen parameters in deze selectie."
+        term
+          ? `Geen parameter gevonden voor "${escape(toestand.zoekterm)}".`
+          : "Geen parameters in deze selectie."
       }</p>`;
     }
 
-    const vorigJaar = this.vorigMeetjaar(toestand);
+    const vorige = this.vorigePeriode(toestand, alles);
 
     return deelIn(zichtbaar)
       .map((categorie) => {
@@ -443,7 +443,7 @@ export class Paneel {
           });
 
         const rijen = gesorteerd
-          .map((p) => this.rijHtml(p, oordelen.get(p.symbool)!, vorigJaar, toestand.normenset))
+          .map((p) => this.rijHtml(p, oordelen.get(p.symbool)!, vorige, toestand.normenset))
           .join("");
 
         return `
@@ -474,13 +474,13 @@ export class Paneel {
   }
 
   private rijHtml(
-    parameter: ParameterJaar,
+    parameter: ParameterSamenvatting,
     oordeel: Oordeel,
-    vorigJaar: ParameterJaar[],
+    vorige: ParameterSamenvatting[],
     set: Normenset,
   ): string {
-    const vorig = vorigJaar.find((p) => p.symbool === parameter.symbool);
-    const verloop = vorig ? this.verloopHtml(parameter, vorig, oordeel) : "";
+    const toen = vorige.find((p) => p.symbool === parameter.symbool);
+    const verloop = toen ? this.verloopHtml(parameter, toen, oordeel) : "";
     const norm = NORMEN[set][parameter.symbool];
     const normregel = norm
       ? `<span class="parameter__norm" title="${escape(norm.toets)} — ${escape(BRONNEN[norm.bron].naam)}">norm ${escape(norm.label)}</span>`
@@ -513,7 +513,11 @@ export class Paneel {
       </tr>`;
   }
 
-  private verloopHtml(nu: ParameterJaar, toen: ParameterJaar, oordeel: Oordeel): string {
+  private verloopHtml(
+    nu: ParameterSamenvatting,
+    toen: ParameterSamenvatting,
+    oordeel: Oordeel,
+  ): string {
     if (toen.gemiddelde === 0 || oordeel.klasse === "geen-norm") return "";
     const procent = ((nu.gemiddelde - toen.gemiddelde) / toen.gemiddelde) * 100;
     if (Math.abs(procent) < 8) return "";
@@ -523,58 +527,56 @@ export class Paneel {
     const beter = nu.symbool === "O2" || nu.symbool === "O2 verz" ? !omlaag : omlaag;
 
     return `<span class="verloop verloop--${beter ? "beter" : "slechter"}">
-      ${omlaag ? "▼" : "▲"} ${Math.abs(Math.round(procent))}% t.o.v. ${toen.jaar}
+      ${omlaag ? "▼" : "▲"} ${Math.abs(Math.round(procent))}% t.o.v. ${escape(toen.bucket)}
     </span>`;
   }
 
-  private vorigMeetjaar(toestand: Toestand): ParameterJaar[] {
-    const eerder = toestand.jaren.filter((j) => j < toestand.gekozenJaar);
-    const jaar = eerder[0];
-    if (jaar === undefined) return [];
-    return vatSamen(toestand.metingen).filter((p) => p.jaar === jaar);
+  /**
+   * De periode vlak vóór de gekozen, voor de trendpijl. Bij een laag met één
+   * emmer bestaat die niet en verdwijnt de pijl vanzelf.
+   */
+  private vorigePeriode(
+    toestand: Toestand,
+    alles: ParameterSamenvatting[],
+  ): ParameterSamenvatting[] {
+    const index = toestand.periodes.findIndex((p) => p.id === toestand.gekozen.id);
+    const vorige = index > 0 ? toestand.periodes[index - 1] : undefined;
+    if (!vorige) return [];
+    return alles.filter((p) => p.bucket === vorige.id);
   }
 
   private voetHtml(toestand: Toestand): string {
     const bronnen = bronnenVoor(toestand.normenset)
-      .map(
-        (b) =>
-          `<li><a href="${b.url}" target="_blank" rel="noopener">${escape(b.naam)}</a></li>`,
-      )
+      .map((b) => `<li><a href="${b.url}" target="_blank" rel="noopener">${escape(b.naam)}</a></li>`)
       .join("");
 
-    // Het gekozen meetjaar, want dat is wat het paneel toont.
-    const links = bronUrls(toestand.meetplaats.code, toestand.meetplaats.matrix, [
-      toestand.gekozenJaar,
-    ]);
+    const bron = toestand.profiel.bron(toestand.punt, toestand.gekozen);
+    const context = bron.context
+      ? ` Onderdeel van de <a href="${escape(bron.context.url)}" target="_blank" rel="noopener">${escape(bron.context.tekst)}</a>.`
+      : "";
 
     return `
       <footer class="paneel__voet">
         <h3>Over deze cijfers</h3>
-        <p>Per parameter tonen we het gemiddelde over ${toestand.gekozenJaar} en de laagste en hoogste
-        gemeten waarde — niet elke afzonderlijke staalname.</p>
+        <p>${escape(toestand.profiel.toelichting(toestand.gekozen))}</p>
 
         <h3>Bron van deze cijfers</h3>
         <p>
-          <a href="${escape(links.rapport)}" target="_blank" rel="noopener">Analyseresultaten voor ${escape(toestand.meetplaats.code)} in ${toestand.gekozenJaar}</a>
-          — het rapport van de VMM zelf, waarop deze cijfers gepubliceerd staan.
-          Het opent rechtstreeks op dit meetpunt en meetjaar. Onderdeel van de
-          <a href="${links.databank}" target="_blank" rel="noopener">databank waterkwaliteit</a>.
+          <a href="${escape(bron.url)}" target="_blank" rel="noopener">${escape(bron.tekst)}</a>
+          — ${escape(bron.uitleg)}${context}
         </p>
 
         <h3>Normen</h3>
         <p>${escape(NORMENSETTEN[toestand.normenset].uitleg)}</p>
         <ul class="bronlijst">${bronnen}</ul>
-        <p>De toetsing is <strong>indicatief</strong> en geen officiële beoordeling van de VMM.
-        Een deel van de normen voor oppervlaktewater verschilt per waterlooptype; welk type deze
-        waterloop heeft weten we niet, dus die parameters krijgen "hangt van type af" in plaats van
-        een oordeel.</p>
+        <p>De toetsing is <strong>indicatief</strong> en geen officiële beoordeling.</p>
 
         <p>Waarden met <code>&lt;</code> liggen onder de detectielimiet van het labo: de stof is niet
         aangetoond en de getoonde waarde is de limiet zelf.</p>
-        <p>Meetgegevens: Vlaamse Milieumaatschappij, databank waterkwaliteit.
-        Locaties: Digitaal Vlaanderen.</p>
       </footer>`;
   }
+
+  // ---- gebeurtenissen ----
 
   private koppelSluiten(): void {
     this.houder
@@ -585,10 +587,99 @@ export class Paneel {
       ?.addEventListener("click", () => window.print());
   }
 
-  private koppelHistoriek(): void {
+  private koppelUitbreiden(): void {
     this.houder
-      .querySelector('[data-actie="historiek"]')
-      ?.addEventListener("click", () => void this.haalVolledigeHistoriek());
+      .querySelector('[data-actie="uitbreiden"]')
+      ?.addEventListener("click", () => void this.breidUit());
+  }
+
+  private koppelPeriodes(toestand: Toestand): void {
+    this.houder.querySelectorAll<HTMLButtonElement>("[data-periode]").forEach((knop) => {
+      knop.addEventListener("click", () => {
+        const periode = toestand.periodes.find((p) => p.id === knop.dataset.periode);
+        if (!periode) return;
+
+        if (toestand.profiel.tijdas.soort === "per-periode") {
+          // Hier bepaalt de keuze wát er opgehaald wordt, niet wat er getoond wordt.
+          void this.haalPeriode(toestand.punt, toestand.profiel, periode, this.begin());
+          return;
+        }
+        toestand.gekozen = periode;
+        this.teken();
+      });
+    });
+  }
+
+  private koppelFilters(toestand: Toestand, aanwezig: OordeelKlasse[], allesAan: boolean): void {
+    this.houder.querySelectorAll<HTMLButtonElement>("[data-filter]").forEach((knop) => {
+      knop.addEventListener("click", () => {
+        const klasse = knop.dataset.filter as OordeelKlasse;
+        if (allesAan) toestand.filters = new Set([klasse]);
+        else if (toestand.filters.has(klasse)) {
+          if (toestand.filters.size === 1) toestand.filters = new Set(aanwezig);
+          else toestand.filters.delete(klasse);
+        } else toestand.filters.add(klasse);
+        this.teken();
+      });
+    });
+
+    this.houder.querySelector('[data-actie="filters-wissen"]')?.addEventListener("click", () => {
+      toestand.filters = new Set(aanwezig);
+      this.teken();
+    });
+  }
+
+  private koppelNormenset(toestand: Toestand): void {
+    this.houder.querySelectorAll<HTMLButtonElement>("[data-normenset]").forEach((knop) => {
+      knop.addEventListener("click", () => {
+        toestand.normenset = knop.dataset.normenset as Normenset;
+        // De klassen verschillen per set; begin weer met alles zichtbaar.
+        toestand.filters = new Set(KLASSE_VOLGORDE);
+        this.teken();
+      });
+    });
+  }
+
+  private koppelZoek(toestand: Toestand): void {
+    const zoekveld = this.houder.querySelector<HTMLInputElement>("[data-parameterzoek]");
+    if (!zoekveld) return;
+
+    zoekveld.addEventListener("input", () => {
+      toestand.zoekterm = zoekveld.value;
+      this.teken();
+      // Na hertekenen is het veld vervangen; zet de cursor terug.
+      const nieuw = this.houder.querySelector<HTMLInputElement>("[data-parameterzoek]");
+      nieuw?.focus();
+      nieuw?.setSelectionRange(nieuw.value.length, nieuw.value.length);
+    });
+  }
+
+  private koppelEvolutie(toestand: Toestand, parameters: ParameterSamenvatting[]): void {
+    this.houder.querySelectorAll<HTMLButtonElement>("[data-evolutie]").forEach((knop) => {
+      knop.addEventListener("click", () => {
+        const symbool = knop.dataset.evolutie!;
+        const parameter = parameters.find((p) => p.symbool === symbool);
+        if (!parameter) return;
+        // Bewust álle opgehaalde metingen, niet enkel de gekozen periode: het
+        // verloop over de tijd is juist wat je hier wil zien.
+        this.venster.toon({
+          parameter,
+          metingen: toestand.metingen.filter((m) => m.symbool === symbool),
+          normenset: toestand.normenset,
+        });
+      });
+    });
+  }
+
+  private koppelCategorieen(): void {
+    this.houder.querySelectorAll<HTMLButtonElement>(".categorie__kop").forEach((knop) => {
+      knop.addEventListener("click", () => {
+        const sectie = knop.closest(".categorie");
+        const open = sectie?.getAttribute("data-open") === "1";
+        sectie?.setAttribute("data-open", open ? "0" : "1");
+        knop.setAttribute("aria-expanded", String(!open));
+      });
+    });
   }
 }
 

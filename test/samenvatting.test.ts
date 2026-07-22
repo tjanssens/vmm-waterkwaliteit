@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { samenvattingsZin } from "../src/ui/samenvatting.js";
-import type { Oordeel, OordeelKlasse, ParameterJaar } from "../src/data/types.js";
+import type { Oordeel, OordeelKlasse, ParameterSamenvatting } from "../src/data/types.js";
 
 const LABELS: Record<OordeelKlasse, string> = {
   "buiten-norm": "boven norm",
@@ -11,11 +11,11 @@ const LABELS: Record<OordeelKlasse, string> = {
 
 /** Bouwt de parameters en hun oordelen in één keer op. */
 function opstelling(paren: [naam: string, klasse: OordeelKlasse][]) {
-  const parameters: ParameterJaar[] = paren.map(([naam], i) => ({
+  const parameters: ParameterSamenvatting[] = paren.map(([naam], i) => ({
     symbool: `S${i}`,
     omschrijving: naam,
     eenheid: "mg/L",
-    jaar: 2024,
+    bucket: "2024",
     aantal: 6,
     aantalOnderLimiet: 0,
     gemiddelde: 1,

@@ -1,20 +1,29 @@
 import L from "leaflet";
 import "leaflet.markercluster";
-import type { Meetplaats, Meetnet } from "../geo/meetplaatsen.js";
+import type { Laagprofiel, LaagId, Meetpunt, Merk, Vak } from "../lagen/types.js";
+import { vormSvg } from "../lagen/merk.js";
 
 /** Vlaanderen in beeld bij het openen. */
 const START = { midden: [51.05, 4.4] as [number, number], zoom: 9 };
 
 export interface KaartOpties {
-  onSelectie: (meetplaats: Meetplaats) => void;
+  onSelectie: (punt: Meetpunt, profiel: Laagprofiel) => void;
+  /** Roept terug wanneer het kaartvenster verschoven of gezoomd is. */
+  onVenster?: (venster: Vak, zoom: number) => void;
+}
+
+interface Laag {
+  profiel: Laagprofiel;
+  cluster: L.MarkerClusterGroup;
+  punten: Map<string, Meetpunt>;
+  markers: Map<string, L.CircleMarker | L.Marker>;
+  zichtbaar: boolean;
 }
 
 export class Kaart {
   private readonly kaart: L.Map;
-  private readonly cluster: L.MarkerClusterGroup;
-  private readonly markers = new Map<string, L.CircleMarker>();
-  private alle: Meetplaats[] = [];
-  private geselecteerd: string | null = null;
+  private readonly lagen = new Map<LaagId, Laag>();
+  private geselecteerd: { laag: LaagId; id: string } | null = null;
   private eigenPositie: L.CircleMarker | null = null;
 
   constructor(
@@ -34,61 +43,78 @@ export class Kaart {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>-bijdragers',
     }).addTo(this.kaart);
 
+    if (this.opties.onVenster) {
+      this.kaart.on("moveend", () => this.meldVenster());
+    }
+  }
+
+  /** Registreert een laag; punten komen er via `zet` in. */
+  voegLaagToe(profiel: Laagprofiel, zichtbaar = true): void {
     // 7.534 losse markers is te veel om vloeiend te tekenen.
-    this.cluster = L.markerClusterGroup({
+    const cluster = L.markerClusterGroup({
       maxClusterRadius: 55,
       showCoverageOnHover: false,
       chunkedLoading: true,
       disableClusteringAtZoom: 14,
+      iconCreateFunction: (groep) => this.clusterIcoon(groep, profiel.merk),
     });
-    this.kaart.addLayer(this.cluster);
+
+    this.lagen.set(profiel.id, {
+      profiel,
+      cluster,
+      punten: new Map(),
+      markers: new Map(),
+      zichtbaar,
+    });
+
+    if (zichtbaar) this.kaart.addLayer(cluster);
   }
 
-  zet(meetplaatsen: Meetplaats[]): void {
-    this.alle = meetplaatsen;
-    this.filter(new Set());
-  }
+  /** Vervangt de punten van één laag. */
+  zet(laagId: LaagId, punten: readonly Meetpunt[]): void {
+    const laag = this.lagen.get(laagId);
+    if (!laag) return;
 
-  /** Toont enkel punten uit de gekozen meetnetten; lege selectie toont alles. */
-  filter(meetnetten: ReadonlySet<Meetnet>): Meetplaats[] {
-    const zichtbaar =
-      meetnetten.size === 0
-        ? this.alle
-        : this.alle.filter((m) => m.meetnetten.some((net) => meetnetten.has(net)));
+    laag.cluster.clearLayers();
+    laag.markers.clear();
+    laag.punten.clear();
 
-    this.cluster.clearLayers();
-    this.markers.clear();
-
-    const laag = zichtbaar.map((meetplaats) => {
-      const marker = L.circleMarker([meetplaats.lat, meetplaats.lon], this.stijl(meetplaats));
-      marker.bindTooltip(
-        `<strong>${meetplaats.code}</strong><br>${meetplaats.omschrijving}`,
-        { direction: "top" },
-      );
-      marker.on("click", () => this.selecteer(meetplaats));
-      this.markers.set(meetplaats.nummer, marker);
+    const markers = punten.map((punt) => {
+      laag.punten.set(punt.id, punt);
+      const marker = this.maakMarker(punt, laag.profiel.merk);
+      marker.bindTooltip(`<strong>${punt.code}</strong><br>${punt.omschrijving}`, {
+        direction: "top",
+      });
+      marker.on("click", () => this.selecteer(punt));
+      laag.markers.set(punt.id, marker);
       return marker;
     });
 
-    this.cluster.addLayers(laag);
-    return zichtbaar;
+    laag.cluster.addLayers(markers);
   }
 
-  selecteer(meetplaats: Meetplaats, zoomIn = false): void {
-    const vorige = this.geselecteerd;
-    this.geselecteerd = meetplaats.nummer;
+  toonLaag(laagId: LaagId, zichtbaar: boolean): void {
+    const laag = this.lagen.get(laagId);
+    if (!laag || laag.zichtbaar === zichtbaar) return;
 
-    if (vorige) {
-      const marker = this.markers.get(vorige);
-      const punt = this.alle.find((m) => m.nummer === vorige);
-      if (marker && punt) marker.setStyle(this.stijl(punt));
-    }
-    this.markers.get(meetplaats.nummer)?.setStyle(this.stijl(meetplaats));
+    laag.zichtbaar = zichtbaar;
+    if (zichtbaar) this.kaart.addLayer(laag.cluster);
+    else this.kaart.removeLayer(laag.cluster);
+  }
+
+  selecteer(punt: Meetpunt, zoomIn = false): void {
+    const vorige = this.geselecteerd;
+    this.geselecteerd = { laag: punt.laag, id: punt.id };
+
+    if (vorige) this.herteken(vorige.laag, vorige.id);
+    this.herteken(punt.laag, punt.id);
 
     if (zoomIn) {
-      this.kaart.setView([meetplaats.lat, meetplaats.lon], Math.max(this.kaart.getZoom(), 14));
+      this.kaart.setView([punt.lat, punt.lon], Math.max(this.kaart.getZoom(), 14));
     }
-    this.opties.onSelectie(meetplaats);
+
+    const laag = this.lagen.get(punt.laag);
+    if (laag) this.opties.onSelectie(punt, laag.profiel);
   }
 
   toonPositie(lat: number, lon: number): void {
@@ -105,14 +131,87 @@ export class Kaart {
     this.kaart.setView([lat, lon], 13);
   }
 
-  private stijl(meetplaats: Meetplaats): L.CircleMarkerOptions {
-    const actief = this.geselecteerd === meetplaats.nummer;
+  huidigVenster(): { venster: Vak; zoom: number } {
+    const grens = this.kaart.getBounds();
     return {
-      radius: actief ? 9 : 6,
+      venster: {
+        zuid: grens.getSouth(),
+        west: grens.getWest(),
+        noord: grens.getNorth(),
+        oost: grens.getEast(),
+      },
+      zoom: this.kaart.getZoom(),
+    };
+  }
+
+  private meldVenster(): void {
+    const { venster, zoom } = this.huidigVenster();
+    this.opties.onVenster?.(venster, zoom);
+  }
+
+  private herteken(laagId: LaagId, id: string): void {
+    const laag = this.lagen.get(laagId);
+    const punt = laag?.punten.get(id);
+    const marker = laag?.markers.get(id);
+    if (!laag || !punt || !marker) return;
+
+    const actief = this.isActief(punt);
+    if (marker instanceof L.CircleMarker) {
+      marker.setStyle(this.cirkelStijl(laag.profiel.merk, actief));
+      marker.setRadius(actief ? 9 : 6);
+    } else {
+      marker.setIcon(this.vormIcoon(laag.profiel.merk, actief));
+    }
+  }
+
+  private isActief(punt: Meetpunt): boolean {
+    return this.geselecteerd?.laag === punt.laag && this.geselecteerd.id === punt.id;
+  }
+
+  /**
+   * Cirkels gaan via canvas — dat is wat 7.534 punten vloeiend houdt. De
+   * andere vormen kan canvas niet tekenen, en die lagen zijn klein genoeg om
+   * als DOM-element te bestaan.
+   */
+  private maakMarker(punt: Meetpunt, merk: Merk): L.CircleMarker | L.Marker {
+    const actief = this.isActief(punt);
+    if (merk.vorm === "cirkel") {
+      return L.circleMarker([punt.lat, punt.lon], {
+        ...this.cirkelStijl(merk, actief),
+        radius: actief ? 9 : 6,
+      });
+    }
+    return L.marker([punt.lat, punt.lon], { icon: this.vormIcoon(merk, actief) });
+  }
+
+  private cirkelStijl(merk: Merk, actief: boolean): L.CircleMarkerOptions {
+    return {
       weight: actief ? 3 : 1.5,
-      color: actief ? "#0b5f63" : "#ffffff",
-      fillColor: meetplaats.meetnetten.length ? "#0b5f63" : "#8b9a93",
+      color: actief ? merk.kleur : "#ffffff",
+      fillColor: merk.kleur,
       fillOpacity: 0.85,
     };
   }
+
+  private vormIcoon(merk: Merk, actief: boolean): L.DivIcon {
+    const maat = actief ? 20 : 14;
+    return L.divIcon({
+      className: "puntmerk",
+      html: vormSvg(merk, maat, actief),
+      iconSize: [maat, maat],
+      iconAnchor: [maat / 2, maat / 2],
+    });
+  }
+
+  /** De clusterbol draagt de kleur van zijn laag, zodat lagen ook geclusterd te onderscheiden zijn. */
+  private clusterIcoon(groep: L.MarkerCluster, merk: Merk): L.DivIcon {
+    const aantal = groep.getChildCount();
+    const maat = aantal < 10 ? 32 : aantal < 100 ? 38 : 44;
+    return L.divIcon({
+      html: `<div class="cluster__bol" style="--laagkleur:${merk.kleur}"><span>${aantal}</span></div>`,
+      className: `cluster cluster--${merk.vorm}`,
+      iconSize: [maat, maat],
+    });
+  }
 }
+

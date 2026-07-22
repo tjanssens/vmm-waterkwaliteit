@@ -22,20 +22,25 @@ export interface Meting {
   onderDetectielimiet: boolean;
 }
 
-/** Samenvatting van één parameter over één meetjaar. */
-export interface ParameterJaar {
+/**
+ * Samenvatting van één parameter over één periode. Wat een periode is, bepaalt
+ * de laag: een meetjaar bij oppervlakte- en grondwater, een tijdvenster bij
+ * lucht. Vandaar een sleutel en geen jaartal.
+ */
+export interface ParameterSamenvatting {
   symbool: string;
   omschrijving: string;
   eenheid: string;
-  jaar: number;
-  /** Aantal metingen in dit jaar. */
+  /** Sleutel van de periode, gelijk aan `Periode.id`. */
+  bucket: string;
+  /** Aantal metingen in deze periode. */
   aantal: number;
   /** Hoeveel daarvan onder de detectielimiet lagen. */
   aantalOnderLimiet: number;
   gemiddelde: number;
   minimum: number;
   maximum: number;
-  /** Datum van de recentste meting in dit jaar. */
+  /** Datum van de recentste meting in deze periode. */
   laatsteDatum: string;
   /**
    * True wanneer élke meting onder de detectielimiet lag. Het gemiddelde is

@@ -1,4 +1,4 @@
-import type { Oordeel, OordeelKlasse, ParameterJaar } from "../data/types.js";
+import type { Oordeel, OordeelKlasse, ParameterSamenvatting } from "../data/types.js";
 import { kleinLetter, sommMaakOp } from "./format.js";
 
 /**
@@ -6,7 +6,7 @@ import { kleinLetter, sommMaakOp } from "./format.js";
  * leest, dus hij mag nooit meer beweren dan er getoetst is.
  */
 export function samenvattingsZin(
-  parameters: readonly ParameterJaar[],
+  parameters: readonly ParameterSamenvatting[],
   oordelen: ReadonlyMap<string, Oordeel>,
 ): string {
   const namenVan = (klasse: OordeelKlasse) =>
