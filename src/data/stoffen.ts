@@ -812,6 +812,14 @@ export function stofprofiel(
   const direct = SLEUTELS[parameter.symbool];
   if (direct) return PROFIELEN[direct];
 
+  // DOV schrijft "Atrazine (Atraz)": naam plus eigen code. Wie een stof onder
+  // haar gewone naam opneemt, moet niet eerst die code achterhalen — anders
+  // valt de tekst stil terug op de groep en merkt niemand dat de eigen,
+  // preciezere uitleg nooit verschijnt.
+  const zonderCode = parameter.symbool.replace(/\s*\([^()]*\)\s*$/, "");
+  const opNaam = zonderCode === parameter.symbool ? undefined : SLEUTELS[zonderCode];
+  if (opNaam) return PROFIELEN[opNaam];
+
   const stam = parameter.symbool.match(/^(.+?) [to]$/)?.[1];
   const metaal = stam ? METAALSTAM[stam] : undefined;
   if (metaal) return PROFIELEN[metaal];

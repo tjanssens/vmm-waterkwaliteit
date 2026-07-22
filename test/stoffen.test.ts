@@ -47,6 +47,15 @@ describe("stofprofiel", () => {
     expect(profiel?.wat).toMatch(/onkruid/i);
   });
 
+  it("vindt een stof ook onder de code die DOV erachter plakt", () => {
+    // DOV noemt atrazine "Atrazine (Atraz)". Zonder deze terugval krijgt het
+    // de algemene pesticidentekst en verdwijnt de eigen uitleg geruisloos.
+    const profiel = stofprofiel(
+      parameter("Atrazine (Atraz)", "Atrazine", "Pesticiden: actieve stoffen"),
+    );
+    expect(profiel?.wat).toMatch(/maïsteelt/i);
+  });
+
   it("zwijgt over een stof die we niet kennen", () => {
     // Liever niets dan een tekst die op alles past: bij gezondheidsinformatie
     // is de schijn van uitleg erger dan geen uitleg.
