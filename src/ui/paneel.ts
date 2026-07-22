@@ -8,7 +8,7 @@ import {
   type Normenset,
 } from "../data/normen.js";
 import { deelIn } from "../data/categorieen.js";
-import { stofprofiel } from "../data/stoffen.js";
+import { korteRisicozin, stofprofiel } from "../data/stoffen.js";
 import { DatabankFout } from "../data/client.js";
 import { FormaatFout } from "../data/csv.js";
 import type { Meting, Oordeel, OordeelKlasse, ParameterSamenvatting } from "../data/types.js";
@@ -742,7 +742,7 @@ export class Paneel {
 
 
 /**
- * Eén zin over wat de stof is, alleen bij een overschrijding.
+ * Eén zin bij een overschrijding: wat er misgaat.
  *
  * Wie hier komt en "atrazine" ziet staan, weet nog niets. De volle duiding
  * hangt achter de grafiek, maar de lezer die nooit doorklikt is juist degene
@@ -756,8 +756,8 @@ function wattekstHtml(
 ): string {
   if (oordeel.klasse !== "buiten-norm") return "";
   const profiel = stofprofiel(parameter, laag);
-  if (!profiel) return "";
-  return `<span class="parameter__duiding">${escape(profiel.wat)}</span>`;
+  const zin = profiel ? korteRisicozin(profiel) : undefined;
+  return zin ? `<span class="parameter__duiding">${escape(zin)}</span>` : "";
 }
 
 /**

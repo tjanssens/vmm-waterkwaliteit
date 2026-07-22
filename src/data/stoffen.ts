@@ -70,6 +70,13 @@ export interface Stofprofiel {
   herkomst?: string;
   /** Wat ze doet met de gezondheid of het watersysteem. */
   risico?: string;
+  /**
+   * Eén zin voor in de tabelrij bij een overschrijding. Ontbreekt hij, dan
+   * wordt de eerste zin van `risico` genomen — die gaat per definitie over het
+   * risico, maar staat er niet altijd even scherp. Vul dit veld waar dat
+   * uitmaakt, in het bijzonder waar een lage waarde het probleem is.
+   */
+  kort?: string;
   /** De bronnen waarin dit staat; twee waar de uitspraak zwaar weegt. */
   bronnen: readonly StofbronId[];
 }
@@ -82,6 +89,8 @@ export interface Stofprofiel {
 const PROFIELEN = {
   // ---- lucht ----
   no2: {
+    kort:
+      "Prikkelt de luchtwegen en hangt samen met astma en meer luchtweginfecties bij kinderen.",
     wat: "Een prikkelend gas dat vrijkomt bij verbranding op hoge temperatuur.",
     herkomst:
       "Vooral wegverkeer, en dan in het bijzonder dieselmotoren. Daarnaast verwarming, industrie en energieproductie. Langs drukke straten ligt het merkbaar hoger dan een paar honderd meter verderop.",
@@ -97,6 +106,8 @@ const PROFIELEN = {
     bronnen: ["vmmLucht"],
   },
   o3: {
+    kort:
+      "Vermindert de longfunctie en prikkelt de luchtwegen, vooral bij inspanning buiten.",
     wat: "Ozon op leefniveau — hetzelfde gas dat hoog in de atmosfeer beschermt, maar hier beneden een probleem is.",
     herkomst:
       "Wordt niet uitgestoten maar gevormd: stikstofoxiden en vluchtige organische stoffen reageren onder zonlicht. Vandaar dat de hoogste waarden op warme, zonnige zomerdagen vallen, en eerder buiten de stad dan erin.",
@@ -105,6 +116,8 @@ const PROFIELEN = {
     bronnen: ["whoLucht", "eea"],
   },
   so2: {
+    kort:
+      "Prikkelt de luchtwegen en kan bij astmapatiënten binnen minuten een aanval uitlokken.",
     wat: "Een scherp ruikend gas dat ontstaat bij het verbranden van zwavelhoudende brandstof.",
     herkomst:
       "Industrie, raffinaderijen en scheepvaart. In Vlaanderen sterk gedaald sinds zwavel uit brandstoffen is gehaald.",
@@ -113,6 +126,8 @@ const PROFIELEN = {
     bronnen: ["whoLucht"],
   },
   co: {
+    kort:
+      "Verdringt zuurstof in het bloed, waardoor het lichaam minder zuurstof krijgt.",
     wat: "Koolstofmonoxide, een reukloos gas uit onvolledige verbranding.",
     herkomst: "Verkeer, houtkachels en open verbranding.",
     risico:
@@ -127,6 +142,8 @@ const PROFIELEN = {
     bronnen: ["vmmLucht"],
   },
   pm25: {
+    kort:
+      "Dringt door tot in de longblaasjes en het bloed; van alle luchtvervuiling de grootste oorzaak van vroegtijdige sterfte.",
     wat: "Zwevende deeltjes kleiner dan 2,5 micrometer — ongeveer dertig keer dunner dan een haar.",
     herkomst:
       "Verkeer, houtstook, industrie en landbouw. Een groot deel ontstaat pas in de lucht zelf, wanneer ammoniak uit de landbouw reageert met stikstof- en zwaveloxiden.",
@@ -135,6 +152,8 @@ const PROFIELEN = {
     bronnen: ["whoLucht", "whoLuchtvervuiling"],
   },
   pm10: {
+    kort:
+      "Dringt door tot in de luchtwegen en verergert astma en chronische longziekten.",
     wat: "Zwevende deeltjes kleiner dan 10 micrometer, inclusief de fijnere fractie PM2,5.",
     herkomst:
       "Naast verbranding ook opwaaiend stof, slijtage van banden en remmen, bouw en landbouw.",
@@ -164,6 +183,8 @@ const PROFIELEN = {
     bronnen: ["whoLucht"],
   },
   benzeen: {
+    kort:
+      "Kankerverwekkend voor de mens en oorzaak van leukemie, zonder veilige ondergrens.",
     wat: "Een vluchtige organische stof uit aardolie.",
     herkomst: "Benzinedampen, uitlaatgassen en tanken. Ook tabaksrook binnenshuis.",
     risico:
@@ -185,6 +206,8 @@ const PROFIELEN = {
     bronnen: ["whoLucht"],
   },
   nh3: {
+    kort:
+      "Vormt fijn stof in de lucht en verrijkt natuurgebieden met stikstof, waardoor soorten van schrale grond verdwijnen.",
     wat: "Ammoniak, een scherp ruikend stikstofgas.",
     herkomst: "Overwegend landbouw: mest in stallen en op het land.",
     risico:
@@ -192,6 +215,8 @@ const PROFIELEN = {
     bronnen: ["eea", "vmmLucht"],
   },
   kwikGas: {
+    kort:
+      "Slaat neer op water en land, waar het als methylkwik in vis terechtkomt en het zenuwstelsel aantast.",
     wat: "Kwik in gasvorm, het enige metaal dat bij kamertemperatuur verdampt.",
     herkomst: "Kolenverbranding, afvalverbranding en industrie. Verspreidt zich wereldwijd.",
     risico:
@@ -227,6 +252,8 @@ const PROFIELEN = {
 
   // ---- water: zuurstof en organische belasting ----
   zuurstof: {
+    kort:
+      "Te weinig zuurstof betekent vissterfte en verlies van bodemleven; hier is een lage waarde het probleem, niet een hoge.",
     wat: "De hoeveelheid zuurstof die in het water is opgelost.",
     herkomst:
       "Komt uit de lucht en uit waterplanten en algen. Verdwijnt wanneer bacteriën organisch materiaal afbreken, en warm water houdt minder zuurstof vast dan koud.",
@@ -235,12 +262,16 @@ const PROFIELEN = {
     bronnen: ["vmmWater"],
   },
   zuurstofverzadiging: {
+    kort:
+      "Sterke afwijkingen wijzen op een algenbloei, die het water ’s nachts zijn zuurstof ontneemt.",
     wat: "Hoeveel zuurstof het water bevat ten opzichte van wat er bij deze temperatuur in kán.",
     risico:
       "Ver boven honderd procent wijst op een algenbloei die overdag zuurstof produceert — 's nachts keert dat om en kan de zuurstof juist wegzakken.",
     bronnen: ["vmmWater"],
   },
   bzv: {
+    kort:
+      "Zoveel afbreekbaar vuil dat de afbraak ervan de waterloop zuurstof ontneemt.",
     wat: "Biochemisch zuurstofverbruik: hoeveel zuurstof bacteriën in vijf dagen opgebruiken om het aanwezige organisch materiaal af te breken.",
     herkomst: "Huishoudelijk afvalwater, mest en afspoeling van landbouwgrond.",
     risico:
@@ -248,6 +279,8 @@ const PROFIELEN = {
     bronnen: ["vmmWater"],
   },
   czv: {
+    kort:
+      "Wijst op een zware belasting met organisch materiaal, waarvan een deel moeilijk afbreekt.",
     wat: "Chemisch zuurstofverbruik: hetzelfde idee als BZV, maar chemisch gemeten en inclusief het materiaal dat bacteriën niet afbreken.",
     herkomst: "Afvalwater van huishoudens en industrie.",
     risico:
@@ -264,6 +297,8 @@ const PROFIELEN = {
 
   // ---- water: nutriënten ----
   nitraat: {
+    kort:
+      "Voedt algengroei in de waterloop, en verstoort in drinkwater het zuurstoftransport in het bloed van zuigelingen.",
     wat: "De meest voorkomende opgeloste vorm van stikstof in water.",
     herkomst:
       "Overwegend bemesting van landbouwgrond. Nitraat spoelt makkelijk uit de bodem en zakt door naar het grondwater, waar het jaren later nog opduikt.",
@@ -272,6 +307,8 @@ const PROFIELEN = {
     bronnen: ["whoDrinkwater", "vmmMest"],
   },
   nitriet: {
+    kort:
+      "Verstoort het zuurstoftransport in het bloed, krachtiger dan nitraat, en is giftig voor vissen.",
     wat: "Een tussenvorm in de omzetting van ammonium naar nitraat.",
     herkomst: "Ontstaat in het water zelf, en komt uit afvalwater.",
     risico:
@@ -279,6 +316,8 @@ const PROFIELEN = {
     bronnen: ["whoDrinkwater"],
   },
   ammonium: {
+    kort:
+      "Verbruikt zuurstof bij afbraak en gaat over in ammoniak, dat giftig is voor vissen — des te meer naarmate het water warmer en basischer is.",
     wat: "De gereduceerde vorm van stikstof, kenmerkend voor water met weinig zuurstof.",
     herkomst: "Huishoudelijk afvalwater, mest en de afbraak van organisch materiaal.",
     risico:
@@ -286,6 +325,8 @@ const PROFIELEN = {
     bronnen: ["vmmWater"],
   },
   stikstofTotaal: {
+    kort:
+      "Te veel stikstof leidt tot algenbloei, zuurstoftekort en het verdwijnen van soorten.",
     wat: "Alle stikstofvormen samen: nitraat, nitriet, ammonium en de stikstof die in organisch materiaal vastzit.",
     herkomst: "Landbouw, afvalwater en neerslag van stikstof uit de lucht.",
     risico:
@@ -293,6 +334,8 @@ const PROFIELEN = {
     bronnen: ["vmmMest"],
   },
   fosfaat: {
+    kort:
+      "In zoet water is fosfor meestal de stof die algengroei begrenst; een teveel zet een bloei in gang die het water later zijn zuurstof ontneemt.",
     wat: "De opgeloste vorm van fosfor die planten en algen direct kunnen opnemen.",
     herkomst: "Mest, afvalwater en historisch ook wasmiddelen.",
     risico:
@@ -300,6 +343,8 @@ const PROFIELEN = {
     bronnen: ["vmmMest"],
   },
   fosforTotaal: {
+    kort:
+      "Voedt algenbloei, ook op termijn: fosfor die aan bodemdeeltjes hangt komt later alsnog vrij.",
     wat: "Alle fosfor samen, opgelost én gebonden aan zwevend materiaal.",
     herkomst: "Mest, afvalwater en erosie van landbouwgrond.",
     risico:
@@ -309,6 +354,8 @@ const PROFIELEN = {
 
   // ---- water: algemeen fysisch-chemisch ----
   zuurtegraad: {
+    kort:
+      "Buiten het bereik dat waterleven verdraagt, en het maakt andere stoffen giftiger — metalen lossen op in zuur water, ammonium wordt schadelijker in basisch water.",
     wat: "De zuurtegraad van het water, op een schaal van 0 tot 14.",
     herkomst: "Bepaald door de bodem, door algengroei en door lozingen.",
     risico:
@@ -316,6 +363,8 @@ const PROFIELEN = {
     bronnen: ["vmmWater"],
   },
   temperatuurWater: {
+    kort:
+      "Warm water houdt minder zuurstof vast en versnelt tegelijk de processen die zuurstof verbruiken.",
     wat: "De temperatuur van het water.",
     herkomst: "Weer en seizoen, en plaatselijk lozingen van koelwater.",
     risico:
@@ -323,6 +372,8 @@ const PROFIELEN = {
     bronnen: ["vmmWater"],
   },
   geleidbaarheid: {
+    kort:
+      "Wijst op veel opgeloste zouten; een sprong verraadt een lozing of indringend zout water.",
     wat: "Hoe goed het water stroom geleidt — een maat voor de hoeveelheid opgeloste zouten.",
     herkomst: "Natuurlijk uit de ondergrond; daarnaast wegenzout, lozingen en zeewaterinvloed.",
     risico:
@@ -330,6 +381,8 @@ const PROFIELEN = {
     bronnen: ["vmmWater"],
   },
   chloride: {
+    kort:
+      "Zoet water met te veel chloride verliest zijn soorten; in drinkwater gaat het om de smaak.",
     wat: "Het zoutbestanddeel dat het water brak maakt.",
     herkomst: "Zeewater, strooizout, en lozingen van industrie.",
     risico:
@@ -337,6 +390,8 @@ const PROFIELEN = {
     bronnen: ["whoDrinkwater"],
   },
   sulfaat: {
+    kort:
+      "Smaakt bitter en werkt laxerend, en maakt in waterbodems fosfaat los waardoor de vermesting toeneemt.",
     wat: "Een zoutbestanddeel dat van nature in de bodem voorkomt.",
     herkomst: "Uitspoeling van de ondergrond, bemesting en industrie.",
     risico:
@@ -344,6 +399,8 @@ const PROFIELEN = {
     bronnen: ["whoDrinkwater"],
   },
   zwevendeStof: {
+    kort:
+      "Houdt licht tegen zodat waterplanten verdwijnen, en bedekt de bodem waar vissen paaien.",
     wat: "Het materiaal dat in het water zweeft en het troebel maakt.",
     herkomst: "Erosie van akkers, opwerveling door stroming en scheepvaart, en lozingen.",
     risico:
@@ -380,6 +437,8 @@ const PROFIELEN = {
     bronnen: ["whoDrinkwater"],
   },
   boor: {
+    kort:
+      "De norm rust op effecten op de voortplanting die in dierproeven zijn beschreven.",
     wat: "Een element dat van nature in de ondergrond en in zeewater zit.",
     herkomst: "Natuurlijk gesteente, en daarnaast wasmiddelen en industrieel afvalwater.",
     risico:
@@ -415,6 +474,8 @@ const PROFIELEN = {
 
   // ---- metalen ----
   arseen: {
+    kort:
+      "Langdurige blootstelling via drinkwater geeft huidafwijkingen en verhoogt het risico op kanker van blaas, longen en huid.",
     wat: "Een halfmetaal dat van nature in de ondergrond zit.",
     herkomst:
       "Vooral natuurlijk, uit gesteente en bodemlagen; daarnaast uit oude houtverduurzaming en industrie. In grondwater kan het zonder menselijk toedoen hoog liggen.",
@@ -423,6 +484,8 @@ const PROFIELEN = {
     bronnen: ["whoArseen", "whoDrinkwater"],
   },
   lood: {
+    kort:
+      "De WHO kent geen blootstellingsniveau dat zonder schadelijk effect is; bij kinderen tast lood de hersenontwikkeling blijvend aan.",
     wat: "Een zwaar metaal dat vroeger volop in leidingen, verf en benzine zat.",
     herkomst:
       "Oude loden waterleidingen en huisaansluitingen, historische bodemvervuiling en industrie. Sinds lood uit benzine verdween, is de blootstelling via lucht sterk gedaald.",
@@ -431,6 +494,8 @@ const PROFIELEN = {
     bronnen: ["whoLood", "whoDrinkwater"],
   },
   cadmium: {
+    kort:
+      "Hoopt zich tientallen jaren op in de nieren en beschadigt die; het IARC noemt cadmium kankerverwekkend voor de mens.",
     wat: "Een zwaar metaal dat zich in het lichaam opstapelt.",
     herkomst:
       "Kunstmest, zinkindustrie, batterijen en historische vervuiling. In de Kempen zit het van oudsher in de bodem door de zinkfabrieken.",
@@ -439,6 +504,8 @@ const PROFIELEN = {
     bronnen: ["whoDrinkwater", "iarc"],
   },
   chroom: {
+    kort:
+      "Zeswaardig chroom is kankerverwekkend, en een analyse van totaal chroom kan die vorm niet uitsluiten.",
     wat: "Een metaal dat in twee vormen voorkomt, met heel verschillende gevaren.",
     herkomst: "Metaalbewerking, leerlooierij, verf en roestvast staal.",
     risico:
@@ -446,6 +513,8 @@ const PROFIELEN = {
     bronnen: ["whoDrinkwater", "iarc"],
   },
   nikkel: {
+    kort:
+      "De bekendste reactie is contactallergie; wie daar gevoelig voor is kan ook via water klachten krijgen.",
     wat: "Een metaal dat veel in legeringen en kranen wordt gebruikt.",
     herkomst: "Kraanwerk en leidingen, metaalindustrie en natuurlijke ondergrond.",
     risico:
@@ -453,6 +522,8 @@ const PROFIELEN = {
     bronnen: ["whoDrinkwater"],
   },
   koper: {
+    kort:
+      "Giftig voor waterorganismen bij gehalten die voor mensen onschadelijk zijn.",
     wat: "Een metaal dat het lichaam in kleine hoeveelheden nodig heeft.",
     herkomst: "Koperen waterleidingen, en in landbouwgebied ook gewasbescherming en veevoeder.",
     risico:
@@ -460,6 +531,8 @@ const PROFIELEN = {
     bronnen: ["whoDrinkwater", "vmmWater"],
   },
   zink: {
+    kort:
+      "Schadelijk voor waterorganismen, ook waar het voor mensen geen probleem vormt.",
     wat: "Een metaal dat het lichaam als spoorelement nodig heeft.",
     herkomst: "Gegalvaniseerd metaal, dakgoten, banden en historische zinkindustrie.",
     risico:
@@ -467,6 +540,8 @@ const PROFIELEN = {
     bronnen: ["whoDrinkwater", "vmmWater"],
   },
   kwikWater: {
+    kort:
+      "Wordt in waterbodems omgezet in methylkwik, dat zich ophoopt in vis en het zenuwstelsel aantast.",
     wat: "Een zwaar metaal dat zich opstapelt in de voedselketen.",
     herkomst: "Industrie, afvalverbranding en historische vervuiling.",
     risico:
@@ -474,6 +549,8 @@ const PROFIELEN = {
     bronnen: ["whoDrinkwater", "vmmWater"],
   },
   mangaan: {
+    kort:
+      "Geeft bruinzwarte aanslag en een metaalsmaak; in grondwater is een hoge waarde meestal natuurlijk en geen vervuiling.",
     wat: "Een metaal dat vrijwel overal in de ondergrond zit.",
     herkomst:
       "Vrijwel altijd natuurlijk. In grondwater zonder zuurstof lost mangaan makkelijk op, waardoor het daar hoog kan liggen zonder dat er iets vervuild is.",
@@ -482,6 +559,8 @@ const PROFIELEN = {
     bronnen: ["whoDrinkwater"],
   },
   ijzer: {
+    kort:
+      "Geeft roestbruine verkleuring en een metaalsmaak, maar vormt geen gezondheidsrisico; in grondwater is het vrijwel altijd natuurlijk.",
     wat: "Een van de meest voorkomende metalen in de bodem.",
     herkomst: "Vrijwel altijd natuurlijk, en net als mangaan goed oplosbaar in zuurstofarm grondwater.",
     risico:
@@ -489,6 +568,8 @@ const PROFIELEN = {
     bronnen: ["whoDrinkwater"],
   },
   aluminium: {
+    kort:
+      "In zuur water beschadigt opgelost aluminium de kieuwen van vissen.",
     wat: "Het meest voorkomende metaal in de aardkorst.",
     herkomst:
       "Natuurlijk uit klei en bodem. Lost sterker op naarmate het water zuurder is, wat het aan verzuring koppelt. Wordt ook gebruikt bij de zuivering van drinkwater.",
@@ -498,6 +579,8 @@ const PROFIELEN = {
   },
 
   antimoon: {
+    kort:
+      "Geeft bij hoge inname maag- en darmklachten.",
     wat: "Een halfmetaal dat lijkt op arseen, maar minder giftig is.",
     herkomst: "Soldeer, legeringen, brandvertragers en de productie van kunststof flessen.",
     risico:
@@ -505,6 +588,8 @@ const PROFIELEN = {
     bronnen: ["whoDrinkwater"],
   },
   barium: {
+    kort:
+      "Verhoogt bij langdurige inname de bloeddruk.",
     wat: "Een metaal dat van nature in gesteente voorkomt.",
     herkomst: "Natuurlijke ondergrond, boorindustrie en verf.",
     risico:
@@ -526,6 +611,8 @@ const PROFIELEN = {
     bronnen: ["whoDrinkwater"],
   },
   seleen: {
+    kort:
+      "Overmaat geeft haaruitval, broze nagels en zenuwklachten.",
     wat: "Een spoorelement dat noodzakelijk is, maar met een smalle marge tussen te weinig en te veel.",
     herkomst: "Natuurlijk uit gesteente; daarnaast verbranding en industrie.",
     risico:
@@ -533,6 +620,8 @@ const PROFIELEN = {
     bronnen: ["whoDrinkwater"],
   },
   thallium: {
+    kort:
+      "Zeer giftig bij inname: het tast het zenuwstelsel aan en veroorzaakt haaruitval.",
     wat: "Een zwaar metaal dat vroeger als rattengif werd gebruikt.",
     herkomst: "Verbranding van steenkool, cementproductie en metaalwinning.",
     risico:
@@ -540,6 +629,8 @@ const PROFIELEN = {
     bronnen: ["whoDrinkwater"],
   },
   uranium: {
+    kort:
+      "Belast de nieren; in drinkwater telt de scheikundige giftigheid, niet de straling.",
     wat: "Een zwaar, licht radioactief metaal dat overal in gesteente voorkomt.",
     herkomst: "Vrijwel altijd natuurlijk, uit de ondergrond; daarnaast fosfaatmeststoffen.",
     risico:
@@ -577,6 +668,8 @@ const PROFIELEN = {
 
   // ---- bacteriologie ----
   fecaleBacterien: {
+    kort:
+      "Verraadt uitwerpselen in het water, en daarmee mogelijk ziekteverwekkers die veel moeilijker te meten zijn.",
     wat: "Bacteriën die van nature in de darm van mens en dier leven.",
     herkomst:
       "Ongezuiverd huishoudelijk afvalwater, overstorten bij hevige regen, mest en watervogels.",
@@ -587,6 +680,8 @@ const PROFIELEN = {
 
   // ---- PFAS en pesticiden ----
   pfas: {
+    kort:
+      "Stapelt zich op in het lichaam en verlaat het traag; EFSA wees als doorslaggevend effect aan dat het afweersysteem minder goed op vaccinatie reageert.",
     wat: "Een familie van duizenden door de mens gemaakte fluorverbindingen, bekend als de eeuwige chemicaliën omdat ze in de natuur nauwelijks afbreken.",
     herkomst:
       "Antiaanbaklagen, waterafstotende kleding, verpakkingen, en vooral blusschuim — dat laatste is de oorzaak van de bekendste vervuilingen in Vlaanderen.",
@@ -595,6 +690,8 @@ const PROFIELEN = {
     bronnen: ["efsaPfas", "whoDrinkwater"],
   },
   pesticiden: {
+    kort:
+      "Bestrijdingsmiddelen horen niet in drinkwater thuis — de norm van 0,1 µg/L is daarop gebaseerd en niet op een gezondheidsgrens per stof.",
     wat: "Stoffen om onkruid, insecten of schimmels te bestrijden, en de resten waarin ze in de bodem uiteenvallen.",
     herkomst:
       "Landbouw, en daarnaast openbaar groen, spoorwegen en particuliere tuinen. Metabolieten kunnen nog jaren opduiken nadat een middel verboden is.",
@@ -603,6 +700,8 @@ const PROFIELEN = {
     bronnen: ["whoDrinkwater"],
   },
   atrazine: {
+    kort:
+      "Verstoort de hormoonhuishouding van waterdieren, en duikt twintig jaar na het Europese verbod nog op.",
     wat: "Een onkruidbestrijder die decennialang in de maïsteelt werd gebruikt.",
     herkomst:
       "In de Europese Unie sinds 2004 niet meer toegelaten. Wat er nu nog gemeten wordt, is een erfenis: atrazine breekt traag af en zakt langzaam door naar het grondwater.",
@@ -612,6 +711,8 @@ const PROFIELEN = {
   },
 
   geneesmiddelen: {
+    kort:
+      "Blootstelling van waterleven gedurende het hele leven, en bij antibiotica het risico dat resistentie in de hand wordt gewerkt.",
     wat: "Resten van medicijnen en hun afbraakproducten.",
     herkomst:
       "Wat mensen en dieren innemen, verlaat het lichaam grotendeels weer. Waterzuivering is er niet op gebouwd deze stoffen te verwijderen, dus komen ze via het riool in het water terecht. Ook mest van behandeld vee draagt bij.",
@@ -620,6 +721,8 @@ const PROFIELEN = {
     bronnen: ["whoDrinkwater", "vmmWater"],
   },
   organisch: {
+    kort:
+      "Wat een waarde betekent hangt sterk af van de stof: sommige zijn vooral hinderlijk van smaak, andere zijn kankerverwekkend.",
     wat: "Door de mens gemaakte koolstofverbindingen: oplosmiddelen, brandstofbestanddelen en industriële grondstoffen.",
     herkomst:
       "Vaak historische bodemvervuiling van tankstations, chemische reiniging en industrie. Zulke stoffen zakken door naar het grondwater en blijven daar lang.",
@@ -821,6 +924,21 @@ const PFAS_NAAM = /(perfluor|polyfluor|fluortelomeer|fluoroctaan|fluorbutaan)/i;
  * zou passen, wekt de indruk dat er iets uitgelegd is terwijl de lezer niets
  * wijzer wordt — en bij gezondheidsinformatie is dat erger dan zwijgen.
  */
+/**
+ * De ene zin die bij een overschrijding in de tabel komt: wat er misgaat, niet
+ * wat de stof is. Wie hier leest, weet al dát de norm overschreden is.
+ *
+ * Zonder eigen `kort` valt hij terug op de eerste zin van `risico`. Dat gaat
+ * over het risico en is dus nooit naast de kwestie, maar het is een terugval en
+ * geen ontwerp — vandaar dat de stoffen die in de praktijk overschrijden hun
+ * eigen zin dragen.
+ */
+export function korteRisicozin(profiel: Stofprofiel): string | undefined {
+  if (profiel.kort) return profiel.kort;
+  const eerste = profiel.risico?.match(/^.*?[.!?](?=\s|$)/)?.[0];
+  return eerste ?? profiel.risico;
+}
+
 export function stofprofiel(
   parameter: Pick<ParameterSamenvatting, "symbool" | "omschrijving"> & { groep?: string },
   laag?: LaagId,

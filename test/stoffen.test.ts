@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { STOFBRONNEN, stofprofiel } from "../src/data/stoffen.js";
+import { korteRisicozin, STOFBRONNEN, stofprofiel } from "../src/data/stoffen.js";
 import { STOFFEN } from "../src/data/lucht.js";
 import type { ParameterSamenvatting } from "../src/data/types.js";
 
@@ -176,6 +176,32 @@ describe("stofprofiel", () => {
 
     expect(gerapporteerd).toHaveLength(46);
     expect(zonder).toEqual([]);
+  });
+
+  it("zegt bij een overschrijding wat er misgaat, niet wat de stof is", () => {
+    const zin = korteRisicozin(stofprofiel(parameter("Nitraat (NO3)"))!);
+    expect(zin).toMatch(/algengroei|zuurstoftransport/i);
+    expect(zin).not.toMatch(/de meest voorkomende opgeloste vorm/i);
+  });
+
+  it("noemt bij zuurstof het tekort, niet het teveel", () => {
+    // Bij zuurstof is een lage waarde het probleem. De eerste zin van risico
+    // gaat daar over de rol van zuurstof en niet over wat er misgaat; daarom
+    // draagt deze stof een eigen korte zin.
+    expect(korteRisicozin(stofprofiel(parameter("Opgeloste zuurstof (O2)"))!)).toMatch(
+      /te weinig zuurstof/i,
+    );
+  });
+
+  it("levert altijd één afgeronde zin op", () => {
+    // De terugval knipt op het eerste leesteken. Blijft er een halve zin over,
+    // of een zin die met een dubbele punt eindigt, dan leest de tabelrij raar.
+    const symbolen = ["NO2", "PM2.5", "Lood (Pb)", "PFOS", "Cl-", "Atrazine (Atraz)"];
+    for (const symbool of symbolen) {
+      const zin = korteRisicozin(stofprofiel(parameter(symbool), "oppervlaktewater")!)!;
+      expect(zin).toMatch(/[.!?]$/);
+      expect(zin.length).toBeLessThan(190);
+    }
   });
 
   it("verwijst naar een pagina die de lezer kan openen", () => {
