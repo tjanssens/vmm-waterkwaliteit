@@ -268,6 +268,34 @@ button:focus-visible {
   color: var(--ink);
 }
 
+/* De licentie-iconen staan vóór de tekst en lopen mee in de regel. */
+.licentie__merk {
+  display: inline-flex;
+  gap: 2px;
+  vertical-align: -4px;
+  margin-right: 5px;
+  border-bottom: 0;
+}
+
+.licentie__merk img {
+  display: block;
+  opacity: 0.55;
+}
+
+.licentie__merk:hover img {
+  opacity: 0.9;
+}
+
+/* Zichtbaar voor een schermlezer, niet in beeld. */
+.visueel-verborgen {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* ---- kaart ---- */
 
 .kaartvlak {

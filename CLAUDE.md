@@ -37,7 +37,7 @@ en niet tegen Cognos, IRCELINE of DOV rechtstreeks.
 
 Een laag toevoegen hoort één bestand in `src/lagen/` te kosten plus één regel in
 `src/lagen/index.ts`. Staat er een `if (laag === …)` in gedeelde code, dan zit
-de oplossing op de verkeerde plek — de meetnetfilters begonnen zo en zijn
+de oplossing op de verkeerde plek, de meetnetfilters begonnen zo en zijn
 daarom `Puntfilter`s op het profiel geworden.
 
 ### Twee manieren waarop de tijdas werkt
@@ -62,7 +62,7 @@ deelbare link niet: die kennen alleen een id en kunnen niet eerst alles ophalen.
 
 ## Databronnen
 
-**Meetplaatsen oppervlaktewater** — WFS van Digitaal Vlaanderen, laag `Mtploppw`:
+**Meetplaatsen oppervlaktewater**, WFS van Digitaal Vlaanderen, laag `Mtploppw`:
 
 ```
 https://geo.api.vlaanderen.be/MeetplOppervlwaterkwal/wfs
@@ -71,9 +71,9 @@ https://geo.api.vlaanderen.be/MeetplOppervlwaterkwal/wfs
   &outputFormat=application/json&srsName=EPSG:4326
 ```
 
-7.534 punten. Geen gemeenteveld — dat bepalen we ruimtelijk tegen `VRBG:Refgem`.
+7.534 punten. Geen gemeenteveld; dat bepalen we ruimtelijk tegen `VRBG:Refgem`.
 
-**Analyseresultaten oppervlaktewater** — ongedocumenteerde REST-endpoint van
+**Analyseresultaten oppervlaktewater**, ongedocumenteerde REST-endpoint van
 Cognos, geen authenticatie:
 
 ```
@@ -86,7 +86,7 @@ Het rapport is ook rechtstreeks te openen met de prompts al ingevuld; dat is wat
 `rapportUrl()` bouwt voor de bronvermelding. `prompt=false` slaat het keuzescherm
 over.
 
-**Luchtkwaliteit** — IRCELINE, SOS-API met CORS:
+**Luchtkwaliteit**, IRCELINE, SOS-API met CORS:
 
 ```
 GET  /sos/api/v1/stations?format=json                     137 stations
@@ -94,7 +94,7 @@ GET  /sos/api/v1/timeseries?station=<id>&expanded=true    reeksen van dat statio
 POST /sos/api/v1/timeseries/getData                       {timeseries:[…], timespan:"ISO/ISO"}
 ```
 
-**Grondwater** — DOV, WFS met CORS. Drie lagen in `gw_meetnetten`:
+**Grondwater**, DOV, WFS met CORS. Drie lagen in `gw_meetnetten`:
 `grondwaterlocaties_met_metingen` (19.024 filters), `grondwatermonsters` en
 `grondwaterobservaties`.
 
@@ -118,7 +118,7 @@ Deze zijn met tests afgedekt. Verwijder die tests niet zonder reden.
 - **"Meet PFAS" is een ingebakken index, geen meetnet.** De resultatendatabank
   kan die vraag niet beantwoorden zonder alle 7.534 punten te bevragen; DOV
   publiceert het antwoord als aparte laag (`pfas:pfas_oppwater`, veld
-  `meetplaats` — dezelfde nummers als de onze). Het bouwscript zet er een vlag
+  `meetplaats`, dezelfde nummers als de onze). Het bouwscript zet er een vlag
   bij: 279 punten. **GeoServer kapt stilzwijgend op 10.000 rijen af**, dus dat
   ophalen pagineert; zonder paginering lijken het er 26 en klopt niets. Een
   test bewaakt het aantal.
@@ -154,8 +154,8 @@ Deze zijn met tests afgedekt. Verwijder die tests niet zonder reden.
   filter. Dit staat in `meetwijze` op het profiel.
 - **Filteren op diepte gebeurt client-side**, op de punten die het venster al
   geladen heeft. De grenzen (10 m, 50 m) komen uit de verdeling over de 14.303
-  filters met chemie, niet uit een ronde gok. Filters zonder ingevulde diepte —
-  1.683 stuks — krijgen een eigen knop in plaats van weg te vallen. De klassen
+  filters met chemie, niet uit een ronde gok. Filters zonder ingevulde diepte,
+  1.683 stuks, krijgen een eigen knop in plaats van weg te vallen. De klassen
   sluiten aan zonder overlap: de bovengrens hoort erbij, de ondergrens niet,
   anders telt de kaart een punt dubbel zodra twee klassen aanstaan.
 - **Het meetpunt is de filter, niet de put.** Eén put kan meerdere filters op
@@ -167,7 +167,7 @@ Deze zijn met tests afgedekt. Verwijder die tests niet zonder reden.
 ## Normen
 
 Zes sets in `src/data/normen.ts`, elk met bron per norm. Elke waarde is in de
-primaire bron opgezocht en met een tweede bron nagerekend — dat is geen
+primaire bron opgezocht en met een tweede bron nagerekend. Dat is geen
 formaliteit:
 
 - De eerste drinkwaterronde kwam uit de ingetrokken richtlijn 98/83. Antimoon
@@ -195,7 +195,7 @@ Aandachtspunten:
 
 `src/data/stoffen.ts` beantwoordt drie vragen per stof: wat is het, waar komt
 het vandaan, waarom maakt het uit. Het verschijnt in het grafiekvenster, ook
-wanneer er niets overschreden wordt — wie een vinkje ziet, mag evengoed weten
+wanneer er niets overschreden wordt: wie een vinkje ziet, mag evengoed weten
 wat er dan binnen de norm blijft.
 
 Bij een overschrijding staat de "wat het is"-zin ook in de tabelrij zelf, want
@@ -227,7 +227,7 @@ waaróm dat uitmaakt.
 `stoffen.ts` beschrijft de PFAS afzonderlijk waar hun verhaal verschilt: PFOS
 komt uit blusschuim, PFBS is de vervanger die daarvoor in de plaats kwam, diPAP
 uit voedselverpakking, TFA regent uit de lucht. Homologe reeksen (korte en
-lange perfluorcarbonzuren, de sulfonzuren) delen wél één tekst — daar is de
+lange perfluorcarbonzuren, de sulfonzuren) delen wél één tekst, daar is de
 ketenlengte juist het verhaal.
 
 - **Dezelfde stof komt in vier gedaanten binnen**: "PFOS totaal", "PFOS
@@ -246,7 +246,7 @@ ketenlengte juist het verhaal.
 
 Hetzelfde als bij PFAS, met één onderscheid dat zwaarder weegt: **sommige
 middelen zijn al twintig jaar verboden en andere mogen vandaag nog**. Atrazine
-is een erfenis, terbutylazine verving het en is nog toegelaten — een vondst
+is een erfenis, terbutylazine verving het en is nog toegelaten, een vondst
 betekent dus iets heel anders. Eén gedeelde tekst wist dat verschil uit.
 
 - **Namen zijn niet op te sommen.** DOV verzint per metaboliet een schrijfwijze
@@ -256,7 +256,7 @@ betekent dus iets heel anders. Eén gedeelde tekst wist dat verschil uit.
 - **De volle databank is niet opgehaald.** 448.000 metingen binnenhalen om een
   namenlijst te krijgen staat niet in verhouding; een steekproef van 30.000
   levert 84 namen, en die dekken het beeld. De familie- en groepsteksten vangen
-  de rest — dat is geen tekortkoming maar het ontwerp.
+  de rest. Dat is geen tekortkoming maar het ontwerp.
 - **"Niet-relevante metabolieten" hebben een eigen tekst**, want dat label
   bepaalt of de norm van 0,1 µg/L geldt.
 - Twee tests: één op de dekking, één die faalt zodra een tekst geen gevolg voor
@@ -271,7 +271,7 @@ verwijzing die de zwaarste uitspraken draagt.
   cadmium, chroom(VI), nikkelverbindingen en beryllium staan in IARC-groep 1;
   dat staat er nu bij mét de kankersoort en met een verwijzing naar de
   IARC-lijst zelf. Een test faalt als zo'n uitspraak zonder die bron staat.
-- **Kwik heeft een eigen verdrag** — Minamata — en dat wordt genoemd waar het
+- **Kwik heeft een eigen verdrag**, Minamata, en dat wordt genoemd waar het
   ertoe doet. Kwik in lucht en kwik in water houden aparte teksten: het eerste
   gaat over neerslag en verspreiding, het tweede over methylkwik in vis.
 - **Geen effect is ook een gevolg.** Bij ijzer staat expliciet dat een
@@ -286,14 +286,14 @@ verwijzing die de zwaarste uitspraken draagt.
 parametergroep niets opleveren. Zo staat er maar op één plek wat een stof is.
 
 Dat was nodig omdat het al misging: op meetplaats OW72000 stonden 75 van de
-155 parameters in "Overige parameters" — geneesmiddelen, organofosfaat-
+155 parameters in "Overige parameters", geneesmiddelen, organofosfaat-
 insecticiden en ultrakorte PFAS, onder afkortingen die de VMM zelf verzint.
 "AzinfosEy" is azinfos-ethyl en "Carbamaze" is carbamazepine; daar past geen
 patroon op, die moeten met de hand. Nu is die categorie er leeg.
 
 ## Elke parameter blijft zichtbaar
 
-Geen enkele bron wordt gefilterd op een lijst die wij bijhouden — wat de bron
+Geen enkele bron wordt gefilterd op een lijst die wij bijhouden, wat de bron
 meet, komt op het scherm. `categorieVan` valt terug op "Overige parameters" en
 `deelIn` verliest niets; dat is met tellingen per bron nagegaan (108 = 108 bij
 grondwater, 46 = 46 bij oppervlaktewater). Bij lucht dekken de 23 stoffen in
@@ -310,7 +310,7 @@ test bewaakt dat voor de luchtstoffen.
   telt 484 filters, maar dat is een campagne en geen index: filter 2003-005059
   in Landen rapporteert PFAS (TFA) en zit er niet in. Een volledige lijst zou
   betekenen dat je de observaties op parametergroep filtert en die via de
-  monsters naar filters terugrekent — twee grote gepagineerde bevragingen.
+  monsters naar filters terugrekent, twee grote gepagineerde bevragingen.
 - Bijlage 2.4.1 noemt normen voor barium, antimoon, seleen, cyanide, minerale
   oliën, fenolen, PAK's en gechloreerde ethenen. DOV's parameternaam daarvoor is
   niet vastgesteld, en een norm op een gegokte sleutel toetst stilzwijgend niets.

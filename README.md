@@ -23,7 +23,7 @@ Open http://localhost:5173. Tijdens ontwikkeling neemt een middleware in
 
 ## De drie lagen
 
-Vorm draagt het onderscheid op de kaart, kleur versterkt het — kleur alleen zou
+Vorm draagt het onderscheid op de kaart, kleur versterkt het, kleur alleen zou
 onleesbaar zijn voor kleurenblinde gebruikers en op een afdruk. De kleuren zijn
 samen door een palletvalidator gehaald op lichtheid, chroma, onderling contrast
 en kleurenblindheid.
@@ -57,7 +57,7 @@ beide door elkaar bekijkt vergelijkt twee verschillende tijdvakken.
 ## De tijdas werkt niet overal hetzelfde
 
 Bij water kiest het meetjaar wat je *ziet* uit wat al opgehaald is. Bij lucht
-bepaalt het venster wat er *opgehaald wordt* — een jaar uurmetingen halen we
+bepaalt het venster wat er *opgehaald wordt*: een jaar uurmetingen halen we
 niet binnen om er twee dagen van te tonen. Vier vensters: 48 uur, 7 dagen,
 30 dagen en 1 jaar.
 
@@ -77,7 +77,7 @@ Per laag kun je toetsen aan verschillende sets:
 Elke waarde is in de primaire bron opgezocht en met een tweede bron nagerekend.
 Dat is geen formaliteit: de eerste ronde bevatte drie drinkwaterwaarden uit een
 ingetrokken richtlijn, en IRCELINE's eigen normenpagina geeft koolstofmonoxide
-als 10 µg/m³ waar de richtlijn 10 mg/m³ zegt — een factor duizend.
+als 10 µg/m³ waar de richtlijn 10 mg/m³ zegt: een factor duizend.
 
 Het verschil tussen de sets is zelf informatie. Meetstation Borgerhout haalde
 over het afgelopen jaar 16,4 µg/m³ PM10, 8,61 PM2,5 en 20 NO₂: drie keer conform
@@ -87,18 +87,18 @@ de VLAREM-norm van 1 mg/L, maar gaat ruim over de drinkwaternorm van 0,05.
 
 Honderden pesticiden delen één norm van 0,1 µg/L per stof. Die hangt aan de
 parametergroep die DOV zelf meegeeft, niet aan een lijst stofnamen die wij
-bijhouden — anders zou elke nieuwe stof stilzwijgend ongetoetst blijven.
+bijhouden: anders zou elke nieuwe stof stilzwijgend ongetoetst blijven.
 
 ## Wat betekent deze stof?
 
 Klik een parameter aan en onder de grafiek staat wat het is, waar het vandaan
-komt en waarom het uitmaakt — ook als er niets overschreden is. Wie een vinkje
+komt en waarom het uitmaakt, ook als er niets overschreden is. Wie een vinkje
 ziet, mag evengoed weten wat er dan binnen de norm blijft.
 
 Bij een overschrijding staat één zin meteen in de tabel: niet wat de stof is,
 maar wat er misgaat.
 
-> **Atrazine (Atraz)** — boven norm · norm ≤ 0,1 µg/L
+> **Atrazine (Atraz)**, boven norm · norm ≤ 0,1 µg/L
 > Verstoort de hormoonhuishouding van waterdieren, en duikt twintig jaar na het
 > Europese verbod nog op.
 
@@ -106,7 +106,7 @@ PFAS krijgen tekst per stof en niet per familie, want hun herkomst verschilt:
 PFOS komt uit blusschuim, PFBS is de vervanger die daarvoor in de plaats kwam,
 fluortelomeerfosfaten uit vetwerende voedselverpakking, en TFA regent uit de
 lucht. Een knop **Enkel aangetoond** laat de stoffen weg die nooit boven de
-detectielimiet uitkwamen — aan een PFAS-meetpunt scheelt dat al snel 50 regels
+detectielimiet uitkwamen, aan een PFAS-meetpunt scheelt dat al snel 50 regels
 tegenover 8.
 
 Bij pesticiden speelt nog iets mee: sommige middelen zijn al twintig jaar
@@ -174,6 +174,39 @@ resultatenservice ontbreekt.
 
 `TOEGELATEN_ORIGINS` in `worker/wrangler.toml` staat al op de Pages-URL; vul aan
 bij een eigen domein.
+
+## Licentie
+
+[![Broncode: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/broncode-PolyForm%20Noncommercial%201.0.0-0b5f63)](LICENSE)
+[![Teksten: CC BY-NC-SA 4.0](https://img.shields.io/badge/teksten-CC%20BY--NC--SA%204.0-0b5f63)](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.nl)
+
+Hergebruiken en aanpassen mag, niet-commercieel en met bronvermelding.
+
+| Wat | Licentie |
+|---|---|
+| Broncode | [PolyForm Noncommercial 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0) |
+| Teksten: de duiding bij de stoffen, de uitleg bij de normen, de interface | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.nl) |
+| Meetgegevens | Niet van ons; zie de bronnen hierboven |
+
+Twee licenties omdat het om twee dingen gaat. Creative Commons raadt haar eigen
+licenties voor software af: ze regelen niets over broncode en octrooien. Voor de
+teksten is CC juist wel het passende instrument. PolyForm Noncommercial neemt
+bovendien de dubbelzinnigheid weg die "niet-commercieel" meestal oproept: het
+staat gebruik door overheid, onderwijs, liefdadigheid en milieuorganisaties
+uitdrukkelijk toe, ongeacht hoe die gefinancierd worden.
+
+De **meetgegevens zijn niet van ons om te licentiëren**. Ze komen van de Vlaamse
+Milieumaatschappij, IRCELINE en Databank Ondergrond Vlaanderen en vallen onder de
+voorwaarden van die instanties. Deze toepassing toont ze alleen.
+
+Commercieel gebruik in gedachten? Vraag het gerust, dat is bespreekbaar.
+
+## Bijdragen
+
+Klopt er een cijfer of een uitleg niet, of mis je een databron of een functie?
+[Meld het als issue](https://github.com/tjanssens/vmm-waterkwaliteit/issues/new);
+daar heb je geen code voor nodig. Werk je zelf een verbetering uit, dan is een
+[pull request](https://github.com/tjanssens/vmm-waterkwaliteit/compare) welkom.
 
 ## Bronnen
 
