@@ -76,6 +76,14 @@ export const STOFBRONNEN = {
     naam: "IARC Monographs — lijst van geclassificeerde stoffen",
     url: "https://monographs.iarc.who.int/list-of-classifications",
   },
+  iarcKankersoorten: {
+    naam: "IARC Monographs — geclassificeerde stoffen per kankersoort",
+    url: "https://monographs.iarc.who.int/wp-content/uploads/2019/07/Classifications_by_cancer_site.pdf",
+  },
+  minamata: {
+    naam: "Verdrag van Minamata over kwik — verdragstekst",
+    url: "https://minamataconvention.org/en/about/convention-text",
+  },
   eea: {
     naam: "Europees Milieuagentschap — Europe's air quality status",
     url: "https://www.eea.europa.eu/publications/europes-air-quality-status-2024",
@@ -253,8 +261,8 @@ const PROFIELEN = {
     wat: "Kwik in gasvorm, het enige metaal dat bij kamertemperatuur verdampt.",
     herkomst: "Kolenverbranding, afvalverbranding en industrie. Verspreidt zich wereldwijd.",
     risico:
-      "Slaat uiteindelijk neer op water en land, waar bacteriën het omzetten in methylkwik dat zich opstapelt in vis. Dat tast het zenuwstelsel aan; een ongeboren kind is er het gevoeligst voor.",
-    bronnen: ["whoDrinkwater"],
+      "Kwik verspreidt zich met de wind over de hele wereld en slaat uiteindelijk neer op water en land, waar bacteriën het omzetten in methylkwik dat zich opstapelt in vis. Dat tast het zenuwstelsel aan en is het gevaarlijkst voor het ongeboren kind. Omdat uitstoot in het ene land in het andere neerkomt, is er een wereldwijd verdrag voor: het Verdrag van Minamata.",
+    bronnen: ["minamata", "whoDrinkwater"],
   },
 
   // ---- weer ----
@@ -482,7 +490,7 @@ const PROFIELEN = {
     wat: "Een metaal dat het lichaam in sporen nodig heeft, als onderdeel van vitamine B12.",
     herkomst: "Natuurlijk uit gesteente; daarnaast metaalindustrie en batterijen.",
     risico:
-      "Zelden aangetroffen in gehalten die er in water toe doen. Bij langdurige hoge inname zijn effecten op hart en schildklier beschreven.",
+      "Zelden aangetroffen in gehalten die er in water toe doen. Bij langdurige hoge inname zijn effecten op hart en schildklier beschreven; kobalt is bovendien een bekende oorzaak van contactallergie. Een verhoogde waarde wijst meestal op metaalindustrie of op batterijverwerking in de buurt.",
     bronnen: ["whoDrinkwater"],
   },
   redox: {
@@ -509,12 +517,12 @@ const PROFIELEN = {
   arseen: {
     kort:
       "Langdurige blootstelling via drinkwater geeft huidafwijkingen en verhoogt het risico op kanker van blaas, longen en huid.",
-    wat: "Een halfmetaal dat van nature in de ondergrond zit.",
+    wat: "Een halfmetaal dat van nature in de ondergrond zit, en wereldwijd de gevaarlijkste verontreiniging van drinkwater.",
     herkomst:
       "Vooral natuurlijk, uit gesteente en bodemlagen; daarnaast uit oude houtverduurzaming en industrie. In grondwater kan het zonder menselijk toedoen hoog liggen.",
     risico:
-      "De WHO noemt langdurige blootstelling via drinkwater de grootste bedreiging: het geeft huidafwijkingen en verhoogt het risico op kanker van blaas, longen en huid. De richtwaarde van 10 µg/L is uitdrukkelijk voorlopig, omdat lager zuiveren technisch moeilijk is — niet omdat het veilig zou zijn.",
-    bronnen: ["whoArseen", "whoDrinkwater"],
+      "Het IARC deelt arseen in groep 1 in: kankerverwekkend voor de mens, met long-, huid- en blaaskanker. De WHO noemt langdurige blootstelling via drinkwater de grootste bedreiging; de eerste tekenen zijn pigmentvlekken en verhoornde plekken op handpalmen en voetzolen. De richtwaarde van 10 µg/L is uitdrukkelijk voorlopig omdat lager zuiveren technisch moeilijk is — niet omdat het veilig zou zijn.",
+    bronnen: ["whoArseen", "iarcKankersoorten", "whoDrinkwater"],
   },
   lood: {
     kort:
@@ -528,22 +536,22 @@ const PROFIELEN = {
   },
   cadmium: {
     kort:
-      "Hoopt zich tientallen jaren op in de nieren en beschadigt die; het IARC noemt cadmium kankerverwekkend voor de mens.",
+      "Kankerverwekkend voor de mens volgens het IARC, en het beschadigt na tientallen jaren opstapeling de nieren en de botten.",
     wat: "Een zwaar metaal dat zich in het lichaam opstapelt.",
     herkomst:
       "Kunstmest, zinkindustrie, batterijen en historische vervuiling. In de Kempen zit het van oudsher in de bodem door de zinkfabrieken.",
     risico:
-      "Hoopt zich tientallen jaren op in de nieren en beschadigt die op termijn. Verzwakt ook de botten. Het IARC classificeert cadmium als kankerverwekkend voor de mens.",
-    bronnen: ["whoDrinkwater", "iarc"],
+      "Het IARC deelt cadmium in groep 1 in: kankerverwekkend voor de mens, met longkanker. Daarnaast hoopt het zich tientallen jaren op in de nieren en beschadigt het die op termijn, en het verzwakt de botten. Wie in een belaste streek woont, krijgt het vooral binnen via groenten uit eigen tuin en niet via het water.",
+    bronnen: ["iarcKankersoorten", "whoDrinkwater"],
   },
   chroom: {
     kort:
-      "Zeswaardig chroom is kankerverwekkend, en een analyse van totaal chroom kan die vorm niet uitsluiten.",
+      "Zeswaardig chroom is door het IARC ingedeeld als kankerverwekkend voor de mens; een analyse van totaal chroom kan die vorm niet uitsluiten.",
     wat: "Een metaal dat in twee vormen voorkomt, met heel verschillende gevaren.",
     herkomst: "Metaalbewerking, leerlooierij, verf en roestvast staal.",
     risico:
-      "Driewaardig chroom is een noodzakelijk spoorelement; zeswaardig chroom is kankerverwekkend bij inademing. Een analyse van totaal chroom maakt dat onderscheid niet, en de norm gaat daarom uit van het ongunstigste geval.",
-    bronnen: ["whoDrinkwater", "iarc"],
+      "Driewaardig chroom is een noodzakelijk spoorelement. Zeswaardig chroom is iets heel anders: het IARC deelt het in groep 1 in, kankerverwekkend voor de mens met longkanker. Een analyse van totaal chroom maakt dat onderscheid niet, dus een meting hier zegt niet welke van de twee er zit — en de norm gaat daarom uit van het ongunstigste geval.",
+    bronnen: ["iarcKankersoorten", "whoDrinkwater"],
   },
   nikkel: {
     kort:
@@ -551,8 +559,8 @@ const PROFIELEN = {
     wat: "Een metaal dat veel in legeringen en kranen wordt gebruikt.",
     herkomst: "Kraanwerk en leidingen, metaalindustrie en natuurlijke ondergrond.",
     risico:
-      "De bekendste reactie is contactallergie. Wie daarvoor gevoelig is, kan ook via drinkwater klachten krijgen. Het eerste water uit een kraan die lang stilstond bevat er het meest van.",
-    bronnen: ["whoDrinkwater"],
+      "Ingeademde nikkelverbindingen zijn door het IARC in groep 1 ingedeeld, met long- en neusholtekanker; dat is een beroepsrisico en geen risico van drinkwater. Via water is de bekendste reactie contactallergie: wie daarvoor gevoelig is, kan er klachten van krijgen. Het eerste water uit een kraan die lang heeft stilgestaan bevat er het meest van, dus even laten doorlopen helpt.",
+    bronnen: ["iarcKankersoorten", "whoDrinkwater"],
   },
   koper: {
     kort:
@@ -560,7 +568,7 @@ const PROFIELEN = {
     wat: "Een metaal dat het lichaam in kleine hoeveelheden nodig heeft.",
     herkomst: "Koperen waterleidingen, en in landbouwgebied ook gewasbescherming en veevoeder.",
     risico:
-      "In het drinkwater vooral een smaak- en maagkwestie bij hoge gehalten. In oppervlaktewater is koper wél problematisch: het is giftig voor waterorganismen bij concentraties die voor mensen onschadelijk zijn.",
+      "In drinkwater geeft een hoog gehalte een metaalsmaak en bij zeer hoge waarden maag- en darmklachten; zuigelingen zijn er gevoeliger voor. In oppervlaktewater weegt het zwaarder: koper is giftig voor waterorganismen bij concentraties die voor mensen onschadelijk zijn, en het is een van de metalen die de biologische kwaliteit van Vlaamse waterlopen het meest drukt.",
     bronnen: ["whoDrinkwater", "vmmWater"],
   },
   zink: {
@@ -569,17 +577,17 @@ const PROFIELEN = {
     wat: "Een metaal dat het lichaam als spoorelement nodig heeft.",
     herkomst: "Gegalvaniseerd metaal, dakgoten, banden en historische zinkindustrie.",
     risico:
-      "Voor mensen weinig problematisch — de norm gaat over smaak. Voor waterorganismen is zink wel schadelijk, en in de Kempen is de bodem er van oudsher mee belast.",
+      "Voor mensen weinig problematisch; de norm gaat over smaak. Voor waterorganismen is zink wel schadelijk: het remt de groei van algen en kreeftachtigen. In de Kempen is de bodem er van oudsher zwaar mee belast door de zinkfabrieken, en daar bepaalt het mee welke gewassen er veilig geteeld kunnen worden.",
     bronnen: ["whoDrinkwater", "vmmWater"],
   },
   kwikWater: {
     kort:
-      "Wordt in waterbodems omgezet in methylkwik, dat zich ophoopt in vis en het zenuwstelsel aantast.",
+      "Wordt in waterbodems omgezet in methylkwik, dat zich ophoopt in vis en het zenuwstelsel aantast — het gevaarlijkst voor het ongeboren kind.",
     wat: "Een zwaar metaal dat zich opstapelt in de voedselketen.",
     herkomst: "Industrie, afvalverbranding en historische vervuiling.",
     risico:
-      "Bacteriën zetten kwik in waterbodems om in methylkwik, dat zich ophoopt in vis en zo bij de mens terechtkomt. Het tast het zenuwstelsel aan en is het gevaarlijkst voor het ongeboren kind. Daarom slaat de norm voor oppervlaktewater op wat er in vis zit, niet enkel op wat er in het water drijft.",
-    bronnen: ["whoDrinkwater", "vmmWater"],
+      "Bacteriën zetten kwik in waterbodems om in methylkwik, dat zich ophoopt in vis en zo bij de mens terechtkomt. Het tast het zenuwstelsel aan en is het gevaarlijkst voor het ongeboren kind, bij wie het de hersenontwikkeling schaadt. Daarom slaat de norm voor oppervlaktewater op wat er in vis zit en niet enkel op wat in het water drijft, en daarom bestaat er een apart wereldwijd verdrag voor: het Verdrag van Minamata, dat mens en milieu wil beschermen tegen door de mens veroorzaakte kwikuitstoot.",
+    bronnen: ["minamata", "whoDrinkwater", "vmmWater"],
   },
   mangaan: {
     kort:
@@ -588,7 +596,7 @@ const PROFIELEN = {
     herkomst:
       "Vrijwel altijd natuurlijk. In grondwater zonder zuurstof lost mangaan makkelijk op, waardoor het daar hoog kan liggen zonder dat er iets vervuild is.",
     risico:
-      "Geeft bruinzwarte aanslag en een metaalsmaak; daarop is de gebruikelijke drinkwaternorm gezet. Bij zeer hoge en langdurige inname zijn effecten op het zenuwstelsel beschreven. De VLAREM-norm voor grondwater ligt bewust een stuk hoger dan die voor drinkwater, omdat grondwater nog gezuiverd wordt.",
+      "Geeft bruinzwarte aanslag op sanitair en wasgoed en een metaalsmaak; daarop is de gebruikelijke drinkwaternorm gezet. Bij zeer hoge en langdurige inname zijn effecten op het zenuwstelsel beschreven, met aandacht voor zuigelingen. De VLAREM-norm voor grondwater ligt bewust een stuk hoger dan de drinkwaternorm, omdat grondwater nog gezuiverd wordt — een overschrijding daar betekent dus zuiveringskosten en niet meteen een gezondheidsprobleem.",
     bronnen: ["whoDrinkwater"],
   },
   ijzer: {
@@ -597,7 +605,7 @@ const PROFIELEN = {
     wat: "Een van de meest voorkomende metalen in de bodem.",
     herkomst: "Vrijwel altijd natuurlijk, en net als mangaan goed oplosbaar in zuurstofarm grondwater.",
     risico:
-      "Geen gezondheidsrisico bij de gehalten die in water voorkomen. Het geeft roestbruine verkleuring, vlekken op wasgoed en een metaalsmaak.",
+      "Geen gezondheidsrisico bij de gehalten die in water voorkomen; dit is een van de weinige parameters waar een overschrijding geen gezondheidsvraag oproept. Het gevolg is praktisch: roestbruine verkleuring, vlekken op wasgoed, een metaalsmaak en aanslag die leidingen en pompen doet dichtslibben.",
     bronnen: ["whoDrinkwater"],
   },
   aluminium: {
@@ -607,7 +615,7 @@ const PROFIELEN = {
     herkomst:
       "Natuurlijk uit klei en bodem. Lost sterker op naarmate het water zuurder is, wat het aan verzuring koppelt. Wordt ook gebruikt bij de zuivering van drinkwater.",
     risico:
-      "In zuur water is opgelost aluminium giftig voor vissen — het beschadigt hun kieuwen. Voor mensen is de drinkwaternorm gebaseerd op de zuiveringstechniek en op verkleuring, niet op een aangetoond gezondheidseffect.",
+      "In zuur water is opgelost aluminium giftig voor vissen: het beschadigt hun kieuwen, en het is de reden dat verzuurde beken en vennen hun visstand verloren. Voor mensen is de drinkwaternorm gebaseerd op de zuiveringstechniek en op verkleuring van het water, niet op een aangetoond gezondheidseffect bij deze gehalten.",
     bronnen: ["whoDrinkwater"],
   },
 
@@ -617,7 +625,7 @@ const PROFIELEN = {
     wat: "Een halfmetaal dat lijkt op arseen, maar minder giftig is.",
     herkomst: "Soldeer, legeringen, brandvertragers en de productie van kunststof flessen.",
     risico:
-      "Bij hoge inname maag- en darmklachten. De drinkwaternorm is in de huidige richtlijn versoepeld van 5 naar 10 µg/L, op basis van herzien onderzoek.",
+      "Bij hoge inname geeft antimoon maag- en darmklachten. De drinkwaternorm is in de huidige richtlijn versoepeld van 5 naar 10 µg/L op basis van herzien onderzoek — een van de weinige normen die minder streng werd in plaats van strenger.",
     bronnen: ["whoDrinkwater"],
   },
   barium: {
@@ -626,21 +634,21 @@ const PROFIELEN = {
     wat: "Een metaal dat van nature in gesteente voorkomt.",
     herkomst: "Natuurlijke ondergrond, boorindustrie en verf.",
     risico:
-      "Oplosbaar barium verhoogt bij langdurige inname de bloeddruk; daarop is de WHO-richtwaarde gebaseerd. De vormen die in de bodem gebonden blijven, worden nauwelijks opgenomen.",
+      "Oplosbaar barium verhoogt bij langdurige inname de bloeddruk, en daarmee het risico op hart- en vaatziekten; daarop is de WHO-richtwaarde gebaseerd. De vormen die in de bodem gebonden blijven, worden nauwelijks opgenomen, dus een hoog totaalgehalte betekent niet automatisch blootstelling.",
     bronnen: ["whoDrinkwater"],
   },
   beryllium: {
     wat: "Een zeer licht metaal, zeldzaam in water.",
     herkomst: "Legeringen, elektronica en verbranding van steenkool.",
     risico:
-      "Kankerverwekkend bij inademing van stof, wat een beroepsrisico is. Via drinkwater worden zelden gehalten bereikt die er toe doen; er is dan ook geen richtwaarde voor.",
-    bronnen: ["whoDrinkwater", "iarc"],
+      "Het IARC deelt beryllium in groep 1 in: kankerverwekkend voor de mens. Dat gaat over inademing van stof en is dus een beroepsrisico; via drinkwater worden zelden gehalten bereikt die ertoe doen, en er bestaat dan ook geen richtwaarde voor. Het wordt gemeten om te weten of er industriële verontreiniging in het spel is.",
+    bronnen: ["iarcKankersoorten", "whoDrinkwater"],
   },
   molybdeen: {
     wat: "Een spoorelement dat het lichaam in kleine hoeveelheden nodig heeft.",
     herkomst: "Natuurlijke ondergrond, staalindustrie en meststoffen.",
     risico:
-      "Zelden een probleem in water. Bij zeer hoge inname zijn effecten op de gewrichten beschreven.",
+      "Zelden een probleem in water: de gehalten die voorkomen liggen ver onder wat schadelijk is. Bij zeer hoge en langdurige inname zijn gewrichtsklachten beschreven. Het wordt vooral gemeten omdat een verhoogde waarde naar een industriële bron of naar bijzondere geologie wijst.",
     bronnen: ["whoDrinkwater"],
   },
   seleen: {
@@ -649,7 +657,7 @@ const PROFIELEN = {
     wat: "Een spoorelement dat noodzakelijk is, maar met een smalle marge tussen te weinig en te veel.",
     herkomst: "Natuurlijk uit gesteente; daarnaast verbranding en industrie.",
     risico:
-      "Overmaat geeft haaruitval, broze nagels en zenuwklachten. De drinkwaternorm ging in de huidige richtlijn van 10 naar 20 µg/L.",
+      "Seleen is een van de weinige stoffen waarbij te weinig én te veel schadelijk is. Overmaat geeft haaruitval, broze nagels en zenuwklachten; de marge tussen wat nodig is en wat schaadt, is klein. De drinkwaternorm ging in de huidige richtlijn van 10 naar 20 µg/L.",
     bronnen: ["whoDrinkwater"],
   },
   thallium: {
@@ -658,7 +666,7 @@ const PROFIELEN = {
     wat: "Een zwaar metaal dat vroeger als rattengif werd gebruikt.",
     herkomst: "Verbranding van steenkool, cementproductie en metaalwinning.",
     risico:
-      "Zeer giftig bij inname: het tast het zenuwstelsel aan en veroorzaakt haaruitval. In water komt het gelukkig zelden in meetbare hoeveelheden voor.",
+      "Zeer giftig bij inname: het tast het zenuwstelsel aan en veroorzaakt haaruitval, en het werd juist daarom vroeger als rattengif gebruikt. In water komt het zelden in meetbare hoeveelheden voor; duikt het wél op, dan wijst dat vrijwel altijd op verbranding van steenkool of op metaalwinning in de buurt.",
     bronnen: ["whoDrinkwater"],
   },
   uranium: {
@@ -667,35 +675,35 @@ const PROFIELEN = {
     wat: "Een zwaar, licht radioactief metaal dat overal in gesteente voorkomt.",
     herkomst: "Vrijwel altijd natuurlijk, uit de ondergrond; daarnaast fosfaatmeststoffen.",
     risico:
-      "In drinkwater telt niet de straling maar de scheikundige giftigheid: uranium belast de nieren. Daarop is de WHO-richtwaarde gebaseerd.",
+      "In drinkwater telt niet de straling maar de scheikundige giftigheid: uranium beschadigt de nieren, en daarop is de WHO-richtwaarde gebaseerd. Omdat het vrijwel altijd uit het gesteente zelf komt, is een verhoogde waarde geen aanwijzing voor vervuiling maar wel een reden om de bron niet zonder zuivering als drinkwater te gebruiken.",
     bronnen: ["whoDrinkwater"],
   },
   vanadium: {
     wat: "Een metaal dat in kleine hoeveelheden vrijwel overal voorkomt.",
     herkomst: "Verbranding van zware stookolie, staalindustrie en natuurlijke ondergrond.",
     risico:
-      "Bij hoge inname maag- en darmklachten. In water zelden in gehalten die er toe doen.",
+      "Bij hoge inname geeft vanadium maag- en darmklachten. In water komen zelden gehalten voor die ertoe doen; het wordt meegemeten omdat een verhoogde waarde wijst op verbranding van zware stookolie of op de staalindustrie.",
     bronnen: ["whoDrinkwater"],
   },
   zilver: {
     wat: "Een edelmetaal dat ook als ontsmettingsmiddel wordt gebruikt.",
     herkomst: "Fotografie, elektronica, en zilverhoudende producten met een antibacteriële werking.",
     risico:
-      "Weinig giftig. Zeer langdurige hoge inname kan de huid blijvend grijsblauw kleuren, wat argyrie heet. Voor waterorganismen is zilver wél schadelijk.",
+      "Voor de mens weinig giftig; alleen zeer langdurige hoge inname kan de huid blijvend grijsblauw kleuren, wat argyrie heet. Voor waterleven ligt dat anders: zilver is een van de giftigste metalen voor vissen en waterinsecten, juist omdat het als ontsmettingsmiddel bedoeld is om micro-organismen te doden.",
     bronnen: ["whoDrinkwater"],
   },
   tin: {
     wat: "Een metaal uit blik, soldeer en legeringen.",
     herkomst: "Conservenblik, soldeerverbindingen en industrie.",
     risico:
-      "Anorganisch tin is weinig giftig; de norm gaat over maagklachten bij hoge inname uit blikvoeding. De organische tinverbindingen uit scheepsverf zijn wél zeer schadelijk voor waterleven, maar dat zijn andere stoffen dan wat hier gemeten wordt.",
+      "Anorganisch tin is weinig giftig; de norm gaat over maagklachten bij hoge inname uit blikvoeding. Belangrijk voor de lezing van deze waarde: de organische tinverbindingen uit scheepsverf zijn wél zeer schadelijk — ze veroorzaakten geslachtsverandering bij zeeslakken en zijn daarom verboden — maar dat zijn andere stoffen dan het tin dat hier gemeten wordt.",
     bronnen: ["whoDrinkwater"],
   },
   sporenmetaal: {
     wat: "Een metaal dat meekomt in de brede metalenscan van het labo.",
     herkomst: "Natuurlijke ondergrond en verspreid industrieel gebruik.",
     risico:
-      "Er bestaat geen milieukwaliteits- of drinkwaternorm voor, omdat er in water zelden gehalten voorkomen die van belang zijn. De meting dient om het volledige beeld te hebben, niet omdat er een probleem verwacht wordt.",
+      "Er bestaat geen milieukwaliteits- of drinkwaternorm voor, omdat er in water zelden gehalten voorkomen die van belang zijn voor gezondheid of waterleven. De meting dient om het beeld volledig te maken en om industriële verontreiniging op het spoor te komen, niet omdat er een probleem verwacht wordt. Ontbreken van een norm is hier dus geen kennisleemte maar een beoordeling.",
     bronnen: ["whoDrinkwater"],
   },
 

@@ -262,6 +262,24 @@ betekent dus iets heel anders. Eén gedeelde tekst wist dat verschil uit.
 - Twee tests: één op de dekking, één die faalt zodra een tekst geen gevolg voor
   mens of milieu meer noemt.
 
+### Metalen: het gevolg, met de instantie die het uitsprak
+
+Metalen hadden al tekst per element; wat ontbrak was het gevolg en een
+verwijzing die de zwaarste uitspraken draagt.
+
+- **Kankerverwekkend is de zwaarste uitspraak die deze app doet.** Arseen,
+  cadmium, chroom(VI), nikkelverbindingen en beryllium staan in IARC-groep 1;
+  dat staat er nu bij mét de kankersoort en met een verwijzing naar de
+  IARC-lijst zelf. Een test faalt als zo'n uitspraak zonder die bron staat.
+- **Kwik heeft een eigen verdrag** — Minamata — en dat wordt genoemd waar het
+  ertoe doet. Kwik in lucht en kwik in water houden aparte teksten: het eerste
+  gaat over neerslag en verspreiding, het tweede over methylkwik in vis.
+- **Geen effect is ook een gevolg.** Bij ijzer staat expliciet dat een
+  overschrijding geen gezondheidsvraag oproept maar leidingen doet dichtslibben.
+  Dat is informatie, geen leegte.
+- De fractie (" t" totaal, " o" opgelost) zegt iets over de meetwijze en niet
+  over de stof; beide komen op dezelfde tekst uit.
+
 ## Elke parameter blijft zichtbaar
 
 Geen enkele bron wordt gefilterd op een lijst die wij bijhouden — wat de bron
