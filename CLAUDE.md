@@ -115,6 +115,13 @@ Deze zijn met tests afgedekt. Verwijder die tests niet zonder reden.
 - **Metalen zijn totaalgehalten** terwijl de milieukwaliteitsnorm op de opgeloste
   fractie slaat. Niet toetsen. Uitzondering: `P t` en `N t` zijn nutriënten.
 - **Cognos meldt fouten met status 200** en een XML-body die met `<` begint.
+- **"Meet PFAS" is een ingebakken index, geen meetnet.** De resultatendatabank
+  kan die vraag niet beantwoorden zonder alle 7.534 punten te bevragen; DOV
+  publiceert het antwoord als aparte laag (`pfas:pfas_oppwater`, veld
+  `meetplaats` — dezelfde nummers als de onze). Het bouwscript zet er een vlag
+  bij: 279 punten. **GeoServer kapt stilzwijgend op 10.000 rijen af**, dus dat
+  ophalen pagineert; zonder paginering lijken het er 26 en klopt niets. Een
+  test bewaakt het aantal.
 - **Niet elk meetplaatsnummer is een getal.** "Timbers 15" bestaat. Sorteer op
   het nummer dat het punt draagt, niet op wat je uit de code terugrekent.
 
@@ -230,8 +237,11 @@ test bewaakt dat voor de luchtstoffen.
 
 ## Openstaand
 
-- Een parameterfilter op de kaart ("toon enkel punten die PFOS meten") vraagt een
-  index per meetpunt.
+- Hetzelfde filter voor **grondwater** kan nog niet eerlijk. DOV's `pfas:pfas_gw`
+  telt 484 filters, maar dat is een campagne en geen index: filter 2003-005059
+  in Landen rapporteert PFAS (TFA) en zit er niet in. Een volledige lijst zou
+  betekenen dat je de observaties op parametergroep filtert en die via de
+  monsters naar filters terugrekent — twee grote gepagineerde bevragingen.
 - Bijlage 2.4.1 noemt normen voor barium, antimoon, seleen, cyanide, minerale
   oliën, fenolen, PAK's en gechloreerde ethenen. DOV's parameternaam daarvoor is
   niet vastgesteld, en een norm op een gegokte sleutel toetst stilzwijgend niets.

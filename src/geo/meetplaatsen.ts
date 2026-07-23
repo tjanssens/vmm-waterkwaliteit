@@ -35,6 +35,7 @@ interface RuweMeetplaats {
   lat: number;
   gem: string | null;
   net: number;
+  pfas?: 1;
 }
 
 export type Matrix = "OW" | "WB" | "BI";
@@ -49,6 +50,12 @@ export interface Meetplaats extends Meetpunt {
    */
   matrix: Matrix;
   meetnetten: Meetnet[];
+  /**
+   * Of hier PFAS gemeten is. Komt uit de PFAS-laag van DOV en wordt bij de
+   * build ingebakken; de resultatendatabank zelf kan die vraag niet
+   * beantwoorden zonder alle 7.534 punten te bevragen.
+   */
+  meetPfas: boolean;
 }
 
 /**
@@ -95,6 +102,7 @@ export async function laadMeetplaatsen(basis: string): Promise<Meetplaats[]> {
       lon: ruw.lon,
       lat: ruw.lat,
       meetnetten,
+      meetPfas: ruw.pfas === 1,
       zoeksleutel: `${ruw.nr} ${ruw.oms} ${ruw.gem ?? ""}`.toLowerCase(),
     };
   });

@@ -42,6 +42,11 @@ daarom pas vanaf zoomniveau 11.
 Alleen grondwaterfilters die daadwerkelijk chemie meten komen op de kaart; van
 de 19.024 houden er 4.721 enkel het waterpeil bij.
 
+Oppervlaktewater heeft naast de meetnetten een knop **Meet PFAS**: 279 van de
+7.534 punten. Die lijst komt uit de PFAS-laag van DOV, want de
+resultatendatabank kan die vraag niet beantwoorden zonder elk punt apart te
+bevragen.
+
 Grondwater kun je filteren op **filterdiepte**: tot 10 m, 10–50 m, dieper dan
 50 m, of diepte onbekend. Dat is geen cosmetische indeling. Een ondiepe filter
 meet water dat kort geleden is ingesijpeld en volgt wat er vandaag op het

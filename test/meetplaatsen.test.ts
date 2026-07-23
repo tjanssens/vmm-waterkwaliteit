@@ -18,6 +18,7 @@ const punt = (over: Partial<Meetplaats> & Pick<Meetplaats, "nummer">): Meetplaat
   lon: 4.5,
   lat: 51,
   meetnetten: ["FYSICOCHEM"],
+  meetPfas: false,
   zoeksleutel: `${over.nummer} ${over.omschrijving ?? ""} ${over.gemeente ?? ""}`.toLowerCase(),
   ...over,
 });

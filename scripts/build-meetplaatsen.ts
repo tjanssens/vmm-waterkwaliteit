@@ -14,6 +14,10 @@ import { dirname } from "node:path";
 
 const WFS = "https://geo.api.vlaanderen.be/MeetplOppervlwaterkwal/wfs";
 const GEMEENTEN_WFS = "https://geo.api.vlaanderen.be/VRBG/wfs";
+/** DOV publiceert de PFAS-metingen in oppervlaktewater als aparte laag. */
+const PFAS_WFS = "https://www.dov.vlaanderen.be/geoserver/pfas/wfs";
+/** GeoServer levert er nooit meer dan tienduizend per aanroep. */
+const PAGINA = 10_000;
 
 interface WfsAntwoord<T> {
   features: { geometry: { type: string; coordinates: unknown }; properties: T }[];
@@ -46,6 +50,8 @@ interface Meetplaats {
   gem: string | null;
   /** Meetnetten waarin dit punt zit, als bitvlag — zie MEETNETTEN. */
   net: number;
+  /** 1 als hier PFAS gemeten is. Ontbreekt bij de overige 7.255 punten. */
+  pfas?: 1;
 }
 
 const MEETNETTEN = [
@@ -73,6 +79,33 @@ async function haal<T>(basis: string, laag: string, extra: Record<string, string
   const antwoord = await fetch(url, { signal: AbortSignal.timeout(180_000) });
   if (!antwoord.ok) throw new Error(`${laag}: WFS gaf status ${antwoord.status}`);
   return (await antwoord.json()) as WfsAntwoord<T>;
+}
+
+/**
+ * De meetplaatsen waar PFAS in oppervlaktewater gemeten is.
+ *
+ * De laag bevat één rij per meting — ruim 92.000 — maar slechts een paar
+ * honderd verschillende meetplaatsen. Die nummers zijn dezelfde als in het
+ * meetplaatsenbestand, dus ze zijn zo aan elkaar te knopen.
+ *
+ * Er wordt gepagineerd omdat GeoServer stilzwijgend op tienduizend afkapt:
+ * zonder paginering zou de lijst er compleet uitzien en dat niet zijn.
+ */
+async function haalPfasMeetplaatsen(): Promise<Set<string>> {
+  const nummers = new Set<string>();
+
+  for (let start = 0; ; start += PAGINA) {
+    const pagina = await haal<{ meetplaats: number | string }>(PFAS_WFS, "pfas:pfas_oppwater", {
+      propertyName: "meetplaats",
+      count: String(PAGINA),
+      startIndex: String(start),
+    });
+
+    for (const rij of pagina.features) nummers.add(String(rij.properties.meetplaats));
+    if (pagina.features.length < PAGINA) break;
+  }
+
+  return nummers;
 }
 
 /** Straalmethode: telt hoe vaak een horizontale lijn de rand kruist. */
@@ -113,6 +146,10 @@ async function main() {
     };
   });
 
+  console.log("PFAS-meetplaatsen ophalen bij DOV…");
+  const pfas = await haalPfasMeetplaatsen();
+  console.log(`  ${pfas.size} meetplaatsen met PFAS-metingen`);
+
   console.log("Gemeente per meetplaats bepalen…");
   const meetplaatsen: Meetplaats[] = punten.features.map((punt) => {
     const [lon, lat] = punt.geometry.coordinates as [number, number];
@@ -140,8 +177,12 @@ async function main() {
       lat: Number(lat.toFixed(5)),
       gem: gemeente,
       net,
+      ...(pfas.has(eigen.MEETPLNR) ? { pfas: 1 as const } : {}),
     };
   });
+
+  const metPfas = meetplaatsen.filter((m) => m.pfas).length;
+  console.log(`  ${metPfas} van de ${pfas.size} PFAS-meetplaatsen teruggevonden`);
 
   const zonderGemeente = meetplaatsen.filter((m) => m.gem === null).length;
   console.log(`  ${meetplaatsen.length - zonderGemeente} toegewezen, ${zonderGemeente} buiten Vlaanderen of op de grens`);

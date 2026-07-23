@@ -58,11 +58,22 @@ export const OPPERVLAKTEWATER: Laagprofiel<Meetplaats> = {
   },
 
   // Meetnetten waarop filteren zinvol is; de rest zit in de details.
-  puntfilters: (["FYSICOCHEM", "BACTERIO", "WATBODEM", "MACROINV"] as const).map((net) => ({
-    id: net,
-    label: MEETNET_NAMEN[net],
-    past: (punt: Meetplaats) => punt.meetnetten.includes(net),
-  })),
+  puntfilters: [
+    ...(["FYSICOCHEM", "BACTERIO", "WATBODEM", "MACROINV"] as const).map((net) => ({
+      id: net,
+      label: MEETNET_NAMEN[net],
+      past: (punt: Meetplaats) => punt.meetnetten.includes(net),
+    })),
+    // PFAS is geen meetnet maar een stofgroep. Het staat hier omdat het de
+    // vraag is die mensen werkelijk stellen, en omdat de resultatendatabank
+    // ze niet kan beantwoorden: daarvoor zou je alle 7.534 punten moeten
+    // bevragen. De PFAS-laag van DOV geeft het antwoord in één keer.
+    {
+      id: "PFAS",
+      label: "Meet PFAS",
+      past: (punt: Meetplaats) => punt.meetPfas,
+    },
+  ],
 
   normensetten: ["oppervlaktewater", "drinkwater"],
   standaardNormenset: "oppervlaktewater",
