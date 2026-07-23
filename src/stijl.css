@@ -568,6 +568,19 @@ button:focus-visible {
   gap: 4px;
 }
 
+.gereedschap__aangetoond {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gereedschap__aangetoond .filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 11px;
+}
+
 .normkeuze {
   display: flex;
   border: 1px solid var(--rule-strong);

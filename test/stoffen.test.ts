@@ -34,9 +34,39 @@ describe("stofprofiel", () => {
     expect(opgelost).toBe(totaal);
   });
 
-  it("valt voor een onbekende PFAS terug op de familie", () => {
-    const profiel = stofprofiel(parameter("PFHxS", "perfluorhexaansulfonzuur"));
+  it("geeft de bekende PFAS elk hun eigen herkomst", () => {
+    // De familie deelt haar gedrag maar niet haar herkomst: PFOS komt uit
+    // blusschuim, PFBS is de vervanger die daarvoor in de plaats kwam, en TFA
+    // regent uit de lucht. Eén tekst voor alle drie zegt niets.
+    const herkomst = (symbool: string) => stofprofiel(parameter(symbool))!.herkomst ?? "";
+
+    expect(herkomst("PFOS")).toMatch(/blusschuim/i);
+    expect(herkomst("PFBS")).toMatch(/PFOS werd uitgefaseerd/i);
+    expect(herkomst("HFPO-DA")).toMatch(/Chemours/i);
+    expect(herkomst("6:2 diPAP")).toMatch(/verpakking/i);
+    expect(herkomst("PFECHS")).toMatch(/luchtvaart/i);
+
+    const alle = ["PFOS", "PFOA", "PFBS", "HFPO-DA", "6:2 diPAP", "PFECHS"].map(herkomst);
+    expect(new Set(alle).size).toBe(alle.length);
+  });
+
+  it("valt voor een PFAS zonder eigen tekst terug op de familie", () => {
+    // Er zijn er duizenden; wat we niet apart beschrijven hoort nog altijd
+    // ergens thuis.
+    const profiel = stofprofiel(parameter("PFTeDS", "perfluortetradecaansulfonzuur"));
     expect(profiel?.wat).toMatch(/fluorverbindingen/i);
+  });
+
+  it("herkent dezelfde stof onder haar varianten", () => {
+    // De VMM schrijft "PFOS totaal" en "PFOS vertakt", DOV plakt het aaneen
+    // tot "PFOStotal" en "PFOSbranched" — met in twee gevallen een tikfout.
+    // Het is telkens PFOS.
+    const pfos = stofprofiel(parameter("PFOS"));
+    for (const variant of ["PFOS totaal", "PFOS vertakt", "PFOStotal", "PFOSbranched"]) {
+      expect(stofprofiel(parameter(variant))).toBe(pfos);
+    }
+    expect(stofprofiel(parameter("PFHxSbranchedl"))).toBe(stofprofiel(parameter("PFHxS")));
+    expect(stofprofiel(parameter("MePFOSAtotal"))).toBe(stofprofiel(parameter("MePFOSA")));
   });
 
   it("valt voor een onbekend pesticide terug op de parametergroep", () => {
@@ -137,13 +167,39 @@ describe("stofprofiel", () => {
     expect(zonder).toEqual([]);
   });
 
-  it("duidt een ultrakorte PFAS via haar parametergroep", () => {
-    // Trifluorazijnzuur heet nergens "perfluor" en heeft geen PF-code, dus de
-    // vormherkenning grijpt niet. DOV zet het wel in de PFAS-groep.
+  it("duidt trifluorazijnzuur onder de naam die DOV eraan geeft", () => {
+    // TFA heet nergens "perfluor" en heeft geen PF-code, dus de vormherkenning
+    // grijpt niet; DOV schrijft het bovendien voluit met de code erachter.
     const profiel = stofprofiel(
       parameter("Trifluorazijnzuur (TFA)", "Trifluorazijnzuur", "Grondwater_chemisch_PFAS"),
     );
-    expect(profiel?.wat).toMatch(/fluorverbindingen/i);
+    expect(profiel?.wat).toMatch(/kortste PFAS/i);
+    expect(profiel).toBe(stofprofiel(parameter("TFA")));
+  });
+
+  it("draagt bij elke PFAS-tekst een bron", () => {
+    // PFAS ligt gevoelig. Een uitspraak over herkomst of risico zonder
+    // vindplaats hoort hier niet te staan.
+    const symbolen = [
+      "PFOS", "PFOA", "PFHxS", "PFNA", "PFBS", "PFBA", "HFPO-DA", "DONA", "6:2 FTS",
+      "6:2 diPAP", "PFOSA", "PFHxA", "PFDA", "PFDS", "PFECHS", "9Cl-PF3ONS", "TFA",
+      "PFAS (EFSA-4)", "PFAS (EU DWRL-20)",
+    ];
+    for (const symbool of symbolen) {
+      const profiel = stofprofiel(parameter(symbool))!;
+      expect(profiel.bronnen.length).toBeGreaterThan(0);
+      for (const bron of profiel.bronnen) expect(STOFBRONNEN[bron]).toBeDefined();
+    }
+  });
+
+  it("onderbouwt een verbod of een norm met de bron die het uitspreekt", () => {
+    // Zeggen dat een stof wereldwijd aan banden ligt, is een juridische
+    // uitspraak. Die hoort naar het verdrag zelf te verwijzen.
+    for (const symbool of ["PFOS", "PFOA", "PFHxS"]) {
+      expect(stofprofiel(parameter(symbool))!.bronnen).toContain("stockholm");
+    }
+    expect(stofprofiel(parameter("HFPO-DA"))!.bronnen).toContain("echa");
+    expect(stofprofiel(parameter("PFAS (EFSA-4)"))!.bronnen).toContain("efsaPfas");
   });
 
   it("leest hetzelfde symbool anders per laag", () => {

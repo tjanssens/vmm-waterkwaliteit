@@ -39,6 +39,18 @@ export const STOFBRONNEN = {
     naam: "EFSA, Risk to human health related to the presence of perfluoroalkyl substances in food (2020)",
     url: "https://www.efsa.europa.eu/en/efsajournal/pub/6223",
   },
+  stockholm: {
+    naam: "Verdrag van Stockholm — lijst van persistente organische verontreinigende stoffen",
+    url: "https://www.pops.int/TheConvention/ThePOPs/AllPOPs/tabid/2509/Default.aspx",
+  },
+  rivmGenx: {
+    naam: "RIVM over GenX",
+    url: "https://www.rivm.nl/genx",
+  },
+  echa: {
+    naam: "ECHA — kandidaatslijst van zeer zorgwekkende stoffen",
+    url: "https://echa.europa.eu/candidate-list-table",
+  },
   iarc: {
     naam: "IARC Monographs — lijst van geclassificeerde stoffen",
     url: "https://monographs.iarc.who.int/list-of-classifications",
@@ -679,6 +691,193 @@ const PROFIELEN = {
   },
 
   // ---- PFAS en pesticiden ----
+  // ---- PFAS per stof ----
+  //
+  // De familie deelt haar gedrag, maar niet haar herkomst: PFOS komt uit
+  // blusschuim en PFBS is de vervanger die daarvoor in de plaats kwam. Wie
+  // overal dezelfde tekst leest, kan een meting niet plaatsen.
+  pfos: {
+    kort:
+      "Wereldwijd aan banden gelegd en toch nog overal aanwezig; hoopt zich op in bloed en lever en verlaat het lichaam pas na jaren.",
+    wat: "Perfluoroctaansulfonzuur, de PFAS waar de bezorgdheid mee begon en waarnaar het meest gemeten wordt.",
+    herkomst:
+      "Blusschuim op brandweeroefenterreinen en luchthavens, impregneermiddel voor textiel en tapijt, en het verchromen van metaal. In Vlaanderen is het de stof achter de vervuiling rond de 3M-site in Zwijndrecht.",
+    risico:
+      "Opgenomen in bijlage B van het Verdrag van Stockholm, dat productie en gebruik wereldwijd aan banden legt. PFOS hoopt zich op in bloed en lever, en het is een van de vier stoffen waarop EFSA haar tolereerbare inname baseerde — met een verzwakte reactie op vaccinatie als doorslaggevend effect.",
+    bronnen: ["stockholm", "efsaPfas"],
+  },
+  pfoa: {
+    kort:
+      "Wereldwijd verboden zonder uitzonderingen; stapelt zich op in het lichaam en werkt in op lever en afweersysteem.",
+    wat: "Perfluoroctaanzuur, jarenlang de hulpstof bij het maken van antiaanbaklagen.",
+    herkomst:
+      "Productie van fluorpolymeren zoals teflon, waterafstotende kleding, en ouder blusschuim. Niet de coating in je pan zelf, maar wat er bij het maken ervan vrijkwam.",
+    risico:
+      "Opgenomen in bijlage A van het Verdrag van Stockholm, zonder uitzonderingen — strenger dus dan PFOS. Ook een van de vier stoffen achter de EFSA-norm.",
+    bronnen: ["stockholm", "efsaPfas"],
+  },
+  pfhxs: {
+    kort:
+      "Wereldwijd verboden, en van de vier EFSA-stoffen degene die het langst in het lichaam blijft.",
+    wat: "Perfluorhexaansulfonzuur, een kortere neef van PFOS met zes koolstofatomen.",
+    herkomst: "Blusschuim en impregneermiddelen; kwam vaak mee als bijproduct van PFOS.",
+    risico:
+      "Opgenomen in bijlage A van het Verdrag van Stockholm, zonder uitzonderingen. Van de vier stoffen waarop EFSA haar norm baseerde, is dit degene die het traagst uit het lichaam verdwijnt.",
+    bronnen: ["stockholm", "efsaPfas"],
+  },
+  pfna: {
+    kort: "Een van de vier stoffen waarop de Europese tolereerbare inname is gebaseerd.",
+    wat: "Perfluornonaanzuur, een lange keten met negen koolstofatomen.",
+    herkomst:
+      "Productie van fluorpolymeren, en daarnaast het afbraakproduct van fluortelomeren uit coatings en verpakkingen.",
+    risico:
+      "De vierde stof achter de EFSA-norm. Lange ketens verlaten het lichaam trager dan korte en stapelen zich sterker op in de voedselketen.",
+    bronnen: ["efsaPfas"],
+  },
+  pfbs: {
+    kort:
+      "De vervanger van PFOS: verdwijnt sneller uit het lichaam, maar is juist mobieler in de bodem.",
+    wat: "Perfluorbutaansulfonzuur, met vier koolstofatomen de korte vervanger van PFOS.",
+    herkomst:
+      "Ingevoerd toen PFOS werd uitgefaseerd, onder meer in impregneermiddelen voor textiel.",
+    risico:
+      "Korte ketens hopen zich minder op en verlaten het lichaam sneller. Dat maakt ze niet onschuldig: ze hechten slecht aan bodemdeeltjes, komen daardoor makkelijker in grondwater terecht en zijn met de gangbare zuivering slechter tegen te houden.",
+    bronnen: ["whoDrinkwater", "efsaPfas"],
+  },
+  pfba: {
+    kort:
+      "Zeer mobiel in de bodem en moeilijk uit water te zuiveren; duikt daardoor breed op in grondwater.",
+    wat: "Perfluorbutaanzuur, met vier koolstofatomen een van de kortste PFAS die routinematig gemeten worden.",
+    herkomst:
+      "Deels rechtstreeks gebruikt, maar vooral het eindproduct waarin langere PFAS en fluortelomeren uiteenvallen.",
+    risico:
+      "Stapelt zich veel minder op dan PFOS of PFOA, maar spoelt juist daardoor ver mee met het water. In grondwater is het een van de meest aangetroffen PFAS.",
+    bronnen: ["whoDrinkwater"],
+  },
+  genx: {
+    kort:
+      "De vervanger van PFOA, sinds juni 2019 door Europa aangemerkt als zeer zorgwekkende stof.",
+    wat: "HFPO-DA, beter bekend als GenX: de stof achter de techniek die PFOA verving.",
+    herkomst:
+      "Sinds 2012 in gebruik bij de productie van fluorpolymeercoatings, onder meer bij Chemours in Dordrecht.",
+    risico:
+      "Ingevoerd als het veiligere alternatief, maar Europa nam GenX in juni 2019 op als zeer zorgwekkende stof. Proefdiergegevens wijzen op effecten op de lever en op mogelijke kankerverwekkendheid. Minder schadelijk voor de voortplanting dan PFOA, maar daarmee niet onschadelijk.",
+    bronnen: ["rivmGenx", "echa"],
+  },
+  dona: {
+    kort: "Een vervanger voor PFOA; net als GenX ingevoerd als alternatief en niet als oplossing.",
+    wat: "DONA of ADONA, een etherverbinding die als alternatief voor PFOA werd ontwikkeld.",
+    herkomst: "Productie van fluorpolymeren, als vervanger van PFOA.",
+    risico:
+      "Over deze vervangers is veel minder bekend dan over de stoffen die ze vervingen. Ze breken evenmin af, en dat is de kern van het PFAS-probleem.",
+    bronnen: ["whoDrinkwater"],
+  },
+  fts: {
+    kort:
+      "Zit in het blusschuim dat na het PFOS-verbod in gebruik kwam, en valt in het milieu uiteen tot PFAS die niet meer afbreken.",
+    wat: "Fluortelomeersulfonzuren, aangeduid met twee getallen zoals 6:2 of 8:2 — die staan voor het aantal gefluoreerde en gewone koolstofatomen.",
+    herkomst:
+      "Het blusschuim dat na het verbod op PFOS in gebruik kwam, en coatings voor textiel en papier.",
+    risico:
+      "Ze werden gekozen omdat ze wél afbreken. Alleen: waar ze in uiteenvallen zijn perfluorcarbonzuren zoals PFOA en PFHxA, en díe breken niet meer af. Een vondst wijst daarom vaak op recenter gebruik van blusschuim.",
+    bronnen: ["whoDrinkwater", "efsaPfas"],
+  },
+  dipap: {
+    kort: "Uit vetwerende voedselverpakking; valt in het milieu uiteen tot PFAS die blijven.",
+    wat: "Fluortelomeerfosfaatdiesters, een vetwerende coating.",
+    herkomst:
+      "Papier en karton dat vet en vocht moet tegenhouden: pizzadozen, popcornzakken, fastfoodverpakking. Ook in sommige cosmetica.",
+    risico:
+      "Op zichzelf weinig onderzocht, maar het zijn voorlopers: in het milieu en in het lichaam vallen ze uiteen in perfluorcarbonzuren die niet meer afbreken.",
+    bronnen: ["whoDrinkwater"],
+  },
+  sulfonamiden: {
+    kort: "Een voorloper die in het milieu alsnog uiteenvalt tot PFOS of PFBS.",
+    wat: "Perfluorsulfonamiden: verbindingen die geen PFOS zijn, maar er wel in veranderen.",
+    herkomst:
+      "Grondstof en bijproduct bij het maken van impregneermiddelen en blusschuim. Ze zaten mee in de producten die met PFOS gemaakt werden.",
+    risico:
+      "Deze meting telt dubbel: wat vandaag als voorloper in het water zit, wordt op termijn PFOS of PFBS. Wie alleen naar PFOS kijkt, onderschat daardoor wat er uiteindelijk komt.",
+    bronnen: ["whoDrinkwater", "stockholm"],
+  },
+  pfcaKort: {
+    kort: "Kort en zeer mobiel: hoopt zich weinig op, maar spoelt ver mee tot in het grondwater.",
+    wat: "Perfluorcarbonzuren met een korte keten, vijf tot zeven koolstofatomen.",
+    herkomst:
+      "Deels rechtstreeks gebruikt als vervanger van de lange ketens, deels het afbraakproduct van fluortelomeren uit coatings en blusschuim.",
+    risico:
+      "Ze verlaten het lichaam sneller dan PFOS of PFOA en stapelen zich minder op. Daar staat tegenover dat ze slecht aan bodemdeeltjes hechten: ze spoelen ver mee, komen makkelijk in grondwater en zijn met de gangbare zuivering nauwelijks tegen te houden.",
+    bronnen: ["whoDrinkwater"],
+  },
+  pfcaLang: {
+    kort: "Lange keten: hecht aan slib en eiwit, en stapelt zich op in vis en in de mens.",
+    wat: "Perfluorcarbonzuren met een lange keten, tien koolstofatomen of meer.",
+    herkomst:
+      "Productie van fluorpolymeren, impregneermiddelen, en het afbraakproduct van langere fluortelomeren.",
+    risico:
+      "Hoe langer de keten, hoe sterker de stof zich bindt aan eiwit en slib en hoe verder ze opklimt in de voedselketen. In het water blijven de gehalten daardoor vaak laag terwijl ze in vis en in bloed juist oplopen.",
+    bronnen: ["efsaPfas", "whoDrinkwater"],
+  },
+  pfsaOverig: {
+    kort: "Familie van PFOS; hoe langer de keten, hoe langer ze blijven hangen in mens en milieu.",
+    wat: "Perfluorsulfonzuren van andere ketenlengte dan PFOS, PFHxS en PFBS.",
+    herkomst: "Bijproducten en nevenbestanddelen van blusschuim en impregneermiddelen.",
+    risico:
+      "Ze horen tot dezelfde familie als PFOS en gedragen zich navenant: hoe langer de keten, hoe sterker de opstapeling. Voor de meeste bestaat geen aparte norm, maar ze tellen wel mee in de som van twintig PFAS uit de drinkwaterrichtlijn.",
+    bronnen: ["whoDrinkwater"],
+  },
+  pfechs: {
+    kort: "Uit hydraulische vloeistof van vliegtuigen; wijst meestal naar luchtvaart of verchromen.",
+    wat: "Perfluor-4-ethylcyclohexaansulfonzuur, een PFAS met een ringvorm in plaats van een rechte keten.",
+    herkomst: "Hydraulische vloeistoffen in de luchtvaart, en verchroombaden.",
+    risico:
+      "Weinig onderzocht en zonder eigen norm. Het wordt gemeten omdat het een bruikbare vingerafdruk is: waar het opduikt, wijst het meestal naar luchtvaart of naar oppervlaktebehandeling van metaal.",
+    bronnen: ["whoDrinkwater"],
+  },
+  clPfesa: {
+    kort: "Vervanger van PFOS bij het verchromen; even persistent als wat het verving.",
+    wat: "Chloorpolyfluorether-sulfonzuren, samen bekend als F-53B.",
+    herkomst:
+      "Bij het verchromen van metaal gebruikt als vervanger van PFOS, vooral buiten Europa.",
+    risico:
+      "Even persistent als PFOS en met een vergelijkbare opstapeling in het lichaam. Een van de duidelijkste voorbeelden van een vervanger die het probleem verplaatst in plaats van oplost.",
+    bronnen: ["whoDrinkwater", "stockholm"],
+  },
+  tfa: {
+    kort:
+      "De kortste en meest mobiele PFAS; met de gangbare zuivering nauwelijks uit water te halen.",
+    wat: "Trifluorazijnzuur, met twee koolstofatomen de kortste PFAS die gemeten wordt.",
+    herkomst:
+      "Grotendeels een afbraakproduct: koelmiddelen en drijfgassen vallen in de atmosfeer uiteen tot TFA, en ook een aantal gefluoreerde bestrijdingsmiddelen en geneesmiddelen eindigen zo. Het regent vervolgens uit.",
+    risico:
+      "Hoopt zich niet op in het lichaam en is veel minder giftig dan PFOS. Het probleem is de mobiliteit: TFA lost volledig op, hecht nergens aan en is met actieve kool of omgekeerde osmose nauwelijks tegen te houden. Het is daardoor de PFAS die het breedst in grond- en oppervlaktewater voorkomt.",
+    bronnen: ["whoDrinkwater"],
+  },
+  somEfsa4: {
+    kort: "De som waarop de Europese tolereerbare inname van 4,4 ng per kilo per week slaat.",
+    wat: "De som van vier PFAS: PFOA, PFNA, PFHxS en PFOS.",
+    herkomst: "Een rekensom van het labo, geen stof op zich.",
+    risico:
+      "EFSA stelde in 2020 vast dat deze vier samen beoordeeld moeten worden en kwam op een tolereerbare inname van 4,4 nanogram per kilo lichaamsgewicht per week. Doorslaggevend was niet kanker of cholesterol, maar dat het afweersysteem minder goed op vaccinatie reageert.",
+    bronnen: ["efsaPfas"],
+  },
+  somPfas43: {
+    kort: "De optelsom van alle PFAS die op dit punt afzonderlijk gemeten zijn.",
+    wat: "De som van de 43 PFAS die de VMM in oppervlaktewater afzonderlijk bepaalt.",
+    herkomst: "Een rekensom van het labo, geen stof op zich.",
+    risico:
+      "Handig om punten te vergelijken, maar de som zegt niets over welke stoffen erin zitten — en dat verschilt sterk. Er hangt geen norm aan: de milieukwaliteitsnorm voor oppervlaktewater geldt voor PFOS afzonderlijk.",
+    bronnen: ["vmmWater"],
+  },
+  somDwrl20: {
+    kort: "De som van twintig PFAS waarop de Europese drinkwaternorm van 100 ng/L slaat.",
+    wat: "De som van de twintig PFAS die de Europese drinkwaterrichtlijn samen beoordeelt.",
+    herkomst: "Een rekensom van het labo, geen stof op zich.",
+    risico:
+      "De richtlijn zet geen norm per stof maar op deze som: 0,1 µg/L, oftewel 100 nanogram per liter. Zo wordt vermeden dat twintig stoffen die elk net onder een drempel blijven, samen alsnog een probleem vormen.",
+    bronnen: ["whoDrinkwater"],
+  },
+
   pfas: {
     kort:
       "Stapelt zich op in het lichaam en verlaat het traag; EFSA wees als doorslaggevend effect aan dat het afweersysteem minder goed op vaccinatie reageert.",
@@ -802,8 +1001,72 @@ const SLEUTELS: Readonly<Record<string, ProfielId>> = {
   FStrep: "fecaleBacterien",
   IEntero: "fecaleBacterien",
   Salm: "fecaleBacterien",
-  PFOS: "pfas",
-  PFOA: "pfas",
+  // --- PFAS ---
+  // De varianten "totaal", "vertakt" en DOV's "PFOStotal" vallen weg in
+  // pfasStam(); hier staan alleen de stamvormen.
+  PFOS: "pfos",
+  PFOA: "pfoa",
+  PFHxS: "pfhxs",
+  PFNA: "pfna",
+  PFBS: "pfbs",
+  PFBA: "pfba",
+  "HFPO-DA": "genx",
+  DONA: "dona",
+
+  "4:2 FTS": "fts",
+  "6:2 FTS": "fts",
+  "8:2 FTS": "fts",
+  "10:2 FTS": "fts",
+  "8:2 FTUCA": "fts",
+
+  "6:2 diPAP": "dipap",
+  "8:2 diPAP": "dipap",
+  "6:2/8:2 diPAP": "dipap",
+
+  PFOSA: "sulfonamiden",
+  MePFOSA: "sulfonamiden",
+  EtPFOSA: "sulfonamiden",
+  MePFOSAA: "sulfonamiden",
+  EtPFOSAA: "sulfonamiden",
+  PFBSA: "sulfonamiden",
+  MePFBSA: "sulfonamiden",
+  MePFBSAA: "sulfonamiden",
+  PFHxSA: "sulfonamiden",
+
+  PFPeA: "pfcaKort",
+  PFHxA: "pfcaKort",
+  PFHpA: "pfcaKort",
+  HPFHpA: "pfcaKort",
+
+  PFDA: "pfcaLang",
+  PFUnDA: "pfcaLang",
+  PFDoDA: "pfcaLang",
+  PFTrDA: "pfcaLang",
+  PFTeDA: "pfcaLang",
+  PFHxDA: "pfcaLang",
+  PFODA: "pfcaLang",
+  PFPeDA: "pfcaLang",
+  "4H-PFUnDA": "pfcaLang",
+  P37DMOA: "pfcaLang",
+
+  PFPeS: "pfsaOverig",
+  PFHpS: "pfsaOverig",
+  PFNS: "pfsaOverig",
+  PFDS: "pfsaOverig",
+  PFUnDS: "pfsaOverig",
+  PFDoDS: "pfsaOverig",
+  PFTrDS: "pfsaOverig",
+
+  PFECHS: "pfechs",
+  "9Cl-PF3ONS": "clPfesa",
+  "11Cl-PF3OUnDS": "clPfesa",
+
+  TFA: "tfa",
+  "Trifluorazijnzuur (TFA)": "tfa",
+
+  "PFAS (EFSA-4)": "somEfsa4",
+  "PFAS (EU DWRL-20)": "somDwrl20",
+  "PFAS-43": "somPfas43",
 
   // grondwater; DOV schrijft de naam voluit
   "Opgeloste zuurstof (O2)": "zuurstof",
@@ -925,6 +1188,25 @@ const PFAS_NAAM = /(perfluor|polyfluor|fluortelomeer|fluoroctaan|fluorbutaan)/i;
  * wijzer wordt — en bij gezondheidsinformatie is dat erger dan zwijgen.
  */
 /**
+ * Haalt de variantaanduiding van een PFAS-symbool af.
+ *
+ * Dezelfde stof komt in vier gedaanten binnen. De VMM schrijft "PFOS totaal"
+ * en "PFOS vertakt"; DOV plakt het aan elkaar tot "PFOStotal" en
+ * "PFOSbranched", met in twee gevallen een tikfout ("PFHxSbranchedl"). Het
+ * gaat telkens om perfluoroctaansulfonzuur, dus om dezelfde uitleg.
+ *
+ * Zonder dit zou alleen de kale vorm zijn eigen tekst krijgen en zouden de
+ * varianten terugvallen op het familieverhaal — zonder dat iemand ziet dat er
+ * een preciezere tekst bestond.
+ */
+export function pfasStam(symbool: string): string {
+  return symbool
+    .replace(/\s+(totaal|vertakt|lineair)$/i, "")
+    .replace(/(total|branchedl?|linear)$/, "")
+    .trim();
+}
+
+/**
  * De ene zin die bij een overschrijding in de tabel komt: wat er misgaat, niet
  * wat de stof is. Wie hier leest, weet al dát de norm overschreden is.
  *
@@ -957,8 +1239,21 @@ export function stofprofiel(
   const opNaam = zonderCode === parameter.symbool ? undefined : SLEUTELS[zonderCode];
   if (opNaam) return PROFIELEN[opNaam];
 
-  const stam = parameter.symbool.match(/^(.+?) [to]$/)?.[1];
-  const metaal = stam ? METAALSTAM[stam] : undefined;
+  // "PFOS totaal" en "PFOSbranched" zijn allebei PFOS.
+  const pfasVorm = pfasStam(parameter.symbool);
+  const opPfasVorm = pfasVorm === parameter.symbool ? undefined : SLEUTELS[pfasVorm];
+  if (opPfasVorm) return PROFIELEN[opPfasVorm];
+
+  // Laatste redmiddel: de code tussen de haakjes achteraan. DOV's namen zijn
+  // niet altijd netjes — "…(DONA)) (DONA)" heeft een haakje te veel en
+  // "(EtPFOSAbranchedl) (EtPFOSAbranched)" een letter — waardoor het symbool
+  // de hele naam blijft. De code zelf klopt dan nog wel.
+  const code = parameter.symbool.match(/\(([^()]+)\)\s*$/)?.[1]?.trim();
+  const opCode = code ? (SLEUTELS[code] ?? SLEUTELS[pfasStam(code)]) : undefined;
+  if (opCode) return PROFIELEN[opCode];
+
+  const metaalstam = parameter.symbool.match(/^(.+?) [to]$/)?.[1];
+  const metaal = metaalstam ? METAALSTAM[metaalstam] : undefined;
   if (metaal) return PROFIELEN[metaal];
 
   if (PFAS_SYMBOOL.test(parameter.symbool) || PFAS_NAAM.test(parameter.omschrijving)) {

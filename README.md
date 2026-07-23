@@ -102,6 +102,13 @@ maar wat er misgaat.
 > Verstoort de hormoonhuishouding van waterdieren, en duikt twintig jaar na het
 > Europese verbod nog op.
 
+PFAS krijgen tekst per stof en niet per familie, want hun herkomst verschilt:
+PFOS komt uit blusschuim, PFBS is de vervanger die daarvoor in de plaats kwam,
+fluortelomeerfosfaten uit vetwerende voedselverpakking, en TFA regent uit de
+lucht. Een knop **Enkel aangetoond** laat de stoffen weg die nooit boven de
+detectielimiet uitkwamen — aan een PFAS-meetpunt scheelt dat al snel 50 regels
+tegenover 8.
+
 Elke gezondheidsuitspraak draagt de bron waarin ze staat, en de zwaarste twee.
 Kennen we een stof niet, dan verschijnt er niets: een tekst die op elke stof zou
 passen wekt de indruk van uitleg zonder er een te geven.

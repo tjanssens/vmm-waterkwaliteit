@@ -49,6 +49,8 @@ interface Toestand {
   normenset: Normenset;
   /** Vrije tekst waarop de parametertabel gefilterd wordt. */
   zoekterm: string;
+  /** Alleen stoffen die minstens één keer boven de detectielimiet uitkwamen. */
+  enkelAangetoond: boolean;
 }
 
 /**
@@ -74,6 +76,11 @@ export class Paneel {
   private readonly voorkeurNormenset = new Map<LaagId, Normenset>();
   /** Per categorie of hij open staat; die zijn wél gedeeld over de lagen. */
   private readonly voorkeurCategorie = new Map<string, boolean>();
+  /**
+   * Of de bezoeker enkel aangetoonde stoffen wil zien. Geldt over de lagen
+   * heen: het is een leesvoorkeur en geen eigenschap van de bron.
+   */
+  private voorkeurEnkelAangetoond = false;
 
   constructor(
     private readonly houder: HTMLElement,
@@ -186,6 +193,7 @@ export class Paneel {
       uitgebreid,
       normenset: this.behoudNormenset(profiel),
       zoekterm: "",
+      enkelAangetoond: this.voorkeurEnkelAangetoond,
     };
     this.teken();
   }
@@ -278,6 +286,7 @@ export class Paneel {
     this.koppelFilters(toestand, aanwezig, allesAan);
     this.koppelNormenset(toestand);
     this.koppelZoek(toestand);
+    this.koppelAangetoond(toestand);
     this.koppelEvolutie(toestand, vanPeriode);
     this.koppelCategorieen();
   }
@@ -403,6 +412,23 @@ export class Paneel {
 
   /** Zoekveld op parameter plus de keuze van de normenset. */
   private gereedschapHtml(toestand: Toestand, parameters: ParameterSamenvatting[]): string {
+    const aangetoond = parameters.filter((p) => !p.volledigOnderLimiet).length;
+    // De knop verschijnt alleen als hij iets doet. Bij een meetpunt waar alles
+    // aangetoond is, zou hij een keuze suggereren die er niet is.
+    const aantonenHtml =
+      aangetoond === parameters.length
+        ? ""
+        : `<div class="gereedschap__aangetoond">
+             <span class="paneel__label" id="aangetoondlabel">Tonen</span>
+             <button type="button" class="filter" data-enkel-aangetoond
+                     aria-pressed="${toestand.enkelAangetoond}"
+                     aria-describedby="aangetoondlabel"
+                     title="Laat de stoffen weg die nooit boven de detectielimiet uitkwamen">
+               Enkel aangetoond
+               <span class="normknop__telling">${aangetoond}</span>
+             </button>
+           </div>`;
+
     const knoppen = toestand.profiel.normensetten
       .map((set) => {
         const getoetst = parameters.filter((p) => normVoor(p, set)).length;
@@ -427,6 +453,7 @@ export class Paneel {
           <span class="paneel__label" id="normlabel">Toetsen aan</span>
           <div class="normkeuze" role="group" aria-labelledby="normlabel">${knoppen}</div>
         </div>
+        ${aantonenHtml}
       </div>
       <p class="paneel__hint gereedschap__uitleg">${escape(NORMENSETTEN[toestand.normenset].uitleg)}</p>`;
   }
@@ -440,6 +467,9 @@ export class Paneel {
     const term = toestand.zoekterm.trim().toLowerCase();
     const zichtbaar = parameters
       .filter((p) => toestand.filters.has(oordelen.get(p.symbool)!.klasse))
+      // "Niet aangetoond" betekent: elke meting bleef onder de detectielimiet.
+      // De waarde die er dan staat is die limiet, niet een concentratie.
+      .filter((p) => !toestand.enkelAangetoond || !p.volledigOnderLimiet)
       .filter(
         (p) =>
           term === "" ||
@@ -448,11 +478,12 @@ export class Paneel {
       );
 
     if (zichtbaar.length === 0) {
-      return `<p class="paneel__leeg">${
-        term
-          ? `Geen parameter gevonden voor "${escape(toestand.zoekterm)}".`
-          : "Geen parameters in deze selectie."
-      }</p>`;
+      const reden = term
+        ? `Geen parameter gevonden voor "${escape(toestand.zoekterm)}".`
+        : toestand.enkelAangetoond
+          ? "Geen enkele stof in deze selectie is boven de detectielimiet gemeten."
+          : "Geen parameters in deze selectie.";
+      return `<p class="paneel__leeg">${reden}</p>`;
     }
 
     const vorige = this.vorigePeriode(toestand, alles);
@@ -724,6 +755,16 @@ export class Paneel {
         });
       });
     });
+  }
+
+  private koppelAangetoond(toestand: Toestand): void {
+    this.houder
+      .querySelector<HTMLButtonElement>("[data-enkel-aangetoond]")
+      ?.addEventListener("click", () => {
+        toestand.enkelAangetoond = !toestand.enkelAangetoond;
+        this.voorkeurEnkelAangetoond = toestand.enkelAangetoond;
+        this.teken();
+      });
   }
 
   private koppelCategorieen(): void {

@@ -222,6 +222,26 @@ waaróm dat uitmaakt.
 - Honderden pesticiden en duizenden PFAS krijgen duiding **via hun groep**,
   net zoals de normen dat doen.
 
+### PFAS krijgen tekst per stof, niet per familie
+
+`stoffen.ts` beschrijft de PFAS afzonderlijk waar hun verhaal verschilt: PFOS
+komt uit blusschuim, PFBS is de vervanger die daarvoor in de plaats kwam, diPAP
+uit voedselverpakking, TFA regent uit de lucht. Homologe reeksen (korte en
+lange perfluorcarbonzuren, de sulfonzuren) delen wél één tekst — daar is de
+ketenlengte juist het verhaal.
+
+- **Dezelfde stof komt in vier gedaanten binnen**: "PFOS totaal", "PFOS
+  vertakt", "PFOStotal", "PFOSbranched". `pfasStam()` haalt die aanduiding
+  eraf. Zonder dat krijgt alleen de kale vorm zijn eigen tekst.
+- **DOV's namen zijn niet altijd netjes.** "…(DONA)) (DONA)" heeft een haakje
+  te veel en "(EtPFOSAbranchedl)" een letter; dan blijft het symbool de hele
+  naam. Vandaar de laatste terugval op de code tussen de haakjes achteraan.
+- **De twee bronnen lopen niet gelijk.** DOV's PFAS-laag kent 48 namen, de
+  VMM-databank rapporteert daarnaast PFPeDA en de som PFAS-43. Dat kwam boven
+  door de tabel van OW834900 na te lopen, niet door de lijsten te vergelijken.
+- Een test loopt alle 111 namen van beide bronnen af en faalt zodra er één op
+  de familietekst terugvalt.
+
 ## Elke parameter blijft zichtbaar
 
 Geen enkele bron wordt gefilterd op een lijst die wij bijhouden — wat de bron
