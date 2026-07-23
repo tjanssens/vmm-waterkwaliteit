@@ -142,14 +142,26 @@ async function start(): Promise<void> {
    * verschilt per bron. Alleen ingeschakelde lagen tonen hun knoppen.
    */
   function bouwPuntfilters(): void {
-    filterbalk.innerHTML = LAGEN.filter((profiel) => actieveLagen.has(profiel.id))
-      .flatMap((profiel) =>
-        (profiel.puntfilters ?? []).map((filter) => {
-          const sleutel = `${profiel.id}/${filter.id}`;
-          return `<button type="button" class="filter" data-filter="${escape(sleutel)}"
-                    aria-pressed="${actieveFilters.has(sleutel)}">${escape(filter.label)}</button>`;
-        }),
-      )
+    // Per laag gegroepeerd, met de naam van de laag ervoor. Op één rij is
+    // "tot 10 m" naast "Waterbodem" een raadsel: het eerste gaat over de
+    // diepte van een grondwaterfilter, het tweede over een meetnet.
+    filterbalk.innerHTML = LAGEN.filter(
+      (profiel) => actieveLagen.has(profiel.id) && (profiel.puntfilters ?? []).length > 0,
+    )
+      .map((profiel) => {
+        const knoppen = (profiel.puntfilters ?? [])
+          .map((filter) => {
+            const sleutel = `${profiel.id}/${filter.id}`;
+            return `<button type="button" class="filter" data-filter="${escape(sleutel)}"
+                      aria-pressed="${actieveFilters.has(sleutel)}">${escape(filter.label)}</button>`;
+          })
+          .join("");
+        const titel = `filtergroep-${profiel.id}`;
+        return `<div class="filtergroep" role="group" aria-labelledby="${titel}">
+                  <span class="filtergroep__naam" id="${titel}">${escape(profiel.naam)}</span>
+                  ${knoppen}
+                </div>`;
+      })
       .join("");
 
     filterbalk.querySelectorAll<HTMLButtonElement>(".filter").forEach((knop) => {

@@ -42,6 +42,13 @@ daarom pas vanaf zoomniveau 11.
 Alleen grondwaterfilters die daadwerkelijk chemie meten komen op de kaart; van
 de 19.024 houden er 4.721 enkel het waterpeil bij.
 
+Grondwater kun je filteren op **filterdiepte**: tot 10 m, 10–50 m, dieper dan
+50 m, of diepte onbekend. Dat is geen cosmetische indeling. Een ondiepe filter
+meet water dat kort geleden is ingesijpeld en volgt wat er vandaag op het
+maaiveld gebeurt; op vijftig meter kan het water tientallen jaren oud zijn.
+Nitraat en pesticiden van dezelfde akker duiken daar pas veel later op, dus wie
+beide door elkaar bekijkt vergelijkt twee verschillende tijdvakken.
+
 ## De tijdas werkt niet overal hetzelfde
 
 Bij water kiest het meetjaar wat je *ziet* uit wat al opgehaald is. Bij lucht

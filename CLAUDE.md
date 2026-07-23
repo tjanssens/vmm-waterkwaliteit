@@ -145,6 +145,12 @@ Deze zijn met tests afgedekt. Verwijder die tests niet zonder reden.
   (WAC/I/A/005 §5.4.4.1). Een overschrijding telt zeker; een vinkje zegt niets
   over wat eruit gefilterd is. Kwik kan onderschat zijn door adsorptie aan het
   filter. Dit staat in `meetwijze` op het profiel.
+- **Filteren op diepte gebeurt client-side**, op de punten die het venster al
+  geladen heeft. De grenzen (10 m, 50 m) komen uit de verdeling over de 14.303
+  filters met chemie, niet uit een ronde gok. Filters zonder ingevulde diepte —
+  1.683 stuks — krijgen een eigen knop in plaats van weg te vallen. De klassen
+  sluiten aan zonder overlap: de bovengrens hoort erbij, de ondergrens niet,
+  anders telt de kaart een punt dubbel zodra twee klassen aanstaan.
 - **Het meetpunt is de filter, niet de put.** Eén put kan meerdere filters op
   verschillende dieptes hebben, elk met eigen metingen.
 - **Observaties hangen aan een monster, niet aan een filter.** Ophalen kost twee

@@ -136,9 +136,26 @@ button:focus-visible {
 
 .filters {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  flex-direction: column;
+  gap: 8px;
   padding: 0 20px 10px;
+}
+
+/* Eén groep per laag, zodat een diepteklasse niet naast een meetnet staat. */
+.filtergroep {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.filtergroep__naam {
+  width: 100%;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
 }
 
 .filter {

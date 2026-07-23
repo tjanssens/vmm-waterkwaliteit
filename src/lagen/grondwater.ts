@@ -15,6 +15,47 @@ const VOLLEDIG_MONSTERS = 40;
 /** Vanaf dit zoomniveau is het kaartvenster klein genoeg om te laden. */
 const MINIMUM_ZOOM = 11;
 
+/**
+ * Diepteklassen voor het filteren op de kaart.
+ *
+ * De grenzen komen uit de verdeling zelf, geteld over de 14.303 filters die
+ * chemie meten: 8.062 zitten op tien meter of ondieper, 2.757 tussen tien en
+ * vijftig, 1.801 dieper, en van 1.683 is de diepte niet ingevuld.
+ *
+ * De indeling is niet cosmetisch. Een ondiepe filter meet water dat kort
+ * geleden is ingesijpeld en volgt wat er vandaag op het maaiveld gebeurt; op
+ * vijftig meter kan het water tientallen jaren oud zijn. Nitraat en pesticiden
+ * uit dezelfde akker duiken daar pas veel later op — wie beide door elkaar
+ * bekijkt, vergelijkt twee verschillende tijdvakken.
+ *
+ * Filters zonder diepte krijgen een eigen knop in plaats van stil weg te
+ * vallen: het zijn er 1.683, en die zouden anders onvindbaar worden zodra
+ * iemand op diepte filtert.
+ */
+const DIEPTEKLASSEN = [
+  { id: "ondiep", label: "tot 10 m", tot: 10 },
+  { id: "middeldiep", label: "10 – 50 m", van: 10, tot: 50 },
+  { id: "diep", label: "dieper dan 50 m", van: 50 },
+  { id: "onbekend", label: "diepte onbekend" },
+] as const satisfies readonly {
+  id: string;
+  label: string;
+  van?: number;
+  tot?: number;
+}[];
+
+/** Of een filter in deze diepteklasse valt. */
+function inKlasse(diepte: number | null, klasse: (typeof DIEPTEKLASSEN)[number]): boolean {
+  const van = "van" in klasse ? klasse.van : undefined;
+  const tot = "tot" in klasse ? klasse.tot : undefined;
+  // De klasse zonder grenzen is die voor de filters zonder ingevulde diepte.
+  if (van === undefined && tot === undefined) return diepte === null;
+  if (diepte === null) return false;
+  // Ondergrens exclusief, bovengrens inclusief: precies 10 m hoort bij "tot
+  // 10 m" en niet bij allebei, anders telt de kaart hetzelfde punt dubbel.
+  return (van === undefined || diepte > van) && (tot === undefined || diepte <= tot);
+}
+
 export interface Grondwaterfilter extends Meetpunt {
   laag: "grondwater";
   aquifer: string | null;
@@ -108,6 +149,12 @@ export const GRONDWATER: Laagprofiel<Grondwaterfilter> = {
       haal: (punt, signaal) => haalGrondwatermetingen(alsPunt(punt), VOLLEDIG_MONSTERS, signaal),
     },
   },
+
+  puntfilters: DIEPTEKLASSEN.map((klasse) => ({
+    id: klasse.id,
+    label: klasse.label,
+    past: (punt: Grondwaterfilter) => inKlasse(punt.onderkantM, klasse),
+  })),
 
   normensetten: ["grondwater-vlarem", "grondwater"],
   standaardNormenset: "grondwater-vlarem",
