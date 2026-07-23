@@ -51,6 +51,19 @@ export const STOFBRONNEN = {
     naam: "ECHA — kandidaatslijst van zeer zorgwekkende stoffen",
     url: "https://echa.europa.eu/candidate-list-table",
   },
+  euPesticiden: {
+    naam: "Europese Commissie — EU-databank gewasbeschermingsmiddelen",
+    url: "https://ec.europa.eu/food/plant/pesticides/eu-pesticides-database/start/screen/active-substances",
+  },
+  verordeningChloorthalonil: {
+    naam:
+      "Uitvoeringsverordening (EU) 2019/677 — niet-verlenging van de goedkeuring van chloorthalonil",
+    url: "https://eur-lex.europa.eu/legal-content/NL/TXT/HTML/?uri=CELEX:32019R0677",
+  },
+  ecGlyfosaat: {
+    naam: "Europese Commissie — hernieuwing van de goedkeuring van glyfosaat",
+    url: "https://food.ec.europa.eu/plants/pesticides/approval-active-substances/renewal-approval/glyphosate_en",
+  },
   iarcPfas: {
     naam: "IARC — evaluatie van de kankerverwekkendheid van PFOA en PFOS (2023)",
     url: "https://www.iarc.who.int/news-events/iarc-monographs-evaluate-the-carcinogenicity-of-perfluorooctanoic-acid-pfoa-and-perfluorooctanesulfonic-acid-pfos/",
@@ -913,6 +926,276 @@ const PROFIELEN = {
       "EFSA stelde in 2020 een gezamenlijke tolereerbare inname vast van 4,4 nanogram per kilogram lichaamsgewicht per week voor vier PFAS samen. Doorslaggevend daarbij was niet kanker of cholesterol, maar dat het afweersysteem minder goed reageert op vaccinatie. Van de best onderzochte stof, PFOA, stelde het IARC in 2023 vast dat ze kankerverwekkend is voor de mens. PFAS stapelen zich op in het lichaam en verlaten het maar traag; in vervuilde zones vertaalt dat zich in adviezen over zelfgeteeld voedsel en putwater.",
     bronnen: ["efsaPfas", "iarcPfas", "vlaanderenPfas"],
   },
+  // ---- pesticiden per stof ----
+  //
+  // Ook hier verschilt het verhaal per stof, en op één punt scherper dan bij
+  // PFAS: sommige middelen zijn al twintig jaar verboden en duiken nog op,
+  // andere mogen vandaag nog gebruikt worden. Dat onderscheid gaat verloren
+  // in één gedeelde tekst, terwijl het juist bepaalt wat een meting betekent.
+  simazine: {
+    kort:
+      "Al sinds 2004 niet meer toegelaten in de EU; wat er nu nog gemeten wordt, zakte decennia geleden weg en bereikt het grondwater pas nu.",
+    wat: "Een triazineherbicide, verwant aan atrazine, tegen onkruid in maïs, fruit en op verhardingen.",
+    herkomst:
+      "Sinds 2004 niet meer toegelaten in de Europese Unie. Werd veel gebruikt op opritten, spoorwegen en in de fruitteelt.",
+    risico:
+      "Voor de mens gaat het bij deze gehalten niet om een acuut gevaar; de norm van 0,1 µg/L is een beleidsgrens en geen gezondheidsdrempel. Wat een vondst wél betekent, is dat een verbod van twintig jaar geleden nog niet in het grondwater is doorgewerkt. Voor waterleven is simazine schadelijk omdat het de fotosynthese van algen en waterplanten remt — de basis van de voedselketen in een beek.",
+    bronnen: ["euPesticiden", "whoDrinkwater"],
+  },
+  terbutylazine: {
+    kort:
+      "Anders dan atrazine en simazine nog wél toegelaten; een vondst wijst dus op gebruik van vandaag, niet op een erfenis.",
+    wat: "Een triazineherbicide dat atrazine verving in de maïsteelt.",
+    herkomst:
+      "Nog steeds toegelaten in de Europese Unie, en juist ingevoerd toen atrazine verboden werd. In de sample van het grondwatermeetnet is het de meest gemeten pesticide.",
+    risico:
+      "Dat het nog toegelaten is, maakt een overschrijding niet minder ernstig — het maakt ze actueler. Waar atrazine een erfenis is, wijst terbutylazine op gebruik van nu, en dus op iets dat nog te veranderen valt. Voor waterleven geldt dezelfde werking als bij de andere triazines: het remt de fotosynthese van algen en waterplanten.",
+    bronnen: ["euPesticiden", "whoDrinkwater"],
+  },
+  triazineMetabolieten: {
+    kort:
+      "Afbraakproduct van atrazine of terbutylazine; het duikt op waar de moederstof zelf al is verdwenen en toont dus hoe traag grondwater zich herstelt.",
+    wat: "Wat er van de triazineherbiciden overblijft nadat de bodem ze deels heeft afgebroken — desethylatrazine, desisopropylatrazine en desethylterbuthylazine.",
+    herkomst:
+      "Ontstaan in de bodem uit atrazine, simazine en terbutylazine. Ze zijn beweeglijker dan de moederstof en zakken dus verder door.",
+    risico:
+      "Deze metabolieten gelden als relevant: de norm van 0,1 µg/L slaat er onverkort op, en een drinkwaterwinning kan er onbruikbaar door worden zonder extra zuivering. Van desethylatrazine worden hogere gehalten gemeten dan van atrazine zelf — het afbraakproduct blijft langer hangen dan wat het verving. Het gevolg is er vooral een van tijd: waar dit opduikt, is de vervuiling van dertig jaar geleden nog steeds onderweg naar beneden, en daar valt vandaag niets meer aan te doen.",
+    bronnen: ["euPesticiden", "whoDrinkwater"],
+  },
+  fenylureum: {
+    kort:
+      "Geen van deze middelen is nog toegelaten; ze zijn giftig voor waterplanten en algen en spoelen makkelijk van verhardingen af.",
+    wat: "Fenylureumherbiciden: diuron, isoproturon, chloortoluron en linuron.",
+    herkomst:
+      "Onkruidbestrijding op verhardingen, spoorwegen en in de akkerbouw. De toelating is voor deze stoffen in de Europese Unie ingetrokken.",
+    risico:
+      "Ze remmen de fotosynthese en zijn daardoor schadelijk voor algen en waterplanten — waar het waterleven in een beek op steunt. Omdat ze veel op verharding werden gebruikt, spoelden ze bij regen rechtstreeks de riolering en de waterloop in, zonder bodem die iets tegenhoudt. Dat verklaart waarom ze nog opduiken.",
+    bronnen: ["euPesticiden", "vmmWater"],
+  },
+  bentazon: {
+    kort:
+      "Nog toegelaten en zeer beweeglijk in de bodem; het bereikt het grondwater sneller dan de meeste andere middelen.",
+    wat: "Een herbicide tegen breedbladig onkruid in granen, maïs en bonen.",
+    herkomst: "Nog toegelaten in de Europese Unie en breed gebruikt in de akkerbouw.",
+    risico:
+      "Bentazon hecht nauwelijks aan bodemdeeltjes en spoelt daardoor snel door naar het grondwater; het is een van de middelen die het vaakst in drinkwaterwinningen opduiken. De norm van 0,1 µg/L is geen gezondheidsdrempel: bentazon is minder giftig dan veel oudere middelen. Het probleem is dat een winning die vervuild raakt, gezuiverd moet worden of dicht moet.",
+    bronnen: ["euPesticiden", "whoDrinkwater"],
+  },
+  chlooracetanilide: {
+    wat: "De chlooracetaniliden — metolachloor, metazachloor, alachloor en verwanten — herbiciden voor maïs, koolzaad en bieten.",
+    herkomst:
+      "Akkerbouw. Alachloor is niet meer toegelaten; S-metolachloor en metazachloor werden lang op grote schaal gebruikt.",
+    risico:
+      "De stoffen zelf worden in de bodem vrij snel afgebroken, maar wat er ontstaat — de ESA- en OA-metabolieten — zakt door naar het grondwater en blijft daar. Juist die afbraakproducten, en niet de moederstof, zijn de reden dat drinkwaterwinningen extra moeten zuiveren.",
+    kort:
+      "Breekt zelf snel af, maar de afbraakproducten zakken door naar het grondwater en dwingen winningen tot extra zuivering.",
+    bronnen: ["euPesticiden", "whoDrinkwater"],
+  },
+  chlooracetanilideMetaboliet: {
+    kort:
+      "Het afbraakproduct dat wél doorzakt naar het grondwater; het is meestal de reden dat een winning moet bijzuiveren.",
+    wat: "ESA- en OA-metabolieten: wat er van metolachloor, metazachloor, alachloor of flufenacet overblijft na afbraak in de bodem.",
+    herkomst: "Ontstaan in landbouwgrond uit de herbiciden die daar gebruikt zijn of werden.",
+    risico:
+      "Deze afbraakproducten zijn beweeglijker dan de stof waaruit ze ontstaan en veel stabieler: ze zakken door naar het grondwater en verdwijnen daar niet meer. Ze zijn doorgaans minder giftig dan de moederstof — een deel is als niet-relevant beoordeeld — maar het gevolg is praktisch: ze maken grondwater ongeschikt als drinkwaterbron zonder extra zuivering.",
+    bronnen: ["euPesticiden", "whoDrinkwater"],
+  },
+  glyfosaat: {
+    kort:
+      "In 2023 opnieuw toegelaten tot 2033, terwijl het IARC het als waarschijnlijk kankerverwekkend indeelt — een omstreden dossier.",
+    wat: "Het meest gebruikte onkruidbestrijdingsmiddel ter wereld.",
+    herkomst:
+      "Landbouw, openbaar groen en particuliere tuinen. In Vlaanderen mogen openbare besturen het op de meeste terreinen niet meer gebruiken.",
+    risico:
+      "Het IARC deelde glyfosaat in 2015 in als waarschijnlijk kankerverwekkend voor de mens; EFSA en de Europese Commissie kwamen tot een andere weging en verlengden de goedkeuring in 2023 tot eind 2033. Die twee oordelen staan naast elkaar en dat is de kern van het debat. In water is het effect indirecter: glyfosaat hecht sterk aan bodemdeeltjes en spoelt vooral bij hevige regen mee van verhardingen.",
+    bronnen: ["ecGlyfosaat", "iarc"],
+  },
+  ampa: {
+    kort:
+      "Het afbraakproduct van glyfosaat: schadelijk voor waterorganismen en de stof die het vaakst in Vlaamse waterlopen wordt gevonden.",
+    wat: "AMPA, waar glyfosaat in uiteenvalt. Het ontstaat ook bij de afbraak van sommige waspoeders.",
+    herkomst:
+      "Grotendeels uit glyfosaat, maar niet uitsluitend — een deel komt uit fosfonaten in schoonmaakmiddelen via het riool.",
+    risico:
+      "AMPA is stabieler dan glyfosaat en hoopt zich daardoor op in waterbodems en oppervlaktewater; het is een van de meest aangetroffen stoffen in Vlaamse waterlopen. Het is schadelijk voor waterorganismen, en in waterlopen die als drinkwaterbron dienen dwingt het tot extra zuivering. Dat het deels uit waspoeder komt, maakt de aanpak lastiger: een hoge waarde wijst niet automatisch naar de landbouw, dus ook niet automatisch naar wie er iets aan kan doen.",
+    bronnen: ["vmmWater", "euPesticiden"],
+  },
+  bam: {
+    kort:
+      "Afbraakproduct van een middel dat al sinds 2008 verboden is, en toch de bekendste vervuiler van drinkwaterwinningen.",
+    wat: "2,6-dichloorbenzamide, het afbraakproduct van het onkruidmiddel dichlobenil.",
+    herkomst:
+      "Dichlobenil werd tot het verbod in 2008 gebruikt op opritten, paden en in de sierteelt — vaak op verharding, waar niets het tegenhoudt.",
+    risico:
+      "BAM breekt vrijwel niet af en is uitermate beweeglijk: het is in heel Noordwest-Europa de stof die het vaakst drinkwaterwinningen boven de norm brengt, en winningen zijn erdoor gesloten. Het is niet bijzonder giftig — het gevolg zit in de onbruikbaarheid van het water, niet in een gezondheidseffect bij deze gehalten.",
+    bronnen: ["euPesticiden", "whoDrinkwater"],
+  },
+  chloridazon: {
+    kort:
+      "Afbraakproduct van een bietenherbicide dat niet meer toegelaten is; het zakt sneller door dan de stof zelf.",
+    wat: "Desphenyl-chloridazon en methyldesfenyl-chloridazon, de afbraakproducten van het bietenherbicide chloridazon.",
+    herkomst:
+      "Suikerbietenteelt. Chloridazon is in de Europese Unie niet meer toegelaten, maar de metabolieten zijn nog volop onderweg door de bodem.",
+    risico:
+      "Deze afbraakproducten zijn als niet-relevant beoordeeld, wat wil zeggen dat ze minder giftig zijn dan de moederstof; de strenge norm van 0,1 µg/L geldt er niet automatisch voor. Wat blijft, is dat ze massaal in het grondwater zitten en er niet uit verdwijnen: in bietenstreken bepalen ze mee of een winning nog bruikbaar is.",
+    bronnen: ["euPesticiden", "whoDrinkwater"],
+  },
+  dms: {
+    kort:
+      "Afbraakproduct van een verboden schimmelmiddel; bij ontsmetting met ozon kan er in de drinkwaterfabriek NDMA uit ontstaan.",
+    wat: "Dimethylsulfamide, het afbraakproduct van het schimmelbestrijdingsmiddel tolylfluanide.",
+    herkomst: "Fruit- en sierteelt. Tolylfluanide is in de Europese Unie niet meer toegelaten.",
+    risico:
+      "DMS zelf is weinig giftig, maar het is bekend geworden om iets anders: bij de bereiding van drinkwater met ozon kan eruit NDMA ontstaan, een stof die als kankerverwekkend geldt. Het gevolg ligt dus niet in het grondwater zelf maar in wat de zuivering ermee doet — waardoor waterbedrijven hun ozonstap moesten aanpassen.",
+    bronnen: ["euPesticiden", "whoDrinkwater"],
+  },
+  triazool: {
+    kort:
+      "Afbraakproduct van de triazoolfungiciden; verscheidene daarvan zijn ingedeeld als schadelijk voor de voortplanting.",
+    wat: "1,2,4-triazool, het gemeenschappelijke afbraakproduct van de triazoolfungiciden.",
+    herkomst:
+      "Schimmelbestrijding in granen, fruit en sierteelt — een grote groep middelen die alle op deze ring uitkomen.",
+    risico:
+      "De moederstoffen uit deze groep zijn voor een deel ingedeeld als schadelijk voor de voortplanting, en dat is de reden dat het afbraakproduct opgevolgd wordt. 1,2,4-triazool is bovendien beweeglijk en zakt makkelijk door naar het grondwater, zodat het over een grote oppervlakte terugkomt in plaats van op de plek van gebruik.",
+    bronnen: ["euPesticiden", "echa"],
+  },
+  chloorthalonilMetaboliet: {
+    kort:
+      "De metaboliet waarom chloorthalonil in 2019 van de markt ging: Europa kon niet uitsluiten dat de resten genotoxisch zorgwekkend zijn.",
+    wat: "R471811, een afbraakproduct van het schimmelbestrijdingsmiddel chloorthalonil.",
+    herkomst:
+      "Chloorthalonil werd gebruikt tegen schimmels in granen, aardappelen en groenten, tot de goedkeuring in april 2019 niet verlengd werd.",
+    risico:
+      "Deze stof is geen bijkomstigheid van dat verbod maar de aanleiding ervan: de Europese Commissie noemt R471811 bij naam als een van de metabolieten waarvan voorspeld werd dat ze in álle scenario's boven 0,1 µg/L in het grondwater zouden voorkomen. Daarbij kon niet uitgesloten worden dat de resten waaraan consumenten worden blootgesteld genotoxisch zorgwekkend zijn, en voor amfibieën en vissen werd een hoog risico vastgesteld.",
+    bronnen: ["verordeningChloorthalonil", "euPesticiden"],
+  },
+  ethofumesaat: {
+    kort:
+      "Nog toegelaten bietenherbicide dat vlot doorzakt naar het grondwater.",
+    wat: "Een herbicide dat vooral in suikerbieten wordt gebruikt.",
+    herkomst: "Bietenteelt en graszaadteelt; nog toegelaten in de Europese Unie.",
+    risico:
+      "Het spoelt makkelijk uit naar het grondwater, waardoor het regelmatig in meetnetten opduikt. Voor de mens is er bij deze gehalten geen aangetoond effect; de norm is een beleidsgrens. Voor waterorganismen is het wel schadelijk, en omdat het nog gebruikt wordt, gaat het om een actuele belasting en niet om een erfenis.",
+    bronnen: ["euPesticiden", "vmmWater"],
+  },
+  fenoxy: {
+    kort:
+      "Klassieke onkruidbestrijders die vlot uitspoelen; ze zijn giftig voor waterplanten en verstoren zo de beek.",
+    wat: "Fenoxyherbiciden zoals 2,4-D, 2,4-DB en MCPA, tegen breedbladig onkruid in grasland en granen.",
+    herkomst: "Akkerbouw en weiland; een deel is nog toegelaten.",
+    risico:
+      "Ze hechten slecht aan de bodem en spoelen bij regen mee naar sloot en beek. Daar werken ze zoals ze bedoeld zijn: ze doden breedbladige planten, ook de waterplanten die schuil- en paaiplaats zijn voor het leven in de waterloop. Voor de mens ligt de norm ruim onder de dosis waarbij effecten optreden.",
+    bronnen: ["euPesticiden", "whoDrinkwater"],
+  },
+  nietRelevanteMetaboliet: {
+    kort:
+      "Een afbraakproduct dat als minder giftig beoordeeld is; het maakt water niet ongezond, maar wel moeilijker bruikbaar als drinkwaterbron.",
+    wat: "Een afbraakproduct van een bestrijdingsmiddel dat als niet-relevant is beoordeeld: minder giftig dan de stof waaruit het ontstond.",
+    herkomst: "Landbouwgrond, uit de middelen die daar gebruikt zijn of werden.",
+    risico:
+      "“Niet-relevant” betekent niet onschuldig maar minder giftig dan de moederstof; de strenge norm van 0,1 µg/L geldt er niet automatisch voor. Wat overblijft is een praktisch gevolg: deze stoffen zijn stabiel en beweeglijk, ze stapelen zich op in het grondwater en maken een winning duurder of onbruikbaar. Voor een aantal ervan is de beoordeling bovendien nooit afgerond, en dan is de indeling een tussenstand en geen vrijbrief.",
+    bronnen: ["euPesticiden", "whoDrinkwater"],
+  },
+
+  triazineOverig: {
+    kort:
+      "Remt de fotosynthese van algen en waterplanten, de basis van het leven in een beek; niet meer toegelaten in de EU.",
+    wat: "De overige triazine- en verwante herbiciden: terbutryn, prometryn, cyanazine, sebuthylazine, hexazinon, bromacil en metamitron.",
+    herkomst:
+      "Onkruidbestrijding in akkerbouw, op spoorwegen en verhardingen. Voor het merendeel is de toelating in de Europese Unie ingetrokken.",
+    risico:
+      "Ze werken alle op dezelfde manier: ze leggen de fotosynthese stil. In een waterloop treft dat de algen en waterplanten waar het hele voedselweb op steunt. Voor de mens is de norm van 0,1 µg/L een beleidsgrens en geen gezondheidsdrempel; het gevolg zit in de waterloop en in de bruikbaarheid van het grondwater.",
+    bronnen: ["euPesticiden", "vmmWater"],
+  },
+  groeistof: {
+    kort:
+      "Doodt breedbladige planten, ook de waterplanten die schuil- en paaiplaats zijn; spoelt vlot af naar sloot en beek.",
+    wat: "Groeistofherbiciden: fenoxyzuren zoals 2,4-D, MCPA, mecoprop en dichloorprop, en verwanten als dicamba, fluroxypyr en triclopyr.",
+    herkomst:
+      "Grasland, granen en openbaar groen. Een deel is nog toegelaten, andere zoals 2,4,5-T al lang niet meer.",
+    risico:
+      "Ze ontregelen de groei van breedbladige planten. Spoelen ze af naar een sloot, dan doen ze daar precies hetzelfde: de waterplanten verdwijnen die schuilplaats en paaiplaats zijn voor vissen en insecten. Ze hechten slecht aan de bodem, dus een regenbui volstaat. Voor de mens ligt de norm ruim onder de dosis waarbij effecten optreden.",
+    bronnen: ["euPesticiden", "vmmWater"],
+  },
+  carbamaat: {
+    kort:
+      "Oudere middelen waarvan de toelating is ingetrokken; ze blijven lang genoeg in de bodem om nu nog op te duiken.",
+    wat: "Carbamaten zoals chloorprofam en carbetamide, gebruikt tegen onkruid en tegen het uitlopen van aardappelen.",
+    herkomst:
+      "Aardappelbewaring en akkerbouw. De toelating is in de Europese Unie ingetrokken.",
+    risico:
+      "Chloorprofam werd tot het verbod op grote schaal in aardappelbewaring gebruikt, waardoor residuen breed verspreid raakten. In water zijn deze stoffen schadelijk voor waterorganismen; voor de mens is bij de gemeten gehalten geen effect aangetoond en is de norm een beleidsgrens.",
+    bronnen: ["euPesticiden", "whoDrinkwater"],
+  },
+  carbendazim: {
+    kort:
+      "Niet meer toegelaten omdat het schadelijk is voor de voortplanting en erfelijk materiaal kan beschadigen.",
+    wat: "Een schimmelbestrijdingsmiddel uit de benzimidazolen, ook het afbraakproduct van benomyl en thiofanaat-methyl.",
+    herkomst:
+      "Fruit, granen en sierteelt. De toelating is in de Europese Unie ingetrokken; het duikt ook op via geïmporteerde producten en via verf en coatings waarin het als conserveermiddel zat.",
+    risico:
+      "Carbendazim is ingedeeld als schadelijk voor de voortplanting en als stof die erfelijk materiaal kan beschadigen; dat is de reden dat de goedkeuring niet verlengd is. Het is bovendien zeer giftig voor waterorganismen en breekt in water traag af.",
+    bronnen: ["euPesticiden", "echa"],
+  },
+  organofosfaat: {
+    kort:
+      "Legt het zenuwstelsel lam — bij insecten in bedoelde dosis, bij mens en vis bij hoge blootstelling; niet meer toegelaten.",
+    wat: "Organofosfaat-insecticiden zoals triazofos.",
+    herkomst: "Insectenbestrijding in land- en tuinbouw. Niet meer toegelaten in de Europese Unie.",
+    risico:
+      "Deze middelen blokkeren een enzym dat zenuwprikkels afbreekt; datzelfde enzym hebben mensen, vissen en insecten. Daardoor zijn ze zeer giftig voor waterinsecten en kreeftachtigen, en bij hoge blootstelling ook voor de mens. Ze zijn juist om die reden uit de markt genomen; een vondst wijst op ouder of niet-toegelaten gebruik.",
+    bronnen: ["euPesticiden", "whoDrinkwater"],
+  },
+  neonicotinoide: {
+    kort:
+      "Extreem giftig voor waterinsecten en bijen; buitengebruik is daarom sinds 2018 in de EU verboden.",
+    wat: "Neonicotinoïden zoals imidacloprid, insecticiden die door de hele plant worden opgenomen.",
+    herkomst:
+      "Zaadbehandeling en gewasbescherming. Voor imidacloprid en verwanten is het gebruik in open lucht sinds 2018 in de Europese Unie verboden vanwege de gevolgen voor bijen.",
+    risico:
+      "Ze werken in op het zenuwstelsel van insecten en zijn daar buitengewoon giftig voor: concentraties ver onder wat voor de mens iets betekent, zijn al schadelijk voor haften, muggenlarven en kreeftachtigen. Verdwijnen die, dan verdwijnt het voedsel van vissen en vogels. De norm van 0,1 µg/L is voor deze stoffen dan ook niet streng genoeg om het waterleven te beschermen.",
+    bronnen: ["euPesticiden", "vmmWater"],
+  },
+  fumigant: {
+    kort:
+      "Bodemontsmetters die massaal werden ingezet en waarvan er één berucht is om onvruchtbaarheid bij arbeiders; geen ervan is nog toegelaten.",
+    wat: "Bodemontsmettingsmiddelen zoals 1,3-dichloorpropeen, broommethaan en 1,2-dibroom-3-chloorpropaan, en het afbraakproduct chlooracrylzuur.",
+    herkomst:
+      "Ontsmetting van landbouwgrond tegen aaltjes en schimmels, vooral in de sierteelt en groenteteelt. Geen van deze middelen is nog toegelaten.",
+    risico:
+      "Deze stoffen werden in grote hoeveelheden in de bodem gebracht en zakken van daaruit door naar het grondwater. 1,2-dibroom-3-chloorpropaan werd wereldwijd uit de markt genomen nadat het onvruchtbaarheid bleek te veroorzaken bij arbeiders die het produceerden. Broommethaan is bovendien onder het Montreal-protocol uitgefaseerd omdat het de ozonlaag aantast.",
+    bronnen: ["euPesticiden", "whoDrinkwater"],
+  },
+  pentachloorfenol: {
+    kort:
+      "Wereldwijd verboden houtverduurzamingsmiddel dat kankerverwekkend is en zich ophoopt in de voedselketen.",
+    wat: "Pentachloorfenol, gebruikt om hout te verduurzamen en als bestrijdingsmiddel.",
+    herkomst:
+      "Houtverduurzaming, leerlooierij en textiel. Opgenomen in bijlage A van het Verdrag van Stockholm, dus wereldwijd uitgefaseerd.",
+    risico:
+      "Het is door het IARC ingedeeld als kankerverwekkend voor de mens, hoopt zich op in de voedselketen en breekt traag af. Bij de productie ervan ontstonden bovendien dioxines. Een vondst wijst vrijwel altijd op historische verontreiniging, bijvoorbeeld bij een oude houtverduurzamingsplaats.",
+    bronnen: ["stockholm", "iarc"],
+  },
+  somPesticiden: {
+    kort:
+      "De optelsom van alle gemeten bestrijdingsmiddelen; de drinkwaterrichtlijn hanteert hiervoor 0,5 µg/L.",
+    wat: "De som van de afzonderlijk bepaalde bestrijdingsmiddelen in dit monster.",
+    herkomst: "Een rekensom van het labo, geen stof op zich.",
+    risico:
+      "De Europese drinkwaterrichtlijn kent naast de 0,1 µg/L per stof een tweede grens: 0,5 µg/L voor alle bestrijdingsmiddelen samen. Zo wordt vermeden dat tien stoffen die elk netjes onder de drempel blijven, samen alsnog een probleem vormen. De som zegt niets over wélke middelen erin zitten, en dat maakt uit voor wat eraan te doen valt.",
+    bronnen: ["whoDrinkwater", "euPesticiden"],
+  },
+
+  fungicideModern: {
+    kort:
+      "Nog toegelaten schimmelmiddelen; ze zijn giftig voor waterorganismen en een vondst wijst op gebruik van vandaag.",
+    wat: "Moderne schimmelbestrijdingsmiddelen zoals trifloxystrobine en fluopicolide.",
+    herkomst: "Fruit, granen, aardappelen en sierteelt; grotendeels nog toegelaten.",
+    risico:
+      "Anders dan de oude middelen zijn deze nog in gebruik, dus een vondst gaat over vandaag en niet over een erfenis. Ze zijn giftig voor waterorganismen, in het bijzonder voor algen en kreeftachtigen, en spoelen af bij regen kort na het spuiten. Voor de mens ligt de norm ruim onder de dosis waarbij effecten optreden.",
+    bronnen: ["euPesticiden", "vmmWater"],
+  },
+
   pesticiden: {
     kort:
       "Bestrijdingsmiddelen horen niet in drinkwater thuis — de norm van 0,1 µg/L is daarop gebaseerd en niet op een gezondheidsgrens per stof.",
@@ -1133,7 +1416,41 @@ const SLEUTELS: Readonly<Record<string, ProfielId>> = {
   "Ijzer (Fe)": "ijzer",
   "Ijzer II (Fe2+)": "ijzer",
   "Aluminium (Al)": "aluminium",
+  // --- pesticiden ---
+  // DOV schrijft "Atrazine (Atraz)"; de code achteraan valt weg in de
+  // opzoeking, dus hier staan de gewone namen.
   Atrazine: "atrazine",
+  Simazine: "simazine",
+  Terbutylazine: "terbutylazine",
+  Terbuthylazine: "terbutylazine",
+  Propazine: "triazineMetabolieten",
+  Bentazon: "bentazon",
+  Ethofumesaat: "ethofumesaat",
+  Diuron: "fenylureum",
+  Isoproturon: "fenylureum",
+  Chloortoluron: "fenylureum",
+  Chlorotoluron: "fenylureum",
+  Linuron: "fenylureum",
+  Metazachloor: "chlooracetanilide",
+  Metolachloor: "chlooracetanilide",
+  "S-Metolachloor": "chlooracetanilide",
+  Alachloor: "chlooracetanilide",
+  Glyfosaat: "glyfosaat",
+  Glyphosate: "glyfosaat",
+  AMPA: "ampa",
+  "2,6-Dichlorobenzamide": "bam",
+  BAM: "bam",
+  "Desphenyl-Chloridazon": "chloridazon",
+  Methyldesfenylchloridazon: "chloridazon",
+  dimethylsulfamide: "dms",
+  DMS: "dms",
+  "1,2,4-Triazool": "triazool",
+  "Chloorthalonil metaboliet R471811": "chloorthalonilMetaboliet",
+  R471811: "chloorthalonilMetaboliet",
+  "2,4-D": "fenoxy",
+  "2,4-DB": "fenoxy",
+  MCPA: "fenoxy",
+  MCPP: "fenoxy",
   "AfwijkingBalans% (%AfwijkBalans)": "ionenbalans",
 };
 
@@ -1190,12 +1507,48 @@ const PER_LAAG: Readonly<Record<LaagId, Readonly<Record<string, ProfielId>>>> = 
 const GROEPEN: Readonly<Record<string, ProfielId>> = {
   "Pesticiden: actieve stoffen": "pesticiden",
   "Pesticiden: relevante metabolieten": "pesticiden",
-  "Niet-relevante metabolieten van pesticiden": "pesticiden",
+  "Niet-relevante metabolieten van pesticiden": "nietRelevanteMetaboliet",
   Grondwater_chemisch_PFAS: "pfas",
   "Bacteriologische parameters": "fecaleBacterien",
   "Farmaceutische stoffen": "geneesmiddelen",
   "Organische verbindingen": "organisch",
 };
+
+/**
+ * Pesticiden die we op naam herkennen in plaats van op een sleutel.
+ *
+ * DOV verzint per metaboliet een eigen schrijfwijze: "Metazachloor ESA
+ * (479M08)", "metolachlor-OA", "Dimethenamid-ESA". Die allemaal opsommen is
+ * dweilen; het patroon erachter is stabiel. Wat hier niet in past, valt terug
+ * op de tekst van zijn parametergroep — dat blijft de vangnetlaag.
+ */
+const PESTICIDE_PATRONEN: readonly (readonly [RegExp, ProfielId])[] = [
+  // De ESA- en OA-metabolieten van de chlooracetaniliden.
+  [
+    /(metolachlo|metazachlo|alachlo|acetochlo|dimethenamid|flufenacet|propachlo)\w*[\s-]*(esa|oa\b|479m)/i,
+    "chlooracetanilideMetaboliet",
+  ],
+  // Desethyl-, desisopropyl- en verwante afbraak van de triazines.
+  [/^des(ethyl|isopropyl|fenyl)|desethyl|desisopropyl/i, "triazineMetabolieten"],
+  [/chloorthalonil|chlorothalonil/i, "chloorthalonilMetaboliet"],
+  [/chloridazon/i, "chloridazon"],
+  [/glyfosaat|glyphosate/i, "glyfosaat"],
+  [/triazool|triazole/i, "triazool"],
+  // Namen die per bron anders gespeld worden; het patroon is stabieler dan
+  // een lijst met varianten als "S-Metolachlor" naast "S-Metolachloor".
+  [/metolachlo|metazachlo|alachlo|acetochlo|propachlo|flufenacet|dimethenamid/i, "chlooracetanilide"],
+  [/terbutryn|prometry|cyanazin|sebuthylazin|hexazinon|bromacil|metamitron|simetryn/i, "triazineOverig"],
+  [/metoxuron|methabenzthiazuron|metobromuron|monolinuron|\buron\b|fenuron/i, "fenylureum"],
+  [/mecoprop|dichloorprop|dichlorprop|fenoprop|mcpb|mcpa|2,4,?5-t|2,4-d|dicamba|fluroxypyr|tri(ch)?lorpyr|triclopyr/i, "groeistof"],
+  [/carbendazim|benomyl|thiofanaat/i, "carbendazim"],
+  [/chloorprop?harm|chloorprofam|chlorproph|carbetamide|profam/i, "carbamaat"],
+  [/imidacloprid|thiamethoxam|clothianidin|acetamiprid|thiacloprid/i, "neonicotinoide"],
+  [/dichloorpropeen|dibroom-3-chloorpropaan|broommethaan|chlooracrylzuur/i, "fumigant"],
+  [/strobilurin|strobin|fluopicolide|boscalid|azoxystrobin/i, "fungicideModern"],
+  [/pentachloorfenol|pentachlorophenol/i, "pentachloorfenol"],
+  [/^pesticiden\s*totaal|som.*pesticiden/i, "somPesticiden"],
+  [/phos\b|fos\b|triazophos|parathion|malathion|dimethoaat/i, "organofosfaat"],
+];
 
 /**
  * PFAS zijn met duizenden en krijgen geen tekst per stof. Dezelfde vorm als in
@@ -1285,6 +1638,15 @@ export function stofprofiel(
     return PROFIELEN.pfas;
   }
 
+  for (const [patroon, id] of PESTICIDE_PATRONEN) {
+    if (patroon.test(parameter.symbool) || patroon.test(parameter.omschrijving)) {
+      return PROFIELEN[id];
+    }
+  }
+
+  // Een niet-relevante metaboliet die we niet apart kennen, krijgt liever de
+  // tekst over die beoordeling dan de algemene pesticidentekst: het verschil
+  // tussen "relevant" en "niet-relevant" bepaalt of de norm van 0,1 µg/L geldt.
   const groep = parameter.groep ? GROEPEN[parameter.groep] : undefined;
   return groep ? PROFIELEN[groep] : undefined;
 }

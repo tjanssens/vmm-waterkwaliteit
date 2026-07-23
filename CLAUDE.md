@@ -242,6 +242,26 @@ ketenlengte juist het verhaal.
 - Een test loopt alle 111 namen van beide bronnen af en faalt zodra er één op
   de familietekst terugvalt.
 
+### Pesticiden: per stof waar het uitmaakt, per familie waar niet
+
+Hetzelfde als bij PFAS, met één onderscheid dat zwaarder weegt: **sommige
+middelen zijn al twintig jaar verboden en andere mogen vandaag nog**. Atrazine
+is een erfenis, terbutylazine verving het en is nog toegelaten — een vondst
+betekent dus iets heel anders. Eén gedeelde tekst wist dat verschil uit.
+
+- **Namen zijn niet op te sommen.** DOV verzint per metaboliet een schrijfwijze
+  ("Metazachloor ESA (479M08)", "metolachlor-OA", "S-Metolachlor"). Vandaar
+  `PESTICIDE_PATRONEN`: regexen op de stofnaam, gecontroleerd vóór de
+  groepsterugval. Het patroon is stabiel, de spelling niet.
+- **De volle databank is niet opgehaald.** 448.000 metingen binnenhalen om een
+  namenlijst te krijgen staat niet in verhouding; een steekproef van 30.000
+  levert 84 namen, en die dekken het beeld. De familie- en groepsteksten vangen
+  de rest — dat is geen tekortkoming maar het ontwerp.
+- **"Niet-relevante metabolieten" hebben een eigen tekst**, want dat label
+  bepaalt of de norm van 0,1 µg/L geldt.
+- Twee tests: één op de dekking, één die faalt zodra een tekst geen gevolg voor
+  mens of milieu meer noemt.
+
 ## Elke parameter blijft zichtbaar
 
 Geen enkele bron wordt gefilterd op een lijst die wij bijhouden — wat de bron

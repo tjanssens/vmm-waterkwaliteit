@@ -109,6 +109,11 @@ lucht. Een knop **Enkel aangetoond** laat de stoffen weg die nooit boven de
 detectielimiet uitkwamen — aan een PFAS-meetpunt scheelt dat al snel 50 regels
 tegenover 8.
 
+Bij pesticiden speelt nog iets mee: sommige middelen zijn al twintig jaar
+verboden en andere mogen vandaag nog gebruikt worden. Atrazine is een erfenis
+die traag door de bodem zakt; terbutylazine verving het en is nog toegelaten, en
+daar gaat een vondst dus over vandaag. Dat onderscheid staat er telkens bij.
+
 Elke gezondheidsuitspraak draagt de bron waarin ze staat, en de zwaarste twee.
 Kennen we een stof niet, dan verschijnt er niets: een tekst die op elke stof zou
 passen wekt de indruk van uitleg zonder er een te geven.
