@@ -1,5 +1,6 @@
 import type { ParameterSamenvatting } from "./types.js";
 import { isTotaalgehalte } from "./normen.js";
+import { stofprofiel } from "./stoffen.js";
 
 export interface Categorie {
   id: string;
@@ -53,7 +54,7 @@ const CATEGORIEEN = [
   { id: "overige", naam: "Overige parameters" },
 ] as const satisfies readonly Categorie[];
 
-type CategorieId = (typeof CATEGORIEEN)[number]["id"];
+export type CategorieId = (typeof CATEGORIEEN)[number]["id"];
 
 const VAST: Readonly<Record<string, CategorieId>> = {
   "O2": "zuurstof",
@@ -204,6 +205,13 @@ export function categorieVan(parameter: ParameterSamenvatting): CategorieId {
 
   const uitGroep = parameter.groep ? GROEPEN[parameter.groep] : undefined;
   if (uitGroep) return uitGroep;
+
+  // De duiding weet vaak al wat voor stof dit is. Die kennis hier hergebruiken
+  // scheelt een tweede lijst die uit de pas zou lopen: het gebeurde al dat een
+  // stof in "Overige parameters" stond terwijl er wél een tekst over bestond.
+  const uitProfiel = stofprofiel(parameter)?.categorie;
+  if (uitProfiel) return uitProfiel;
+
   if (isTotaalgehalte(parameter.symbool) || /\s[ot]$/.test(parameter.symbool)) return "metalen";
   return "overige";
 }

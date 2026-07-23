@@ -280,6 +280,17 @@ verwijzing die de zwaarste uitspraken draagt.
 - De fractie (" t" totaal, " o" opgelost) zegt iets over de meetwijze en niet
   over de stof; beide komen op dezelfde tekst uit.
 
+### De indeling volgt de duiding
+
+`categorieVan` leest `categorie` van het stofprofiel wanneer symbool en
+parametergroep niets opleveren. Zo staat er maar op één plek wat een stof is.
+
+Dat was nodig omdat het al misging: op meetplaats OW72000 stonden 75 van de
+155 parameters in "Overige parameters" — geneesmiddelen, organofosfaat-
+insecticiden en ultrakorte PFAS, onder afkortingen die de VMM zelf verzint.
+"AzinfosEy" is azinfos-ethyl en "Carbamaze" is carbamazepine; daar past geen
+patroon op, die moeten met de hand. Nu is die categorie er leeg.
+
 ## Elke parameter blijft zichtbaar
 
 Geen enkele bron wordt gefilterd op een lijst die wij bijhouden — wat de bron

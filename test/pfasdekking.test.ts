@@ -167,7 +167,7 @@ describe("dekking van de PFAS-teksten", () => {
     // niet vaststaat, hoort dat er met zoveel woorden te staan — vandaar dat
     // "kennisleemte" en "te weinig gegevens" ook meetellen.
     const GEVOLG =
-      /kanker|vaccinatie|afweersysteem|lever|drinkwater|putwater|eieren|vis|voedselketen|voedsel|winning|gezondheid|kennisleemte|te weinig gegevens|niet meer uit/i;
+      /kanker|vaccinatie|afweersysteem|lever|drinkwater|putwater|eieren|vis|voedselketen|voedsel|winning|gezondheid|kennisleemte|te weinig gegevens|niet meer uit|schildklier/i;
 
     const zonderGevolg = [...OPPERVLAKTEWATER_PFAS, ...GRONDWATER_PFAS]
       .map((naam) => ({ naam, profiel: profielVoor(naam, "Grondwater_chemisch_PFAS") }))
@@ -181,7 +181,7 @@ describe("dekking van de PFAS-teksten", () => {
     // De regel in de tabel is voor wie nooit doorklikt. Daar is de ruimte het
     // kleinst en het gevolg het belangrijkst.
     const GEVOLG =
-      /kanker|vaccinatie|afweersysteem|lever|drinkwater|putwater|eieren|vis|voedselketen|voedsel|winning|gezondheid|gevolgen/i;
+      /kanker|vaccinatie|afweersysteem|lever|drinkwater|putwater|eieren|vis|voedselketen|voedsel|winning|gezondheid|gevolgen|schildklier/i;
 
     for (const symbool of ["PFOS", "PFOA", "PFBS", "6:2 diPAP", "TFA", "PFHxA"]) {
       expect(korteRisicozin(profielVoor(symbool)!)).toMatch(GEVOLG);

@@ -1,5 +1,6 @@
 import type { ParameterSamenvatting } from "./types.js";
 import type { LaagId } from "../lagen/types.js";
+import type { CategorieId } from "./categorieen.js";
 
 /**
  * Duiding bij de stoffen: wat is dit, waar komt het vandaan, wat doet het.
@@ -34,6 +35,14 @@ export const STOFBRONNEN = {
   whoLuchtvervuiling: {
     naam: "WHO, factsheet Ambient (outdoor) air pollution",
     url: "https://www.who.int/news-room/fact-sheets/detail/ambient-(outdoor)-air-quality-and-health",
+  },
+  efsaTfa: {
+    naam: "EFSA — verlaagt het veilige blootstellingsniveau voor TFA (22 juli 2026)",
+    url: "https://www.efsa.europa.eu/en/news/efsa-lowers-safe-level-exposure-tfa",
+  },
+  vmmTfa: {
+    naam: "VMM — voorlopige gezondheidskundige advieswaarde voor TFA in drinkwater",
+    url: "https://vmm.vlaanderen.be/nieuws/voorlopige-gezondheidskundige-advieswaarde-voor-tfa-in-drinkwater-bepaald",
   },
   efsaPfas: {
     naam: "EFSA, Risk to human health related to the presence of perfluoroalkyl substances in food (2020)",
@@ -75,6 +84,10 @@ export const STOFBRONNEN = {
   iarc: {
     naam: "IARC Monographs — lijst van geclassificeerde stoffen",
     url: "https://monographs.iarc.who.int/list-of-classifications",
+  },
+  whoGeneesmiddelen: {
+    naam: "WHO, Pharmaceuticals in drinking-water (2012)",
+    url: "https://www.who.int/publications/i/item/9789241502085",
   },
   iarcKankersoorten: {
     naam: "IARC Monographs — geclassificeerde stoffen per kankersoort",
@@ -118,6 +131,12 @@ export interface Stofprofiel {
    * uitmaakt, in het bijzonder waar een lage waarde het probleem is.
    */
   kort?: string;
+  /**
+   * In welke categorie deze stof thuishoort, waar dat niet uit haar symbool of
+   * uit de parametergroep van de bron af te leiden is. `categorieen.ts` leest
+   * dit veld, zodat er maar één plek is waar staat wat een stof ís.
+   */
+  categorie?: CategorieId;
   /** De bronnen waarin dit staat; twee waar de uitspraak zwaar weegt. */
   bronnen: readonly StofbronId[];
 }
@@ -731,6 +750,7 @@ const PROFIELEN = {
   // dat het putwater erdoor afgeraden wordt, wel. Waar het gevolg niet vaststaat,
   // staat dat er met zoveel woorden bij.
   pfos: {
+    categorie: "pfas",
     kort:
       "Verzwakt de reactie op vaccinatie en hoopt zich jarenlang op in het bloed; in vervuilde zones geldt daarom het advies van hoogstens twee eigen eieren per week.",
     wat: "Perfluoroctaansulfonzuur, de PFAS waar de bezorgdheid mee begon en waarnaar het meest gemeten wordt.",
@@ -741,6 +761,7 @@ const PROFIELEN = {
     bronnen: ["stockholm", "efsaPfas", "iarcPfas", "vlaanderenPfas"],
   },
   pfoa: {
+    categorie: "pfas",
     kort:
       "Door het IARC ingedeeld als kankerverwekkend voor de mens, met nierkanker en teelbalkanker als aangetoonde gevolgen.",
     wat: "Perfluoroctaanzuur, jarenlang de hulpstof bij het maken van antiaanbaklagen.",
@@ -751,6 +772,7 @@ const PROFIELEN = {
     bronnen: ["iarcPfas", "stockholm", "efsaPfas"],
   },
   pfhxs: {
+    categorie: "pfas",
     kort:
       "Blijft van de vier EFSA-stoffen het langst in het lichaam en draagt zo het meeste bij aan de verzwakte reactie op vaccinatie.",
     wat: "Perfluorhexaansulfonzuur, een kortere neef van PFOS met zes koolstofatomen.",
@@ -760,6 +782,7 @@ const PROFIELEN = {
     bronnen: ["stockholm", "efsaPfas"],
   },
   pfna: {
+    categorie: "pfas",
     kort:
       "Telt mee in de EFSA-norm voor het afweersysteem, en klimt via vis op in de voedselketen.",
     wat: "Perfluornonaanzuur, een lange keten met negen koolstofatomen.",
@@ -770,6 +793,7 @@ const PROFIELEN = {
     bronnen: ["efsaPfas"],
   },
   pfbs: {
+    categorie: "pfas",
     kort:
       "Zakt door tot in het grondwater en is er nauwelijks uit te zuiveren; in vervuilde zones wordt putwater als drinkwater daarom afgeraden.",
     wat: "Perfluorbutaansulfonzuur, met vier koolstofatomen de korte vervanger van PFOS.",
@@ -780,6 +804,7 @@ const PROFIELEN = {
     bronnen: ["vlaanderenPfas", "efsaPfas"],
   },
   pfba: {
+    categorie: "pfas",
     kort:
       "Een van de meest aangetroffen PFAS in grondwater, en met de gangbare zuivering nauwelijks te verwijderen.",
     wat: "Perfluorbutaanzuur, met vier koolstofatomen een van de kortste PFAS die routinematig gemeten worden.",
@@ -790,6 +815,7 @@ const PROFIELEN = {
     bronnen: ["vlaanderenPfas", "whoDrinkwater"],
   },
   genx: {
+    categorie: "pfas",
     kort:
       "Ingevoerd als het veiligere alternatief, maar erkend als zeer zorgwekkende stof: proefdieren tonen effecten op de lever en aanwijzingen voor kankerverwekkendheid.",
     wat: "HFPO-DA, beter bekend als GenX: de stof achter de techniek die PFOA verving.",
@@ -800,6 +826,7 @@ const PROFIELEN = {
     bronnen: ["rivmGenx", "echa"],
   },
   dona: {
+    categorie: "pfas",
     kort:
       "Een PFOA-vervanger waarvan de gevolgen nog niet vaststaan, terwijl ze net als PFOA niet meer uit het water verdwijnt.",
     wat: "DONA of ADONA, een etherverbinding die als alternatief voor PFOA werd ontwikkeld.",
@@ -809,6 +836,7 @@ const PROFIELEN = {
     bronnen: ["echa", "whoDrinkwater"],
   },
   fts: {
+    categorie: "pfas",
     kort:
       "Valt in het milieu uiteen tot PFOA en verwanten — en díe zijn kankerverwekkend en niet meer af te breken.",
     wat: "Fluortelomeersulfonzuren, aangeduid met twee getallen zoals 6:2 of 8:2 — die staan voor het aantal gefluoreerde en gewone koolstofatomen.",
@@ -819,6 +847,7 @@ const PROFIELEN = {
     bronnen: ["iarcPfas", "efsaPfas"],
   },
   dipap: {
+    categorie: "pfas",
     kort:
       "Komt via vetwerende voedselverpakking mee met het eten en valt daarna uiteen tot PFAS die het lichaam niet meer kwijtraakt.",
     wat: "Fluortelomeerfosfaatdiesters, een vetwerende coating.",
@@ -829,6 +858,7 @@ const PROFIELEN = {
     bronnen: ["iarcPfas", "vlaanderenPfas"],
   },
   sulfonamiden: {
+    categorie: "pfas",
     kort:
       "Verandert in het milieu alsnog in PFOS, met de opstapeling en het effect op het afweersysteem die daarbij horen.",
     wat: "Perfluorsulfonamiden: verbindingen die geen PFOS zijn, maar er wel in veranderen.",
@@ -839,6 +869,7 @@ const PROFIELEN = {
     bronnen: ["efsaPfas", "stockholm"],
   },
   pfcaKort: {
+    categorie: "pfas",
     kort:
       "Zakt door tot in het grondwater en is er nauwelijks uit te zuiveren; daarom wordt putwater in vervuilde zones afgeraden.",
     wat: "Perfluorcarbonzuren met een korte keten, vijf tot zeven koolstofatomen.",
@@ -849,6 +880,7 @@ const PROFIELEN = {
     bronnen: ["vlaanderenPfas", "whoDrinkwater"],
   },
   pfcaLang: {
+    categorie: "pfas",
     kort:
       "Klimt op in de voedselketen en belandt via vis en eieren bij de mens; vandaar het advies over zelfgeteeld voedsel.",
     wat: "Perfluorcarbonzuren met een lange keten, tien koolstofatomen of meer.",
@@ -859,6 +891,7 @@ const PROFIELEN = {
     bronnen: ["vlaanderenPfas", "iarcPfas"],
   },
   pfsaOverig: {
+    categorie: "pfas",
     kort:
       "Zelfde familie als PFOS: de langere hopen zich op in vis en in de mens, met dezelfde effecten op het afweersysteem.",
     wat: "Perfluorsulfonzuren van andere ketenlengte dan PFOS, PFHxS en PFBS.",
@@ -868,6 +901,7 @@ const PROFIELEN = {
     bronnen: ["efsaPfas", "whoDrinkwater"],
   },
   pfechs: {
+    categorie: "pfas",
     kort:
       "Wijst op vervuiling door luchtvaart of verchromen; over de gevolgen voor de gezondheid is nog te weinig bekend om iets te beweren.",
     wat: "Perfluor-4-ethylcyclohexaansulfonzuur, een PFAS met een ringvorm in plaats van een rechte keten.",
@@ -877,6 +911,7 @@ const PROFIELEN = {
     bronnen: ["whoDrinkwater"],
   },
   clPfesa: {
+    categorie: "pfas",
     kort:
       "Even persistent als PFOS en met dezelfde opstapeling in het lichaam; de vervanger verplaatste het probleem in plaats van het op te lossen.",
     wat: "Chloorpolyfluorether-sulfonzuren, samen bekend als F-53B.",
@@ -887,16 +922,18 @@ const PROFIELEN = {
     bronnen: ["stockholm", "whoDrinkwater"],
   },
   tfa: {
+    categorie: "pfas",
     kort:
-      "Regent overal uit en is met geen enkele gangbare zuivering uit drinkwater te halen; de gehalten stijgen daardoor gestaag.",
+      "EFSA verlaagde de veilige dagelijkse inname in juli 2026 met een factor 3,5, wegens effecten op het schildklierhormoon.",
     wat: "Trifluorazijnzuur, met twee koolstofatomen de kortste PFAS die gemeten wordt.",
     herkomst:
       "Grotendeels een afbraakproduct: koelmiddelen en drijfgassen vallen in de atmosfeer uiteen tot TFA, en ook een aantal gefluoreerde bestrijdingsmiddelen en geneesmiddelen eindigen zo. Het regent vervolgens uit.",
     risico:
-      "TFA hoopt zich niet op in het lichaam en is veel minder giftig dan PFOS; een acuut gezondheidsrisico is er bij deze gehalten niet. Het gevolg zit in de onomkeerbaarheid: het lost volledig op, hecht nergens aan en is met actieve kool of omgekeerde osmose niet tegen te houden. Wat in het grondwater komt, gaat er niet meer uit, en omdat de bronnen nog in gebruik zijn, lopen de gehalten in drink- en oppervlaktewater gestaag op.",
-    bronnen: ["whoDrinkwater", "echa"],
+      "De beoordeling is net verstrengd: op 22 juli 2026 verlaagde EFSA de aanvaardbare dagelijkse inname van 0,05 naar 0,014 milligram per kilogram lichaamsgewicht, 3,5 keer lager, omdat TFA het gehalte aan thyroxine verandert — het hormoon waarmee de schildklier de stofwisseling regelt. Vlaanderen hanteert voor drinkwater een voorlopige advieswaarde van 15,6 µg/L; gemeten werd tot 8,3 µg/L, dus daaronder. Zet die getallen wel naast elkaar: voor de vier grote PFAS samen geldt 4,4 nanogram per kilo per week, duizenden keren strenger. TFA is dus veel minder giftig dan PFOS of PFOA — het probleem is de onomkeerbaarheid. Het lost volledig op, hecht nergens aan en is met actieve kool of omgekeerde osmose niet tegen te houden; wat in het grondwater komt, gaat er niet meer uit.",
+    bronnen: ["efsaTfa", "vmmTfa", "whoDrinkwater"],
   },
   somEfsa4: {
+    categorie: "pfas",
     kort:
       "De som waarop de Europese tolereerbare inname slaat: 4,4 ng per kilo per week, gebaseerd op een verzwakte reactie op vaccinatie.",
     wat: "De som van vier PFAS: PFOA, PFNA, PFHxS en PFOS.",
@@ -906,6 +943,7 @@ const PROFIELEN = {
     bronnen: ["efsaPfas"],
   },
   somPfas43: {
+    categorie: "pfas",
     kort:
       "De optelsom van alle afzonderlijk gemeten PFAS; bruikbaar om punten te vergelijken, maar er hangt geen norm aan.",
     wat: "De som van de 43 PFAS die de VMM in oppervlaktewater afzonderlijk bepaalt.",
@@ -915,6 +953,7 @@ const PROFIELEN = {
     bronnen: ["vmmWater"],
   },
   somDwrl20: {
+    categorie: "pfas",
     kort:
       "De som waarop de Europese drinkwaternorm van 100 ng/L slaat; erboven is het water niet geschikt om te drinken.",
     wat: "De som van de twintig PFAS die de Europese drinkwaterrichtlijn samen beoordeelt.",
@@ -925,6 +964,7 @@ const PROFIELEN = {
   },
 
   pfas: {
+    categorie: "pfas",
     kort:
       "Stapelt zich op in het lichaam en verlaat het traag; EFSA wees als doorslaggevend effect aan dat het afweersysteem minder goed op vaccinatie reageert.",
     wat: "Een familie van duizenden door de mens gemaakte fluorverbindingen, bekend als de eeuwige chemicaliën omdat ze in de natuur nauwelijks afbreken.",
@@ -934,6 +974,100 @@ const PROFIELEN = {
       "EFSA stelde in 2020 een gezamenlijke tolereerbare inname vast van 4,4 nanogram per kilogram lichaamsgewicht per week voor vier PFAS samen. Doorslaggevend daarbij was niet kanker of cholesterol, maar dat het afweersysteem minder goed reageert op vaccinatie. Van de best onderzochte stof, PFOA, stelde het IARC in 2023 vast dat ze kankerverwekkend is voor de mens. PFAS stapelen zich op in het lichaam en verlaten het maar traag; in vervuilde zones vertaalt dat zich in adviezen over zelfgeteeld voedsel en putwater.",
     bronnen: ["efsaPfas", "iarcPfas", "vlaanderenPfas"],
   },
+  // ---- geneesmiddelenresten ----
+  //
+  // De VMM meet op een aantal plaatsen tientallen geneesmiddelen. Ze belandden
+  // in "Overige parameters" omdat ze geen symbool hebben dat we herkenden, en
+  // dat is precies de categorie waar niemand naar kijkt.
+  betablokker: {
+    categorie: "farmaceutisch",
+    kort:
+      "Hartmedicatie die via het riool in de waterloop komt; ze verlaagt de hartslag van vissen bij gehalten die in beken voorkomen.",
+    wat: "Bètablokkers zoals metoprolol, atenolol, propranolol en sotalol: middelen tegen hoge bloeddruk en hartritmestoornissen.",
+    herkomst:
+      "Wat mensen innemen, verlaat het lichaam grotendeels weer. De waterzuivering is er niet op gebouwd deze stoffen te verwijderen, dus komen ze via het riool in de waterloop.",
+    risico:
+      "De gemeten gehalten liggen ver onder een medicinale dosis; iemand die dit water drinkt, krijgt geen behandeling binnen. De zorg gaat over vissen en waterinsecten, die er hun hele leven in zwemmen: bij bètablokkers is een tragere hartslag beschreven bij concentraties die in beken voorkomen. Voor de meeste van deze stoffen bestaat geen norm.",
+    bronnen: ["whoGeneesmiddelen", "vmmWater"],
+  },
+  pijnstiller: {
+    categorie: "farmaceutisch",
+    kort:
+      "Ontstekingsremmers die de nieren en kieuwen van vissen aantasten; diclofenac roeide in Azië bijna de gieren uit.",
+    wat: "Ontstekingsremmende pijnstillers zoals diclofenac, ibuprofen, naproxen, ketoprofen en fenazon.",
+    herkomst:
+      "Riool, en bij diclofenac ook de zalf die van de huid afspoelt onder de douche. Diergeneeskundig gebruik draagt eveneens bij.",
+    risico:
+      "Van deze groep is diclofenac de bekendste: in Zuid-Azië stierven gieren massaal na het eten van behandeld vee, waardoor die soorten vrijwel verdwenen. In vissen tast het bij lage gehalten de nieren en kieuwen aan. Europa zette diclofenac daarom op de lijst van stoffen die extra opgevolgd worden.",
+    bronnen: ["whoGeneesmiddelen", "vmmWater"],
+  },
+  antibioticum: {
+    categorie: "farmaceutisch",
+    kort:
+      "Zelfs sporen kunnen resistente bacteriën in de hand werken, en dat is een probleem dat zich verspreidt.",
+    wat: "Antibiotica zoals claritromycine, clindamycine, sulfamethoxazol en trimethoprim.",
+    herkomst:
+      "Riool van huishoudens en ziekenhuizen, en mest van behandeld vee. Een deel verlaat het lichaam onveranderd.",
+    risico:
+      "Hier weegt niet de giftigheid maar de resistentie: ook zeer lage gehalten kunnen bacteriën in het water selecteren die tegen antibiotica bestand zijn. Die resistentie blijft niet in de beek — ze komt via mens en dier terug. Voor waterorganismen zijn sommige van deze stoffen bovendien giftig voor algen en blauwalgen.",
+    bronnen: ["whoGeneesmiddelen", "vmmWater"],
+  },
+  contrastmiddel: {
+    categorie: "farmaceutisch",
+    kort:
+      "Uit ziekenhuizen; breekt vrijwel niet af en is met de gangbare zuivering niet uit water te halen.",
+    wat: "Röntgencontrastmiddelen zoals amidotrizoïnezuur, iopamidol en iopromide, gebruikt bij medische beeldvorming.",
+    herkomst:
+      "Ziekenhuizen en radiologiepraktijken, via de urine van patiënten. Ze worden in hoge doses toegediend en vrijwel onveranderd uitgescheiden.",
+    risico:
+      "Ze zijn met opzet zo gemaakt dat het lichaam er niets mee doet, en precies daarom breken ze ook in het milieu niet af. Ze zijn weinig giftig, maar met de gangbare zuivering nauwelijks te verwijderen: het gevolg is dat ze zich ophopen in het watersysteem en tot in drinkwaterbronnen terugkomen.",
+    bronnen: ["whoGeneesmiddelen", "whoDrinkwater"],
+  },
+  psychofarmacon: {
+    categorie: "farmaceutisch",
+    kort:
+      "Verandert het gedrag van vissen — schuwheid, voedselzoeken en paargedrag — bij gehalten die in waterlopen gemeten worden.",
+    wat: "Middelen die op de hersenen werken, zoals carbamazepine, gabapentine en clozapine.",
+    herkomst: "Riool. Carbamazepine wordt zo slecht afgebroken dat het als merker voor huishoudelijk afvalwater dient.",
+    risico:
+      "Deze stoffen zijn ontworpen om gedrag te beïnvloeden, en dat doen ze ook bij dieren: bij vissen zijn veranderingen in schuwheid, voedselzoeken en voortplantingsgedrag beschreven bij concentraties die in oppervlaktewater voorkomen. Voor de mens zijn de gehalten verwaarloosbaar tegenover een dosis.",
+    bronnen: ["whoGeneesmiddelen", "vmmWater"],
+  },
+  hartvaatmedicatie: {
+    categorie: "farmaceutisch",
+    kort:
+      "Veelgebruikte medicatie die het riool passeert; ze is slecht afbreekbaar en hoopt zich op in het watersysteem.",
+    wat: "Bloeddrukverlagers en plaspillen zoals valsartan, irbesartan en hydrochloorthiazide.",
+    herkomst: "Riool. Het zijn middelen die zeer veel mensen dagelijks innemen, wat de aanvoer constant maakt.",
+    risico:
+      "Ze zijn weinig giftig voor waterleven, maar breken traag af en worden door de zuivering slecht tegengehouden. Het gevolg is een constante achtergrond in het watersysteem waar de waterorganismen hun hele leven in doorbrengen, en waarvan de effecten op lange termijn nog niet vaststaan.",
+    bronnen: ["whoGeneesmiddelen", "vmmWater"],
+  },
+
+  // ---- overige ----
+  benzotriazool: {
+    categorie: "organisch",
+    kort:
+      "Uit vaatwastabletten en koelvloeistof; het breekt slecht af en is een van de meest gevonden industriële stoffen in oppervlaktewater.",
+    wat: "Een corrosieremmer die metaal beschermt tegen aantasting.",
+    herkomst:
+      "Vaatwasmiddel, koelvloeistof en ontijzingsvloeistof voor vliegtuigen. Het komt vooral via het huishoudelijk riool binnen.",
+    risico:
+      "Benzotriazool wordt door waterzuiveringen maar deels afgebroken en hoort daardoor bij de meest aangetroffen industriële stoffen in oppervlaktewater. Het is matig giftig voor waterplanten en algen; de grootste zorg is dat het tot in drinkwaterbronnen doordringt en daar moeilijk te verwijderen is.",
+    bronnen: ["vmmWater", "whoDrinkwater"],
+  },
+  ultrakortePfas: {
+    categorie: "pfas",
+    kort:
+      "De kortste PFAS: volledig oplosbaar, met geen enkele gangbare zuivering uit water te halen.",
+    wat: "Ultrakorte PFAS zoals trifluorazijnzuur, trifluormethaansulfonzuur en de tetrafluorpropaanzuren.",
+    herkomst:
+      "Grotendeels afbraakproducten van koelmiddelen, drijfgassen, gefluoreerde bestrijdingsmiddelen en geneesmiddelen. Ze regenen uit de atmosfeer.",
+    risico:
+      "Ze hopen zich niet op in het lichaam en zijn veel minder giftig dan PFOS. Het gevolg zit in de onomkeerbaarheid: ze lossen volledig op, hechten nergens aan en zijn met actieve kool of omgekeerde osmose niet tegen te houden. Wat in het water komt, gaat er niet meer uit, en omdat de bronnen nog in gebruik zijn lopen de gehalten gestaag op. Voor trifluorazijnzuur, de bekendste van deze groep, verlaagde EFSA in juli 2026 de veilige dagelijkse inname met een factor 3,5 wegens effecten op het schildklierhormoon.",
+    bronnen: ["efsaTfa", "whoDrinkwater"],
+  },
+
   // ---- pesticiden per stof ----
   //
   // Ook hier verschilt het verhaal per stof, en op één punt scherper dan bij
@@ -941,6 +1075,7 @@ const PROFIELEN = {
   // andere mogen vandaag nog gebruikt worden. Dat onderscheid gaat verloren
   // in één gedeelde tekst, terwijl het juist bepaalt wat een meting betekent.
   simazine: {
+    categorie: "pesticiden",
     kort:
       "Al sinds 2004 niet meer toegelaten in de EU; wat er nu nog gemeten wordt, zakte decennia geleden weg en bereikt het grondwater pas nu.",
     wat: "Een triazineherbicide, verwant aan atrazine, tegen onkruid in maïs, fruit en op verhardingen.",
@@ -951,6 +1086,7 @@ const PROFIELEN = {
     bronnen: ["euPesticiden", "whoDrinkwater"],
   },
   terbutylazine: {
+    categorie: "pesticiden",
     kort:
       "Anders dan atrazine en simazine nog wél toegelaten; een vondst wijst dus op gebruik van vandaag, niet op een erfenis.",
     wat: "Een triazineherbicide dat atrazine verving in de maïsteelt.",
@@ -961,6 +1097,7 @@ const PROFIELEN = {
     bronnen: ["euPesticiden", "whoDrinkwater"],
   },
   triazineMetabolieten: {
+    categorie: "pesticiden",
     kort:
       "Afbraakproduct van atrazine of terbutylazine; het duikt op waar de moederstof zelf al is verdwenen en toont dus hoe traag grondwater zich herstelt.",
     wat: "Wat er van de triazineherbiciden overblijft nadat de bodem ze deels heeft afgebroken — desethylatrazine, desisopropylatrazine en desethylterbuthylazine.",
@@ -971,6 +1108,7 @@ const PROFIELEN = {
     bronnen: ["euPesticiden", "whoDrinkwater"],
   },
   fenylureum: {
+    categorie: "pesticiden",
     kort:
       "Geen van deze middelen is nog toegelaten; ze zijn giftig voor waterplanten en algen en spoelen makkelijk van verhardingen af.",
     wat: "Fenylureumherbiciden: diuron, isoproturon, chloortoluron en linuron.",
@@ -981,6 +1119,7 @@ const PROFIELEN = {
     bronnen: ["euPesticiden", "vmmWater"],
   },
   bentazon: {
+    categorie: "pesticiden",
     kort:
       "Nog toegelaten en zeer beweeglijk in de bodem; het bereikt het grondwater sneller dan de meeste andere middelen.",
     wat: "Een herbicide tegen breedbladig onkruid in granen, maïs en bonen.",
@@ -990,6 +1129,7 @@ const PROFIELEN = {
     bronnen: ["euPesticiden", "whoDrinkwater"],
   },
   chlooracetanilide: {
+    categorie: "pesticiden",
     wat: "De chlooracetaniliden — metolachloor, metazachloor, alachloor en verwanten — herbiciden voor maïs, koolzaad en bieten.",
     herkomst:
       "Akkerbouw. Alachloor is niet meer toegelaten; S-metolachloor en metazachloor werden lang op grote schaal gebruikt.",
@@ -1000,6 +1140,7 @@ const PROFIELEN = {
     bronnen: ["euPesticiden", "whoDrinkwater"],
   },
   chlooracetanilideMetaboliet: {
+    categorie: "pesticiden",
     kort:
       "Het afbraakproduct dat wél doorzakt naar het grondwater; het is meestal de reden dat een winning moet bijzuiveren.",
     wat: "ESA- en OA-metabolieten: wat er van metolachloor, metazachloor, alachloor of flufenacet overblijft na afbraak in de bodem.",
@@ -1009,6 +1150,7 @@ const PROFIELEN = {
     bronnen: ["euPesticiden", "whoDrinkwater"],
   },
   glyfosaat: {
+    categorie: "pesticiden",
     kort:
       "In 2023 opnieuw toegelaten tot 2033, terwijl het IARC het als waarschijnlijk kankerverwekkend indeelt — een omstreden dossier.",
     wat: "Het meest gebruikte onkruidbestrijdingsmiddel ter wereld.",
@@ -1019,6 +1161,7 @@ const PROFIELEN = {
     bronnen: ["ecGlyfosaat", "iarc"],
   },
   ampa: {
+    categorie: "pesticiden",
     kort:
       "Het afbraakproduct van glyfosaat: schadelijk voor waterorganismen en de stof die het vaakst in Vlaamse waterlopen wordt gevonden.",
     wat: "AMPA, waar glyfosaat in uiteenvalt. Het ontstaat ook bij de afbraak van sommige waspoeders.",
@@ -1029,6 +1172,7 @@ const PROFIELEN = {
     bronnen: ["vmmWater", "euPesticiden"],
   },
   bam: {
+    categorie: "pesticiden",
     kort:
       "Afbraakproduct van een middel dat al sinds 2008 verboden is, en toch de bekendste vervuiler van drinkwaterwinningen.",
     wat: "2,6-dichloorbenzamide, het afbraakproduct van het onkruidmiddel dichlobenil.",
@@ -1039,6 +1183,7 @@ const PROFIELEN = {
     bronnen: ["euPesticiden", "whoDrinkwater"],
   },
   chloridazon: {
+    categorie: "pesticiden",
     kort:
       "Afbraakproduct van een bietenherbicide dat niet meer toegelaten is; het zakt sneller door dan de stof zelf.",
     wat: "Desphenyl-chloridazon en methyldesfenyl-chloridazon, de afbraakproducten van het bietenherbicide chloridazon.",
@@ -1049,6 +1194,7 @@ const PROFIELEN = {
     bronnen: ["euPesticiden", "whoDrinkwater"],
   },
   dms: {
+    categorie: "pesticiden",
     kort:
       "Afbraakproduct van een verboden schimmelmiddel; bij ontsmetting met ozon kan er in de drinkwaterfabriek NDMA uit ontstaan.",
     wat: "Dimethylsulfamide, het afbraakproduct van het schimmelbestrijdingsmiddel tolylfluanide.",
@@ -1058,6 +1204,7 @@ const PROFIELEN = {
     bronnen: ["euPesticiden", "whoDrinkwater"],
   },
   triazool: {
+    categorie: "pesticiden",
     kort:
       "Afbraakproduct van de triazoolfungiciden; verscheidene daarvan zijn ingedeeld als schadelijk voor de voortplanting.",
     wat: "1,2,4-triazool, het gemeenschappelijke afbraakproduct van de triazoolfungiciden.",
@@ -1068,6 +1215,7 @@ const PROFIELEN = {
     bronnen: ["euPesticiden", "echa"],
   },
   chloorthalonilMetaboliet: {
+    categorie: "pesticiden",
     kort:
       "De metaboliet waarom chloorthalonil in 2019 van de markt ging: Europa kon niet uitsluiten dat de resten genotoxisch zorgwekkend zijn.",
     wat: "R471811, een afbraakproduct van het schimmelbestrijdingsmiddel chloorthalonil.",
@@ -1078,6 +1226,7 @@ const PROFIELEN = {
     bronnen: ["verordeningChloorthalonil", "euPesticiden"],
   },
   ethofumesaat: {
+    categorie: "pesticiden",
     kort:
       "Nog toegelaten bietenherbicide dat vlot doorzakt naar het grondwater.",
     wat: "Een herbicide dat vooral in suikerbieten wordt gebruikt.",
@@ -1096,6 +1245,7 @@ const PROFIELEN = {
     bronnen: ["euPesticiden", "whoDrinkwater"],
   },
   nietRelevanteMetaboliet: {
+    categorie: "pesticiden",
     kort:
       "Een afbraakproduct dat als minder giftig beoordeeld is; het maakt water niet ongezond, maar wel moeilijker bruikbaar als drinkwaterbron.",
     wat: "Een afbraakproduct van een bestrijdingsmiddel dat als niet-relevant is beoordeeld: minder giftig dan de stof waaruit het ontstond.",
@@ -1106,6 +1256,7 @@ const PROFIELEN = {
   },
 
   triazineOverig: {
+    categorie: "pesticiden",
     kort:
       "Remt de fotosynthese van algen en waterplanten, de basis van het leven in een beek; niet meer toegelaten in de EU.",
     wat: "De overige triazine- en verwante herbiciden: terbutryn, prometryn, cyanazine, sebuthylazine, hexazinon, bromacil en metamitron.",
@@ -1116,6 +1267,7 @@ const PROFIELEN = {
     bronnen: ["euPesticiden", "vmmWater"],
   },
   groeistof: {
+    categorie: "pesticiden",
     kort:
       "Doodt breedbladige planten, ook de waterplanten die schuil- en paaiplaats zijn; spoelt vlot af naar sloot en beek.",
     wat: "Groeistofherbiciden: fenoxyzuren zoals 2,4-D, MCPA, mecoprop en dichloorprop, en verwanten als dicamba, fluroxypyr en triclopyr.",
@@ -1126,6 +1278,7 @@ const PROFIELEN = {
     bronnen: ["euPesticiden", "vmmWater"],
   },
   carbamaat: {
+    categorie: "pesticiden",
     kort:
       "Oudere middelen waarvan de toelating is ingetrokken; ze blijven lang genoeg in de bodem om nu nog op te duiken.",
     wat: "Carbamaten zoals chloorprofam en carbetamide, gebruikt tegen onkruid en tegen het uitlopen van aardappelen.",
@@ -1136,6 +1289,7 @@ const PROFIELEN = {
     bronnen: ["euPesticiden", "whoDrinkwater"],
   },
   carbendazim: {
+    categorie: "pesticiden",
     kort:
       "Niet meer toegelaten omdat het schadelijk is voor de voortplanting en erfelijk materiaal kan beschadigen.",
     wat: "Een schimmelbestrijdingsmiddel uit de benzimidazolen, ook het afbraakproduct van benomyl en thiofanaat-methyl.",
@@ -1146,6 +1300,7 @@ const PROFIELEN = {
     bronnen: ["euPesticiden", "echa"],
   },
   organofosfaat: {
+    categorie: "pesticiden",
     kort:
       "Legt het zenuwstelsel lam — bij insecten in bedoelde dosis, bij mens en vis bij hoge blootstelling; niet meer toegelaten.",
     wat: "Organofosfaat-insecticiden zoals triazofos.",
@@ -1155,6 +1310,7 @@ const PROFIELEN = {
     bronnen: ["euPesticiden", "whoDrinkwater"],
   },
   neonicotinoide: {
+    categorie: "pesticiden",
     kort:
       "Extreem giftig voor waterinsecten en bijen; buitengebruik is daarom sinds 2018 in de EU verboden.",
     wat: "Neonicotinoïden zoals imidacloprid, insecticiden die door de hele plant worden opgenomen.",
@@ -1165,6 +1321,7 @@ const PROFIELEN = {
     bronnen: ["euPesticiden", "vmmWater"],
   },
   fumigant: {
+    categorie: "pesticiden",
     kort:
       "Bodemontsmetters die massaal werden ingezet en waarvan er één berucht is om onvruchtbaarheid bij arbeiders; geen ervan is nog toegelaten.",
     wat: "Bodemontsmettingsmiddelen zoals 1,3-dichloorpropeen, broommethaan en 1,2-dibroom-3-chloorpropaan, en het afbraakproduct chlooracrylzuur.",
@@ -1175,6 +1332,7 @@ const PROFIELEN = {
     bronnen: ["euPesticiden", "whoDrinkwater"],
   },
   pentachloorfenol: {
+    categorie: "pesticiden",
     kort:
       "Wereldwijd verboden houtverduurzamingsmiddel dat kankerverwekkend is en zich ophoopt in de voedselketen.",
     wat: "Pentachloorfenol, gebruikt om hout te verduurzamen en als bestrijdingsmiddel.",
@@ -1185,6 +1343,7 @@ const PROFIELEN = {
     bronnen: ["stockholm", "iarc"],
   },
   somPesticiden: {
+    categorie: "pesticiden",
     kort:
       "De optelsom van alle gemeten bestrijdingsmiddelen; de drinkwaterrichtlijn hanteert hiervoor 0,5 µg/L.",
     wat: "De som van de afzonderlijk bepaalde bestrijdingsmiddelen in dit monster.",
@@ -1195,6 +1354,7 @@ const PROFIELEN = {
   },
 
   fungicideModern: {
+    categorie: "pesticiden",
     kort:
       "Nog toegelaten schimmelmiddelen; ze zijn giftig voor waterorganismen en een vondst wijst op gebruik van vandaag.",
     wat: "Moderne schimmelbestrijdingsmiddelen zoals trifloxystrobine en fluopicolide.",
@@ -1205,6 +1365,7 @@ const PROFIELEN = {
   },
 
   pesticiden: {
+    categorie: "pesticiden",
     kort:
       "Bestrijdingsmiddelen horen niet in drinkwater thuis — de norm van 0,1 µg/L is daarop gebaseerd en niet op een gezondheidsgrens per stof.",
     wat: "Stoffen om onkruid, insecten of schimmels te bestrijden, en de resten waarin ze in de bodem uiteenvallen.",
@@ -1215,6 +1376,7 @@ const PROFIELEN = {
     bronnen: ["whoDrinkwater"],
   },
   atrazine: {
+    categorie: "pesticiden",
     kort:
       "Verstoort de hormoonhuishouding van waterdieren, en duikt twintig jaar na het Europese verbod nog op.",
     wat: "Een onkruidbestrijder die decennialang in de maïsteelt werd gebruikt.",
@@ -1226,6 +1388,7 @@ const PROFIELEN = {
   },
 
   geneesmiddelen: {
+    categorie: "farmaceutisch",
     kort:
       "Blootstelling van waterleven gedurende het hele leven, en bij antibiotica het risico dat resistentie in de hand wordt gewerkt.",
     wat: "Resten van medicijnen en hun afbraakproducten.",
@@ -1236,6 +1399,7 @@ const PROFIELEN = {
     bronnen: ["whoDrinkwater", "vmmWater"],
   },
   organisch: {
+    categorie: "organisch",
     kort:
       "Wat een waarde betekent hangt sterk af van de stof: sommige zijn vooral hinderlijk van smaak, andere zijn kankerverwekkend.",
     wat: "Door de mens gemaakte koolstofverbindingen: oplosmiddelen, brandstofbestanddelen en industriële grondstoffen.",
@@ -1384,6 +1548,81 @@ const SLEUTELS: Readonly<Record<string, ProfielId>> = {
   "PFAS (EU DWRL-20)": "somDwrl20",
   "PFAS-43": "somPfas43",
 
+  // --- symbolen zoals de VMM-databank ze afkort ---
+  Atenolol: "betablokker",
+  Metoprolol: "betablokker",
+  Metoprololtartraat: "betablokker",
+  Propanolol: "betablokker",
+  PropanololHCl: "betablokker",
+  Sotalol: "betablokker",
+  SotalolHCl: "betablokker",
+  Diclofenac: "pijnstiller",
+  Na_diclofenac: "pijnstiller",
+  Ketoprofen: "pijnstiller",
+  Naproxen: "pijnstiller",
+  Fenazon: "pijnstiller",
+  Clarithromyc: "antibioticum",
+  Clindamyc: "antibioticum",
+  ClindamycineHCl: "antibioticum",
+  Sulfamazol: "antibioticum",
+  Trimoprim: "antibioticum",
+  Dimdazol: "antibioticum",
+  Amidotriz: "contrastmiddel",
+  Iopamidol: "contrastmiddel",
+  Iopromide: "contrastmiddel",
+  Carbamaze: "psychofarmacon",
+  Gabapentine: "psychofarmacon",
+  Clozapine: "psychofarmacon",
+  Irbesartan: "hartvaatmedicatie",
+  Valsartan: "hartvaatmedicatie",
+  HyCtazide: "hartvaatmedicatie",
+  Bezafibraat: "hartvaatmedicatie",
+  Pentoxif: "hartvaatmedicatie",
+  Lidocaine: "geneesmiddelen",
+  Dflucan: "geneesmiddelen",
+  Benzotriazool: "benzotriazool",
+  TFMS: "ultrakortePfas",
+  "2233TFPrA": "ultrakortePfas",
+  "2333TFPrA": "ultrakortePfas",
+  AzinfosEy: "organofosfaat",
+  AzinfosMy: "organofosfaat",
+  BrfosEy: "organofosfaat",
+  BrfosMy: "organofosfaat",
+  CpfosEy: "organofosfaat",
+  CpfosMy: "organofosfaat",
+  Cfvinfos: "organofosfaat",
+  Cumafos: "organofosfaat",
+  Demeton: "organofosfaat",
+  "Demeton-O": "organofosfaat",
+  "Demeton-S": "organofosfaat",
+  Diazinon: "organofosfaat",
+  DCvos: "organofosfaat",
+  Dmetoat: "organofosfaat",
+  Dsulfoton: "organofosfaat",
+  Ethopfos: "organofosfaat",
+  Fenithion: "organofosfaat",
+  Fenthion: "organofosfaat",
+  Fonofos: "organofosfaat",
+  Malathion: "organofosfaat",
+  Methidat: "organofosfaat",
+  Mevinfos: "organofosfaat",
+  PathionEy: "organofosfaat",
+  PathionMy: "organofosfaat",
+  PirfosMy: "organofosfaat",
+  Terbufos: "organofosfaat",
+  TclofosMy: "organofosfaat",
+  Triazofos: "organofosfaat",
+  Cprofam: "carbamaat",
+  Metcarb: "carbamaat",
+  Boscalid: "fungicideModern",
+  Quinofen: "fungicideModern",
+  Metbuzin: "triazineOverig",
+  Aclonifen: "groeistof",
+  Bifenox: "groeistof",
+  Oxadiazon: "groeistof",
+  Fipronil: "neonicotinoide",
+  Cypmethrin: "neonicotinoide",
+
   // grondwater; DOV schrijft de naam voluit
   "Opgeloste zuurstof (O2)": "zuurstof",
   "Totaal organische koolstof (TOC)": "organischeKoolstof",
@@ -1434,6 +1673,7 @@ const SLEUTELS: Readonly<Record<string, ProfielId>> = {
   Propazine: "triazineMetabolieten",
   Bentazon: "bentazon",
   Ethofumesaat: "ethofumesaat",
+  Etfum: "ethofumesaat",
   Diuron: "fenylureum",
   Isoproturon: "fenylureum",
   Chloortoluron: "fenylureum",
