@@ -54,7 +54,7 @@ async function toonRapport(laagId: LaagId, puntId: string): Promise<void> {
     return;
   }
 
-  document.title = `${gekozen.code} — ${gekozen.omschrijving || "meetpunt"} | ${profiel.naam}`;
+  document.title = `${gekozen.code}: ${gekozen.omschrijving || "meetpunt"} | ${profiel.naam}`;
   await new Paneel(houder, "rapport").toon(gekozen);
 }
 

@@ -36,7 +36,7 @@ export function formatteerDatum(iso: string): string {
   return `${Number(dag)} ${naam} ${jaar}`;
 }
 
-/** "2024-11-07" wordt "07/11/2024" — compact genoeg voor een tabelkolom. */
+/** "2024-11-07" wordt "07/11/2024", compact genoeg voor een tabelkolom. */
 export function formatteerDatumKort(iso: string): string {
   const [jaar, maand, dag] = iso.split("-");
   if (!jaar || !maand || !dag) return iso;
@@ -70,7 +70,7 @@ export function sommMaakOp(delen: readonly string[]): string {
 
 /**
  * Ontsnapt tekst die in HTML terechtkomt. Stond eerder drie keer in de
- * codebase, in twee varianten waarvan er één `>` liet staan — vandaar één
+ * codebase, in twee varianten waarvan er één `>` liet staan: vandaar één
  * versie op de plek waar de andere opmaakhulpjes ook wonen.
  */
 export function escape(tekst: string): string {

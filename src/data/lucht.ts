@@ -4,7 +4,7 @@ import { DatabankFout } from "./client.js";
 /**
  * IRCELINE, het Belgische Interregionale Milieuagentschap, publiceert de
  * luchtmetingen via een open SOS-API. Die stuurt wél CORS-headers, dus hier is
- * geen proxy nodig — anders dan bij de VMM-waterdatabank.
+ * geen proxy nodig, anders dan bij de VMM-waterdatabank.
  */
 const BASIS = "https://geo.irceline.be/sos/api/v1";
 
@@ -23,7 +23,7 @@ interface RuweReeks {
 /**
  * IRCELINE noemt de stoffen in het Engels en met een lange omschrijving.
  * Hier staan ze onder de code die een lezer herkent, met een Nederlandse naam.
- * Wat hier niet in staat, komt onder zijn eigen label door — beter een ruwe
+ * Wat hier niet in staat, komt onder zijn eigen label door, beter een ruwe
  * naam tonen dan een meting laten vallen.
  */
 export const STOFFEN: Readonly<Record<string, { symbool: string; naam: string }>> = {
@@ -144,7 +144,7 @@ export async function haalLuchtmetingen(
   return metingen;
 }
 
-/** De URL die exact deze cijfers teruggeeft — de bronvermelding bij lucht. */
+/** De URL die exact deze cijfers teruggeeft; dat is de bronvermelding bij lucht. */
 export function luchtBronUrl(station: Luchtstation): string {
   return `${BASIS}/timeseries?station=${encodeURIComponent(station.stationId)}&expanded=true&format=json`;
 }

@@ -59,7 +59,7 @@ export interface ParameterSamenvatting {
 
 /**
  * "buiten-norm" dekt zowel een overschrijding (fosfor te hoog) als een
- * onderschrijding (zuurstof te laag) — beide zijn een probleem.
+ * onderschrijding (zuurstof te laag), beide zijn een probleem.
  */
 export type OordeelKlasse = "buiten-norm" | "op-grens" | "conform" | "geen-norm";
 

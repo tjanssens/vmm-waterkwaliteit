@@ -7,7 +7,7 @@ import type { CategorieId } from "./categorieen.js";
  *
  * Bewust los van `normen.ts`. Een norm zegt of een waarde te hoog is; deze
  * teksten zeggen waaróm dat uitmaakt, en die staan er ook als er niets
- * overschreden wordt — juist dan wil een lezer weten wat er gemeten is.
+ * overschreden wordt, juist dan wil een lezer weten wat er gemeten is.
  *
  * Elke gezondheidsuitspraak draagt de bron waarin ze staat. Waar de uitspraak
  * zwaar weegt, staan er twee: het oordeel van een gezondheidsinstantie is geen
@@ -37,11 +37,11 @@ export const STOFBRONNEN = {
     url: "https://www.who.int/news-room/fact-sheets/detail/ambient-(outdoor)-air-quality-and-health",
   },
   efsaTfa: {
-    naam: "EFSA — verlaagt het veilige blootstellingsniveau voor TFA (22 juli 2026)",
+    naam: "EFSA verlaagt het veilige blootstellingsniveau voor TFA (22 juli 2026)",
     url: "https://www.efsa.europa.eu/en/news/efsa-lowers-safe-level-exposure-tfa",
   },
   vmmTfa: {
-    naam: "VMM — voorlopige gezondheidskundige advieswaarde voor TFA in drinkwater",
+    naam: "VMM, voorlopige gezondheidskundige advieswaarde voor TFA in drinkwater",
     url: "https://vmm.vlaanderen.be/nieuws/voorlopige-gezondheidskundige-advieswaarde-voor-tfa-in-drinkwater-bepaald",
   },
   efsaPfas: {
@@ -49,7 +49,7 @@ export const STOFBRONNEN = {
     url: "https://www.efsa.europa.eu/en/efsajournal/pub/6223",
   },
   stockholm: {
-    naam: "Verdrag van Stockholm — lijst van persistente organische verontreinigende stoffen",
+    naam: "Verdrag van Stockholm, lijst van persistente organische verontreinigende stoffen",
     url: "https://www.pops.int/TheConvention/ThePOPs/AllPOPs/tabid/2509/Default.aspx",
   },
   rivmGenx: {
@@ -57,32 +57,32 @@ export const STOFBRONNEN = {
     url: "https://www.rivm.nl/genx",
   },
   echa: {
-    naam: "ECHA — kandidaatslijst van zeer zorgwekkende stoffen",
+    naam: "ECHA, kandidaatslijst van zeer zorgwekkende stoffen",
     url: "https://echa.europa.eu/candidate-list-table",
   },
   euPesticiden: {
-    naam: "Europese Commissie — EU-databank gewasbeschermingsmiddelen",
+    naam: "Europese Commissie, EU-databank gewasbeschermingsmiddelen",
     url: "https://ec.europa.eu/food/plant/pesticides/eu-pesticides-database/start/screen/active-substances",
   },
   verordeningChloorthalonil: {
     naam:
-      "Uitvoeringsverordening (EU) 2019/677 — niet-verlenging van de goedkeuring van chloorthalonil",
+      "Uitvoeringsverordening (EU) 2019/677, niet-verlenging van de goedkeuring van chloorthalonil",
     url: "https://eur-lex.europa.eu/legal-content/NL/TXT/HTML/?uri=CELEX:32019R0677",
   },
   ecGlyfosaat: {
-    naam: "Europese Commissie — hernieuwing van de goedkeuring van glyfosaat",
+    naam: "Europese Commissie, hernieuwing van de goedkeuring van glyfosaat",
     url: "https://food.ec.europa.eu/plants/pesticides/approval-active-substances/renewal-approval/glyphosate_en",
   },
   iarcPfas: {
-    naam: "IARC — evaluatie van de kankerverwekkendheid van PFOA en PFOS (2023)",
+    naam: "IARC, evaluatie van de kankerverwekkendheid van PFOA en PFOS (2023)",
     url: "https://www.iarc.who.int/news-events/iarc-monographs-evaluate-the-carcinogenicity-of-perfluorooctanoic-acid-pfoa-and-perfluorooctanesulfonic-acid-pfos/",
   },
   vlaanderenPfas: {
-    naam: "Vlaanderen — blootstelling aan PFAS beperken",
+    naam: "Vlaanderen, blootstelling aan PFAS beperken",
     url: "https://www.vlaanderen.be/pfas-vervuiling/blootstelling-aan-pfas-beperken",
   },
   iarc: {
-    naam: "IARC Monographs — lijst van geclassificeerde stoffen",
+    naam: "IARC Monographs, lijst van geclassificeerde stoffen",
     url: "https://monographs.iarc.who.int/list-of-classifications",
   },
   whoGeneesmiddelen: {
@@ -90,27 +90,27 @@ export const STOFBRONNEN = {
     url: "https://www.who.int/publications/i/item/9789241502085",
   },
   iarcKankersoorten: {
-    naam: "IARC Monographs — geclassificeerde stoffen per kankersoort",
+    naam: "IARC Monographs, geclassificeerde stoffen per kankersoort",
     url: "https://monographs.iarc.who.int/wp-content/uploads/2019/07/Classifications_by_cancer_site.pdf",
   },
   minamata: {
-    naam: "Verdrag van Minamata over kwik — verdragstekst",
+    naam: "Verdrag van Minamata over kwik, verdragstekst",
     url: "https://minamataconvention.org/en/about/convention-text",
   },
   eea: {
-    naam: "Europees Milieuagentschap — Europe's air quality status",
+    naam: "Europees Milieuagentschap, Europe's air quality status",
     url: "https://www.eea.europa.eu/publications/europes-air-quality-status-2024",
   },
   vmmWater: {
-    naam: "VMM — Toestand van het watersysteem",
+    naam: "VMM, Toestand van het watersysteem",
     url: "https://www.vmm.be/water",
   },
   vmmLucht: {
-    naam: "VMM — Luchtkwaliteit in Vlaanderen",
+    naam: "VMM, Luchtkwaliteit in Vlaanderen",
     url: "https://www.vmm.be/lucht",
   },
   vmmMest: {
-    naam: "VMM — Nutriënten in oppervlaktewater en het mestbeleid",
+    naam: "VMM, Nutriënten in oppervlaktewater en het mestbeleid",
     url: "https://www.vmm.be/water/kwaliteit-waterlopen/nutrienten",
   },
 } as const;
@@ -126,7 +126,7 @@ export interface Stofprofiel {
   risico?: string;
   /**
    * Eén zin voor in de tabelrij bij een overschrijding. Ontbreekt hij, dan
-   * wordt de eerste zin van `risico` genomen — die gaat per definitie over het
+   * wordt de eerste zin van `risico` genomen, die gaat per definitie over het
    * risico, maar staat er niet altijd even scherp. Vul dit veld waar dat
    * uitmaakt, in het bijzonder waar een lage waarde het probleem is.
    */
@@ -143,7 +143,7 @@ export interface Stofprofiel {
 
 /**
  * De profielen zelf, onder een eigen sleutel. Dezelfde stof heet bij elke bron
- * anders — nitraat is "NO3-" bij de VMM en "Nitraat (NO3)" bij DOV — dus de
+ * anders, nitraat is "NO3-" bij de VMM en "Nitraat (NO3)" bij DOV, dus de
  * tekst hangt aan een eigen naam en de bronsleutels wijzen daarheen.
  */
 const PROFIELEN = {
@@ -168,7 +168,7 @@ const PROFIELEN = {
   o3: {
     kort:
       "Vermindert de longfunctie en prikkelt de luchtwegen, vooral bij inspanning buiten.",
-    wat: "Ozon op leefniveau — hetzelfde gas dat hoog in de atmosfeer beschermt, maar hier beneden een probleem is.",
+    wat: "Ozon op leefniveau, hetzelfde gas dat hoog in de atmosfeer beschermt, maar hier beneden een probleem is.",
     herkomst:
       "Wordt niet uitgestoten maar gevormd: stikstofoxiden en vluchtige organische stoffen reageren onder zonlicht. Vandaar dat de hoogste waarden op warme, zonnige zomerdagen vallen, en eerder buiten de stad dan erin.",
     risico:
@@ -204,7 +204,7 @@ const PROFIELEN = {
   pm25: {
     kort:
       "Dringt door tot in de longblaasjes en het bloed; van alle luchtvervuiling de grootste oorzaak van vroegtijdige sterfte.",
-    wat: "Zwevende deeltjes kleiner dan 2,5 micrometer — ongeveer dertig keer dunner dan een haar.",
+    wat: "Zwevende deeltjes kleiner dan 2,5 micrometer: ongeveer dertig keer dunner dan een haar.",
     herkomst:
       "Verkeer, houtstook, industrie en landbouw. Een groot deel ontstaat pas in de lucht zelf, wanneer ammoniak uit de landbouw reageert met stikstof- en zwaveloxiden.",
     risico:
@@ -326,7 +326,7 @@ const PROFIELEN = {
       "Sterke afwijkingen wijzen op een algenbloei, die het water ’s nachts zijn zuurstof ontneemt.",
     wat: "Hoeveel zuurstof het water bevat ten opzichte van wat er bij deze temperatuur in kán.",
     risico:
-      "Ver boven honderd procent wijst op een algenbloei die overdag zuurstof produceert — 's nachts keert dat om en kan de zuurstof juist wegzakken.",
+      "Ver boven honderd procent wijst op een algenbloei die overdag zuurstof produceert, 's nachts keert dat om en kan de zuurstof juist wegzakken.",
     bronnen: ["vmmWater"],
   },
   bzv: {
@@ -377,11 +377,11 @@ const PROFIELEN = {
   },
   ammonium: {
     kort:
-      "Verbruikt zuurstof bij afbraak en gaat over in ammoniak, dat giftig is voor vissen — des te meer naarmate het water warmer en basischer is.",
+      "Verbruikt zuurstof bij afbraak en gaat over in ammoniak, dat giftig is voor vissen, des te meer naarmate het water warmer en basischer is.",
     wat: "De gereduceerde vorm van stikstof, kenmerkend voor water met weinig zuurstof.",
     herkomst: "Huishoudelijk afvalwater, mest en de afbraak van organisch materiaal.",
     risico:
-      "Bij afbraak verbruikt ammonium zuurstof. Het staat bovendien in evenwicht met ammoniak, dat giftig is voor vissen — en dat evenwicht verschuift naar de giftige kant naarmate het water warmer en basischer is.",
+      "Bij afbraak verbruikt ammonium zuurstof. Het staat bovendien in evenwicht met ammoniak, dat giftig is voor vissen, en dat evenwicht verschuift naar de giftige kant naarmate het water warmer en basischer is.",
     bronnen: ["vmmWater"],
   },
   stikstofTotaal: {
@@ -415,7 +415,7 @@ const PROFIELEN = {
   // ---- water: algemeen fysisch-chemisch ----
   zuurtegraad: {
     kort:
-      "Buiten het bereik dat waterleven verdraagt, en het maakt andere stoffen giftiger — metalen lossen op in zuur water, ammonium wordt schadelijker in basisch water.",
+      "Buiten het bereik dat waterleven verdraagt, en het maakt andere stoffen giftiger, metalen lossen op in zuur water, ammonium wordt schadelijker in basisch water.",
     wat: "De zuurtegraad van het water, op een schaal van 0 tot 14.",
     herkomst: "Bepaald door de bodem, door algengroei en door lozingen.",
     risico:
@@ -434,7 +434,7 @@ const PROFIELEN = {
   geleidbaarheid: {
     kort:
       "Wijst op veel opgeloste zouten; een sprong verraadt een lozing of indringend zout water.",
-    wat: "Hoe goed het water stroom geleidt — een maat voor de hoeveelheid opgeloste zouten.",
+    wat: "Hoe goed het water stroom geleidt: een maat voor de hoeveelheid opgeloste zouten.",
     herkomst: "Natuurlijk uit de ondergrond; daarnaast wegenzout, lozingen en zeewaterinvloed.",
     risico:
       "Op zich geen gifstof, maar een snelle aanwijzing dat er iets in het water zit. Een plotse sprong wijst op een lozing of op indringend zout water.",
@@ -468,7 +468,7 @@ const PROFIELEN = {
     bronnen: ["vmmWater"],
   },
   hardheid: {
-    wat: "De hoeveelheid opgelost calcium en magnesium — hoe hard of zacht het water is.",
+    wat: "De hoeveelheid opgelost calcium en magnesium: hoe hard of zacht het water is.",
     herkomst: "De ondergrond waar het water doorheen gaat, vooral kalkrijke lagen.",
     risico:
       "Geen gezondheidsrisico. Hard water zet kalk af in leidingen en toestellen; zeer zacht water werkt eerder corrosief op leidingen, wat metalen kan losmaken.",
@@ -486,7 +486,7 @@ const PROFIELEN = {
     wat: "Bicarbonaat en carbonaat, samen de buffer die de zuurtegraad van water stabiel houdt.",
     herkomst: "Het oplossen van kalk in de ondergrond.",
     risico:
-      "Geen gezondheidsrisico. Water met weinig buffer verzuurt makkelijk bij zure neerslag, en dan lossen metalen uit de bodem op — daar zit het belang.",
+      "Geen gezondheidsrisico. Water met weinig buffer verzuurt makkelijk bij zure neerslag, en dan lossen metalen uit de bodem op, daar zit het belang.",
     bronnen: ["whoDrinkwater"],
   },
   bromide: {
@@ -540,7 +540,7 @@ const PROFIELEN = {
     herkomst:
       "Vooral natuurlijk, uit gesteente en bodemlagen; daarnaast uit oude houtverduurzaming en industrie. In grondwater kan het zonder menselijk toedoen hoog liggen.",
     risico:
-      "Het IARC deelt arseen in groep 1 in: kankerverwekkend voor de mens, met long-, huid- en blaaskanker. De WHO noemt langdurige blootstelling via drinkwater de grootste bedreiging; de eerste tekenen zijn pigmentvlekken en verhoornde plekken op handpalmen en voetzolen. De richtwaarde van 10 µg/L is uitdrukkelijk voorlopig omdat lager zuiveren technisch moeilijk is — niet omdat het veilig zou zijn.",
+      "Het IARC deelt arseen in groep 1 in: kankerverwekkend voor de mens, met long-, huid- en blaaskanker. De WHO noemt langdurige blootstelling via drinkwater de grootste bedreiging; de eerste tekenen zijn pigmentvlekken en verhoornde plekken op handpalmen en voetzolen. De richtwaarde van 10 µg/L is uitdrukkelijk voorlopig omdat lager zuiveren technisch moeilijk is, niet omdat het veilig zou zijn.",
     bronnen: ["whoArseen", "iarcKankersoorten", "whoDrinkwater"],
   },
   lood: {
@@ -569,7 +569,7 @@ const PROFIELEN = {
     wat: "Een metaal dat in twee vormen voorkomt, met heel verschillende gevaren.",
     herkomst: "Metaalbewerking, leerlooierij, verf en roestvast staal.",
     risico:
-      "Driewaardig chroom is een noodzakelijk spoorelement. Zeswaardig chroom is iets heel anders: het IARC deelt het in groep 1 in, kankerverwekkend voor de mens met longkanker. Een analyse van totaal chroom maakt dat onderscheid niet, dus een meting hier zegt niet welke van de twee er zit — en de norm gaat daarom uit van het ongunstigste geval.",
+      "Driewaardig chroom is een noodzakelijk spoorelement. Zeswaardig chroom is iets heel anders: het IARC deelt het in als kankerverwekkend voor de mens, met longkanker. Een analyse van totaal chroom maakt dat onderscheid niet, dus een meting hier zegt niet welke van de twee er zit, en de norm gaat daarom uit van het ongunstigste geval.",
     bronnen: ["iarcKankersoorten", "whoDrinkwater"],
   },
   nikkel: {
@@ -601,7 +601,7 @@ const PROFIELEN = {
   },
   kwikWater: {
     kort:
-      "Wordt in waterbodems omgezet in methylkwik, dat zich ophoopt in vis en het zenuwstelsel aantast — het gevaarlijkst voor het ongeboren kind.",
+      "Wordt in waterbodems omgezet in methylkwik, dat zich ophoopt in vis en het zenuwstelsel aantast en het gevaarlijkst is voor het ongeboren kind.",
     wat: "Een zwaar metaal dat zich opstapelt in de voedselketen.",
     herkomst: "Industrie, afvalverbranding en historische vervuiling.",
     risico:
@@ -615,7 +615,7 @@ const PROFIELEN = {
     herkomst:
       "Vrijwel altijd natuurlijk. In grondwater zonder zuurstof lost mangaan makkelijk op, waardoor het daar hoog kan liggen zonder dat er iets vervuild is.",
     risico:
-      "Geeft bruinzwarte aanslag op sanitair en wasgoed en een metaalsmaak; daarop is de gebruikelijke drinkwaternorm gezet. Bij zeer hoge en langdurige inname zijn effecten op het zenuwstelsel beschreven, met aandacht voor zuigelingen. De VLAREM-norm voor grondwater ligt bewust een stuk hoger dan de drinkwaternorm, omdat grondwater nog gezuiverd wordt — een overschrijding daar betekent dus zuiveringskosten en niet meteen een gezondheidsprobleem.",
+      "Geeft bruinzwarte aanslag op sanitair en wasgoed en een metaalsmaak; daarop is de gebruikelijke drinkwaternorm gezet. Bij zeer hoge en langdurige inname zijn effecten op het zenuwstelsel beschreven, met aandacht voor zuigelingen. De VLAREM-norm voor grondwater ligt bewust een stuk hoger dan de drinkwaternorm, omdat grondwater nog gezuiverd wordt, een overschrijding daar betekent dus zuiveringskosten en niet meteen een gezondheidsprobleem.",
     bronnen: ["whoDrinkwater"],
   },
   ijzer: {
@@ -644,7 +644,7 @@ const PROFIELEN = {
     wat: "Een halfmetaal dat lijkt op arseen, maar minder giftig is.",
     herkomst: "Soldeer, legeringen, brandvertragers en de productie van kunststof flessen.",
     risico:
-      "Bij hoge inname geeft antimoon maag- en darmklachten. De drinkwaternorm is in de huidige richtlijn versoepeld van 5 naar 10 µg/L op basis van herzien onderzoek — een van de weinige normen die minder streng werd in plaats van strenger.",
+      "Bij hoge inname geeft antimoon maag- en darmklachten. De drinkwaternorm is in de huidige richtlijn versoepeld van 5 naar 10 µg/L op basis van herzien onderzoek, een van de weinige normen die minder streng werd in plaats van strenger.",
     bronnen: ["whoDrinkwater"],
   },
   barium: {
@@ -715,7 +715,7 @@ const PROFIELEN = {
     wat: "Een metaal uit blik, soldeer en legeringen.",
     herkomst: "Conservenblik, soldeerverbindingen en industrie.",
     risico:
-      "Anorganisch tin is weinig giftig; de norm gaat over maagklachten bij hoge inname uit blikvoeding. Belangrijk voor de lezing van deze waarde: de organische tinverbindingen uit scheepsverf zijn wél zeer schadelijk — ze veroorzaakten geslachtsverandering bij zeeslakken en zijn daarom verboden — maar dat zijn andere stoffen dan het tin dat hier gemeten wordt.",
+      "Anorganisch tin is weinig giftig; de norm gaat over maagklachten bij hoge inname uit blikvoeding. Belangrijk voor de lezing van deze waarde: de organische tinverbindingen uit scheepsverf zijn wél zeer schadelijk, ze veroorzaakten geslachtsverandering bij zeeslakken en zijn daarom verboden, maar dat zijn andere stoffen dan het tin dat hier gemeten wordt.",
     bronnen: ["whoDrinkwater"],
   },
   sporenmetaal: {
@@ -734,7 +734,7 @@ const PROFIELEN = {
     herkomst:
       "Ongezuiverd huishoudelijk afvalwater, overstorten bij hevige regen, mest en watervogels.",
     risico:
-      "Ze maken zelf meestal niemand ziek, maar verraden dat er uitwerpselen in het water zitten — en daarmee mogelijk ziekteverwekkers die veel moeilijker te meten zijn. Dit is de reden dat zwemwater in de zomer wordt opgevolgd.",
+      "Ze maken zelf meestal niemand ziek, maar verraden dat er uitwerpselen in het water zitten, en daarmee mogelijk ziekteverwekkers die veel moeilijker te meten zijn. Dit is de reden dat zwemwater in de zomer wordt opgevolgd.",
     bronnen: ["whoDrinkwater"],
   },
 
@@ -800,7 +800,7 @@ const PROFIELEN = {
     herkomst:
       "Ingevoerd toen PFOS werd uitgefaseerd, onder meer in impregneermiddelen voor textiel.",
     risico:
-      "Korte ketens hopen zich minder op in het lichaam dan PFOS. Het gevolg verschuift daardoor van de mens naar zijn watervoorziening: PFBS hecht slecht aan bodemdeeltjes, zakt door tot in het grondwater en is met de gangbare zuivering nauwelijks tegen te houden. Daarom raadt Vlaanderen in vervuilde zones af om putwater te drinken of ermee te koken. Over de gezondheidseffecten van de korte ketens is veel minder bekend dan over PFOS en PFOA — dat is een kennisleemte en geen vrijspraak.",
+      "Korte ketens hopen zich minder op in het lichaam dan PFOS. Het gevolg verschuift daardoor van de mens naar zijn watervoorziening: PFBS hecht slecht aan bodemdeeltjes, zakt door tot in het grondwater en is met de gangbare zuivering nauwelijks tegen te houden. Daarom raadt Vlaanderen in vervuilde zones af om putwater te drinken of ermee te koken. Over de gezondheidseffecten van de korte ketens is veel minder bekend dan over PFOS en PFOA. Dat is een kennisleemte en geen vrijspraak.",
     bronnen: ["vlaanderenPfas", "efsaPfas"],
   },
   pfba: {
@@ -838,8 +838,8 @@ const PROFIELEN = {
   fts: {
     categorie: "pfas",
     kort:
-      "Valt in het milieu uiteen tot PFOA en verwanten — en díe zijn kankerverwekkend en niet meer af te breken.",
-    wat: "Fluortelomeersulfonzuren, aangeduid met twee getallen zoals 6:2 of 8:2 — die staan voor het aantal gefluoreerde en gewone koolstofatomen.",
+      "Valt in het milieu uiteen tot PFOA en verwanten, en díe zijn kankerverwekkend en niet meer af te breken.",
+    wat: "Fluortelomeersulfonzuren, aangeduid met twee getallen zoals 6:2 of 8:2, die staan voor het aantal gefluoreerde en gewone koolstofatomen.",
     herkomst:
       "Het blusschuim dat na het verbod op PFOS in gebruik kwam, en coatings voor textiel en papier.",
     risico:
@@ -865,7 +865,7 @@ const PROFIELEN = {
     herkomst:
       "Grondstof en bijproduct bij het maken van impregneermiddelen en blusschuim. Ze zaten mee in de producten die met PFOS gemaakt werden.",
     risico:
-      "Deze meting telt dubbel: wat vandaag als voorloper in het water zit, wordt op termijn PFOS of PFBS. De gevolgen zijn dus die van PFOS — opstapeling in bloed en lever, en een verzwakte reactie op vaccinatie — alleen later. Wie enkel naar PFOS kijkt, onderschat daardoor wat er uiteindelijk komt.",
+      "Deze meting telt dubbel: wat vandaag als voorloper in het water zit, wordt op termijn PFOS of PFBS. De gevolgen zijn dus die van PFOS, opstapeling in bloed en lever, en een verzwakte reactie op vaccinatie, alleen later. Wie enkel naar PFOS kijkt, onderschat daardoor wat er uiteindelijk komt.",
     bronnen: ["efsaPfas", "stockholm"],
   },
   pfcaKort: {
@@ -876,7 +876,7 @@ const PROFIELEN = {
     herkomst:
       "Deels rechtstreeks gebruikt als vervanger van de lange ketens, deels het afbraakproduct van fluortelomeren uit coatings en blusschuim.",
     risico:
-      "Ze verlaten het lichaam sneller dan PFOS of PFOA en stapelen zich minder op. Het gevolg verschuift daarmee naar het water: ze hechten slecht aan bodemdeeltjes, zakken door tot in het grondwater en zijn met actieve kool nauwelijks tegen te houden. Een winning die zo vervuild raakt, is niet zomaar te herstellen; waar de bodem belast is, raadt Vlaanderen putwater als drinkwater af. Over hun gezondheidseffecten is veel minder bekend dan over de lange ketens — een kennisleemte, geen vrijspraak.",
+      "Ze verlaten het lichaam sneller dan PFOS of PFOA en stapelen zich minder op. Het gevolg verschuift daarmee naar het water: ze hechten slecht aan bodemdeeltjes, zakken door tot in het grondwater en zijn met actieve kool nauwelijks tegen te houden. Een winning die zo vervuild raakt, is niet zomaar te herstellen; waar de bodem belast is, raadt Vlaanderen putwater als drinkwater af. Over hun gezondheidseffecten is veel minder bekend dan over de lange ketens. Dat is een kennisleemte en geen vrijspraak.",
     bronnen: ["vlaanderenPfas", "whoDrinkwater"],
   },
   pfcaLang: {
@@ -897,7 +897,7 @@ const PROFIELEN = {
     wat: "Perfluorsulfonzuren van andere ketenlengte dan PFOS, PFHxS en PFBS.",
     herkomst: "Bijproducten en nevenbestanddelen van blusschuim en impregneermiddelen.",
     risico:
-      "Ze horen tot dezelfde familie als PFOS en gedragen zich navenant: hoe langer de keten, hoe sterker de opstapeling in vis en in de mens, en hoe meer ze bijdragen aan het effect waarop de EFSA-norm rust — een verzwakte reactie op vaccinatie. Voor de meeste bestaat geen aparte norm, maar ze tellen wel mee in de som van twintig PFAS uit de drinkwaterrichtlijn.",
+      "Ze horen tot dezelfde familie als PFOS en gedragen zich navenant: hoe langer de keten, hoe sterker de opstapeling in vis en in de mens, en hoe meer ze bijdragen aan het effect waarop de EFSA-norm rust: een verzwakte reactie op vaccinatie. Voor de meeste bestaat geen aparte norm, maar ze tellen wel mee in de som van twintig PFAS uit de drinkwaterrichtlijn.",
     bronnen: ["efsaPfas", "whoDrinkwater"],
   },
   pfechs: {
@@ -907,7 +907,7 @@ const PROFIELEN = {
     wat: "Perfluor-4-ethylcyclohexaansulfonzuur, een PFAS met een ringvorm in plaats van een rechte keten.",
     herkomst: "Hydraulische vloeistoffen in de luchtvaart, en verchroombaden.",
     risico:
-      "Hier past terughoudendheid: er is geen norm en er zijn te weinig gegevens om een gezondheidseffect te benoemen. Wat het wél doet, is de bron aanwijzen — waar PFECHS opduikt, wijst het meestal naar luchtvaart of naar oppervlaktebehandeling van metaal, en dus naar de plek waar ook de beter onderzochte PFAS vandaan komen.",
+      "Hier past terughoudendheid: er is geen norm en er zijn te weinig gegevens om een gezondheidseffect te benoemen. Wat het wél doet, is de bron aanwijzen: waar PFECHS opduikt, wijst het meestal naar luchtvaart of naar oppervlaktebehandeling van metaal, en dus naar de plek waar ook de beter onderzochte PFAS vandaan komen.",
     bronnen: ["whoDrinkwater"],
   },
   clPfesa: {
@@ -929,7 +929,7 @@ const PROFIELEN = {
     herkomst:
       "Grotendeels een afbraakproduct: koelmiddelen en drijfgassen vallen in de atmosfeer uiteen tot TFA, en ook een aantal gefluoreerde bestrijdingsmiddelen en geneesmiddelen eindigen zo. Het regent vervolgens uit.",
     risico:
-      "De beoordeling is net verstrengd: op 22 juli 2026 verlaagde EFSA de aanvaardbare dagelijkse inname van 0,05 naar 0,014 milligram per kilogram lichaamsgewicht, 3,5 keer lager, omdat TFA het gehalte aan thyroxine verandert — het hormoon waarmee de schildklier de stofwisseling regelt. Vlaanderen hanteert voor drinkwater een voorlopige advieswaarde van 15,6 µg/L; gemeten werd tot 8,3 µg/L, dus daaronder. Zet die getallen wel naast elkaar: voor de vier grote PFAS samen geldt 4,4 nanogram per kilo per week, duizenden keren strenger. TFA is dus veel minder giftig dan PFOS of PFOA — het probleem is de onomkeerbaarheid. Het lost volledig op, hecht nergens aan en is met actieve kool of omgekeerde osmose niet tegen te houden; wat in het grondwater komt, gaat er niet meer uit.",
+      "De beoordeling is net verstrengd: op 22 juli 2026 verlaagde EFSA de aanvaardbare dagelijkse inname van 0,05 naar 0,014 milligram per kilogram lichaamsgewicht, 3,5 keer lager, omdat TFA het gehalte aan thyroxine verandert, het hormoon waarmee de schildklier de stofwisseling regelt. Vlaanderen hanteert voor drinkwater een voorlopige advieswaarde van 15,6 µg/L; gemeten werd tot 8,3 µg/L, dus daaronder. Zet die getallen wel naast elkaar: voor de vier grote PFAS samen geldt 4,4 nanogram per kilo per week, duizenden keren strenger. TFA is dus veel minder giftig dan PFOS of PFOA; het probleem is de onomkeerbaarheid. Het lost volledig op, hecht nergens aan en is met actieve kool of omgekeerde osmose niet tegen te houden; wat in het grondwater komt, gaat er niet meer uit.",
     bronnen: ["efsaTfa", "vmmTfa", "whoDrinkwater"],
   },
   somEfsa4: {
@@ -939,7 +939,7 @@ const PROFIELEN = {
     wat: "De som van vier PFAS: PFOA, PFNA, PFHxS en PFOS.",
     herkomst: "Een rekensom van het labo, geen stof op zich.",
     risico:
-      "EFSA stelde in 2020 vast dat deze vier samen beoordeeld moeten worden en kwam op een tolereerbare inname van 4,4 nanogram per kilo lichaamsgewicht per week. Doorslaggevend was niet kanker of cholesterol, maar dat het afweersysteem van kinderen minder goed reageert op vaccinatie. Voor een volwassene van 70 kilo komt die norm neer op ongeveer 300 nanogram per week — uit álle voeding samen.",
+      "EFSA stelde in 2020 vast dat deze vier samen beoordeeld moeten worden en kwam op een tolereerbare inname van 4,4 nanogram per kilo lichaamsgewicht per week. Doorslaggevend was niet kanker of cholesterol, maar dat het afweersysteem van kinderen minder goed reageert op vaccinatie. Voor een volwassene van 70 kilo komt die norm neer op ongeveer 300 nanogram per week, uit álle voeding samen.",
     bronnen: ["efsaPfas"],
   },
   somPfas43: {
@@ -949,7 +949,7 @@ const PROFIELEN = {
     wat: "De som van de 43 PFAS die de VMM in oppervlaktewater afzonderlijk bepaalt.",
     herkomst: "Een rekensom van het labo, geen stof op zich.",
     risico:
-      "Handig om meetpunten te vergelijken, maar de som zegt niets over wélke stoffen erin zitten — en dat maakt uit, want PFOA en TFA hebben heel verschillende gevolgen. Er hangt geen norm aan: de milieukwaliteitsnorm voor oppervlaktewater geldt voor PFOS afzonderlijk.",
+      "Handig om meetpunten te vergelijken, maar de som zegt niets over wélke stoffen erin zitten, en dat maakt uit, want PFOA en TFA hebben heel verschillende gevolgen. Er hangt geen norm aan: de milieukwaliteitsnorm voor oppervlaktewater geldt voor PFOS afzonderlijk.",
     bronnen: ["vmmWater"],
   },
   somDwrl20: {
@@ -969,7 +969,7 @@ const PROFIELEN = {
       "Stapelt zich op in het lichaam en verlaat het traag; EFSA wees als doorslaggevend effect aan dat het afweersysteem minder goed op vaccinatie reageert.",
     wat: "Een familie van duizenden door de mens gemaakte fluorverbindingen, bekend als de eeuwige chemicaliën omdat ze in de natuur nauwelijks afbreken.",
     herkomst:
-      "Antiaanbaklagen, waterafstotende kleding, verpakkingen, en vooral blusschuim — dat laatste is de oorzaak van de bekendste vervuilingen in Vlaanderen.",
+      "Antiaanbaklagen, waterafstotende kleding, verpakkingen, en vooral blusschuim, dat laatste is de oorzaak van de bekendste vervuilingen in Vlaanderen.",
     risico:
       "EFSA stelde in 2020 een gezamenlijke tolereerbare inname vast van 4,4 nanogram per kilogram lichaamsgewicht per week voor vier PFAS samen. Doorslaggevend daarbij was niet kanker of cholesterol, maar dat het afweersysteem minder goed reageert op vaccinatie. Van de best onderzochte stof, PFOA, stelde het IARC in 2023 vast dat ze kankerverwekkend is voor de mens. PFAS stapelen zich op in het lichaam en verlaten het maar traag; in vervuilde zones vertaalt dat zich in adviezen over zelfgeteeld voedsel en putwater.",
     bronnen: ["efsaPfas", "iarcPfas", "vlaanderenPfas"],
@@ -1009,7 +1009,7 @@ const PROFIELEN = {
     herkomst:
       "Riool van huishoudens en ziekenhuizen, en mest van behandeld vee. Een deel verlaat het lichaam onveranderd.",
     risico:
-      "Hier weegt niet de giftigheid maar de resistentie: ook zeer lage gehalten kunnen bacteriën in het water selecteren die tegen antibiotica bestand zijn. Die resistentie blijft niet in de beek — ze komt via mens en dier terug. Voor waterorganismen zijn sommige van deze stoffen bovendien giftig voor algen en blauwalgen.",
+      "Hier weegt niet de giftigheid maar de resistentie: ook zeer lage gehalten kunnen bacteriën in het water selecteren die tegen antibiotica bestand zijn. Die resistentie blijft niet in de beek: ze komt via mens en dier terug. Voor waterorganismen zijn sommige van deze stoffen bovendien giftig voor algen en blauwalgen.",
     bronnen: ["whoGeneesmiddelen", "vmmWater"],
   },
   contrastmiddel: {
@@ -1026,7 +1026,7 @@ const PROFIELEN = {
   psychofarmacon: {
     categorie: "farmaceutisch",
     kort:
-      "Verandert het gedrag van vissen — schuwheid, voedselzoeken en paargedrag — bij gehalten die in waterlopen gemeten worden.",
+      "Verandert het gedrag van vissen, schuwheid, voedselzoeken en paargedrag, bij gehalten die in waterlopen gemeten worden.",
     wat: "Middelen die op de hersenen werken, zoals carbamazepine, gabapentine en clozapine.",
     herkomst: "Riool. Carbamazepine wordt zo slecht afgebroken dat het als merker voor huishoudelijk afvalwater dient.",
     risico:
@@ -1082,7 +1082,7 @@ const PROFIELEN = {
     herkomst:
       "Sinds 2004 niet meer toegelaten in de Europese Unie. Werd veel gebruikt op opritten, spoorwegen en in de fruitteelt.",
     risico:
-      "Voor de mens gaat het bij deze gehalten niet om een acuut gevaar; de norm van 0,1 µg/L is een beleidsgrens en geen gezondheidsdrempel. Wat een vondst wél betekent, is dat een verbod van twintig jaar geleden nog niet in het grondwater is doorgewerkt. Voor waterleven is simazine schadelijk omdat het de fotosynthese van algen en waterplanten remt — de basis van de voedselketen in een beek.",
+      "Voor de mens gaat het bij deze gehalten niet om een acuut gevaar; de norm van 0,1 µg/L is een beleidsgrens en geen gezondheidsdrempel. Wat een vondst wél betekent, is dat een verbod van twintig jaar geleden nog niet in het grondwater is doorgewerkt. Voor waterleven is simazine schadelijk omdat het de fotosynthese remt van algen en waterplanten, en die vormen de basis van de voedselketen in een beek.",
     bronnen: ["euPesticiden", "whoDrinkwater"],
   },
   terbutylazine: {
@@ -1093,18 +1093,18 @@ const PROFIELEN = {
     herkomst:
       "Nog steeds toegelaten in de Europese Unie, en juist ingevoerd toen atrazine verboden werd. In de sample van het grondwatermeetnet is het de meest gemeten pesticide.",
     risico:
-      "Dat het nog toegelaten is, maakt een overschrijding niet minder ernstig — het maakt ze actueler. Waar atrazine een erfenis is, wijst terbutylazine op gebruik van nu, en dus op iets dat nog te veranderen valt. Voor waterleven geldt dezelfde werking als bij de andere triazines: het remt de fotosynthese van algen en waterplanten.",
+      "Dat het nog toegelaten is, maakt een overschrijding niet minder ernstig; het maakt ze actueler. Waar atrazine een erfenis is, wijst terbutylazine op gebruik van nu, en dus op iets dat nog te veranderen valt. Voor waterleven geldt dezelfde werking als bij de andere triazines: het remt de fotosynthese van algen en waterplanten.",
     bronnen: ["euPesticiden", "whoDrinkwater"],
   },
   triazineMetabolieten: {
     categorie: "pesticiden",
     kort:
       "Afbraakproduct van atrazine of terbutylazine; het duikt op waar de moederstof zelf al is verdwenen en toont dus hoe traag grondwater zich herstelt.",
-    wat: "Wat er van de triazineherbiciden overblijft nadat de bodem ze deels heeft afgebroken — desethylatrazine, desisopropylatrazine en desethylterbuthylazine.",
+    wat: "Wat er van de triazineherbiciden overblijft nadat de bodem ze deels heeft afgebroken: desethylatrazine, desisopropylatrazine en desethylterbuthylazine.",
     herkomst:
       "Ontstaan in de bodem uit atrazine, simazine en terbutylazine. Ze zijn beweeglijker dan de moederstof en zakken dus verder door.",
     risico:
-      "Deze metabolieten gelden als relevant: de norm van 0,1 µg/L slaat er onverkort op, en een drinkwaterwinning kan er onbruikbaar door worden zonder extra zuivering. Van desethylatrazine worden hogere gehalten gemeten dan van atrazine zelf — het afbraakproduct blijft langer hangen dan wat het verving. Het gevolg is er vooral een van tijd: waar dit opduikt, is de vervuiling van dertig jaar geleden nog steeds onderweg naar beneden, en daar valt vandaag niets meer aan te doen.",
+      "Deze metabolieten gelden als relevant: de norm van 0,1 µg/L slaat er onverkort op, en een drinkwaterwinning kan er onbruikbaar door worden zonder extra zuivering. Van desethylatrazine worden hogere gehalten gemeten dan van atrazine zelf, het afbraakproduct blijft langer hangen dan wat het verving. Het gevolg is er vooral een van tijd: waar dit opduikt, is de vervuiling van dertig jaar geleden nog steeds onderweg naar beneden, en daar valt vandaag niets meer aan te doen.",
     bronnen: ["euPesticiden", "whoDrinkwater"],
   },
   fenylureum: {
@@ -1115,7 +1115,7 @@ const PROFIELEN = {
     herkomst:
       "Onkruidbestrijding op verhardingen, spoorwegen en in de akkerbouw. De toelating is voor deze stoffen in de Europese Unie ingetrokken.",
     risico:
-      "Ze remmen de fotosynthese en zijn daardoor schadelijk voor algen en waterplanten — waar het waterleven in een beek op steunt. Omdat ze veel op verharding werden gebruikt, spoelden ze bij regen rechtstreeks de riolering en de waterloop in, zonder bodem die iets tegenhoudt. Dat verklaart waarom ze nog opduiken.",
+      "Ze remmen de fotosynthese en zijn daardoor schadelijk voor algen en waterplanten: waar het waterleven in een beek op steunt. Omdat ze veel op verharding werden gebruikt, spoelden ze bij regen rechtstreeks de riolering en de waterloop in, zonder bodem die iets tegenhoudt. Dat verklaart waarom ze nog opduiken.",
     bronnen: ["euPesticiden", "vmmWater"],
   },
   bentazon: {
@@ -1130,11 +1130,11 @@ const PROFIELEN = {
   },
   chlooracetanilide: {
     categorie: "pesticiden",
-    wat: "De chlooracetaniliden — metolachloor, metazachloor, alachloor en verwanten — herbiciden voor maïs, koolzaad en bieten.",
+    wat: "De chlooracetaniliden, metolachloor, metazachloor, alachloor en verwanten, herbiciden voor maïs, koolzaad en bieten.",
     herkomst:
       "Akkerbouw. Alachloor is niet meer toegelaten; S-metolachloor en metazachloor werden lang op grote schaal gebruikt.",
     risico:
-      "De stoffen zelf worden in de bodem vrij snel afgebroken, maar wat er ontstaat — de ESA- en OA-metabolieten — zakt door naar het grondwater en blijft daar. Juist die afbraakproducten, en niet de moederstof, zijn de reden dat drinkwaterwinningen extra moeten zuiveren.",
+      "De stoffen zelf worden in de bodem vrij snel afgebroken, maar wat er ontstaat, de ESA- en OA-metabolieten, zakt door naar het grondwater en blijft daar. Juist die afbraakproducten, en niet de moederstof, zijn de reden dat drinkwaterwinningen extra moeten zuiveren.",
     kort:
       "Breekt zelf snel af, maar de afbraakproducten zakken door naar het grondwater en dwingen winningen tot extra zuivering.",
     bronnen: ["euPesticiden", "whoDrinkwater"],
@@ -1146,13 +1146,13 @@ const PROFIELEN = {
     wat: "ESA- en OA-metabolieten: wat er van metolachloor, metazachloor, alachloor of flufenacet overblijft na afbraak in de bodem.",
     herkomst: "Ontstaan in landbouwgrond uit de herbiciden die daar gebruikt zijn of werden.",
     risico:
-      "Deze afbraakproducten zijn beweeglijker dan de stof waaruit ze ontstaan en veel stabieler: ze zakken door naar het grondwater en verdwijnen daar niet meer. Ze zijn doorgaans minder giftig dan de moederstof — een deel is als niet-relevant beoordeeld — maar het gevolg is praktisch: ze maken grondwater ongeschikt als drinkwaterbron zonder extra zuivering.",
+      "Deze afbraakproducten zijn beweeglijker dan de stof waaruit ze ontstaan en veel stabieler: ze zakken door naar het grondwater en verdwijnen daar niet meer. Ze zijn doorgaans minder giftig dan de moederstof, een deel is als niet-relevant beoordeeld, maar het gevolg is praktisch: ze maken grondwater ongeschikt als drinkwaterbron zonder extra zuivering.",
     bronnen: ["euPesticiden", "whoDrinkwater"],
   },
   glyfosaat: {
     categorie: "pesticiden",
     kort:
-      "In 2023 opnieuw toegelaten tot 2033, terwijl het IARC het als waarschijnlijk kankerverwekkend indeelt — een omstreden dossier.",
+      "In 2023 opnieuw toegelaten tot 2033, terwijl het IARC het als waarschijnlijk kankerverwekkend indeelt: een omstreden dossier.",
     wat: "Het meest gebruikte onkruidbestrijdingsmiddel ter wereld.",
     herkomst:
       "Landbouw, openbaar groen en particuliere tuinen. In Vlaanderen mogen openbare besturen het op de meeste terreinen niet meer gebruiken.",
@@ -1166,7 +1166,7 @@ const PROFIELEN = {
       "Het afbraakproduct van glyfosaat: schadelijk voor waterorganismen en de stof die het vaakst in Vlaamse waterlopen wordt gevonden.",
     wat: "AMPA, waar glyfosaat in uiteenvalt. Het ontstaat ook bij de afbraak van sommige waspoeders.",
     herkomst:
-      "Grotendeels uit glyfosaat, maar niet uitsluitend — een deel komt uit fosfonaten in schoonmaakmiddelen via het riool.",
+      "Grotendeels uit glyfosaat, maar niet uitsluitend, een deel komt uit fosfonaten in schoonmaakmiddelen via het riool.",
     risico:
       "AMPA is stabieler dan glyfosaat en hoopt zich daardoor op in waterbodems en oppervlaktewater; het is een van de meest aangetroffen stoffen in Vlaamse waterlopen. Het is schadelijk voor waterorganismen, en in waterlopen die als drinkwaterbron dienen dwingt het tot extra zuivering. Dat het deels uit waspoeder komt, maakt de aanpak lastiger: een hoge waarde wijst niet automatisch naar de landbouw, dus ook niet automatisch naar wie er iets aan kan doen.",
     bronnen: ["vmmWater", "euPesticiden"],
@@ -1177,9 +1177,9 @@ const PROFIELEN = {
       "Afbraakproduct van een middel dat al sinds 2008 verboden is, en toch de bekendste vervuiler van drinkwaterwinningen.",
     wat: "2,6-dichloorbenzamide, het afbraakproduct van het onkruidmiddel dichlobenil.",
     herkomst:
-      "Dichlobenil werd tot het verbod in 2008 gebruikt op opritten, paden en in de sierteelt — vaak op verharding, waar niets het tegenhoudt.",
+      "Dichlobenil werd tot het verbod in 2008 gebruikt op opritten, paden en in de sierteelt, vaak op verharding, waar niets het tegenhoudt.",
     risico:
-      "BAM breekt vrijwel niet af en is uitermate beweeglijk: het is in heel Noordwest-Europa de stof die het vaakst drinkwaterwinningen boven de norm brengt, en winningen zijn erdoor gesloten. Het is niet bijzonder giftig — het gevolg zit in de onbruikbaarheid van het water, niet in een gezondheidseffect bij deze gehalten.",
+      "BAM breekt vrijwel niet af en is uitermate beweeglijk: het is in heel Noordwest-Europa de stof die het vaakst drinkwaterwinningen boven de norm brengt, en winningen zijn erdoor gesloten. Het is niet bijzonder giftig, het gevolg zit in de onbruikbaarheid van het water, niet in een gezondheidseffect bij deze gehalten.",
     bronnen: ["euPesticiden", "whoDrinkwater"],
   },
   chloridazon: {
@@ -1200,7 +1200,7 @@ const PROFIELEN = {
     wat: "Dimethylsulfamide, het afbraakproduct van het schimmelbestrijdingsmiddel tolylfluanide.",
     herkomst: "Fruit- en sierteelt. Tolylfluanide is in de Europese Unie niet meer toegelaten.",
     risico:
-      "DMS zelf is weinig giftig, maar het is bekend geworden om iets anders: bij de bereiding van drinkwater met ozon kan eruit NDMA ontstaan, een stof die als kankerverwekkend geldt. Het gevolg ligt dus niet in het grondwater zelf maar in wat de zuivering ermee doet — waardoor waterbedrijven hun ozonstap moesten aanpassen.",
+      "DMS zelf is weinig giftig, maar het is bekend geworden om iets anders: bij de bereiding van drinkwater met ozon kan eruit NDMA ontstaan, een stof die als kankerverwekkend geldt. Het gevolg ligt dus niet in het grondwater zelf maar in wat de zuivering ermee doet: waardoor waterbedrijven hun ozonstap moesten aanpassen.",
     bronnen: ["euPesticiden", "whoDrinkwater"],
   },
   triazool: {
@@ -1209,7 +1209,7 @@ const PROFIELEN = {
       "Afbraakproduct van de triazoolfungiciden; verscheidene daarvan zijn ingedeeld als schadelijk voor de voortplanting.",
     wat: "1,2,4-triazool, het gemeenschappelijke afbraakproduct van de triazoolfungiciden.",
     herkomst:
-      "Schimmelbestrijding in granen, fruit en sierteelt — een grote groep middelen die alle op deze ring uitkomen.",
+      "Schimmelbestrijding in granen, fruit en sierteelt: een grote groep middelen die alle op deze ring uitkomen.",
     risico:
       "De moederstoffen uit deze groep zijn voor een deel ingedeeld als schadelijk voor de voortplanting, en dat is de reden dat het afbraakproduct opgevolgd wordt. 1,2,4-triazool is bovendien beweeglijk en zakt makkelijk door naar het grondwater, zodat het over een grote oppervlakte terugkomt in plaats van op de plek van gebruik.",
     bronnen: ["euPesticiden", "echa"],
@@ -1302,7 +1302,7 @@ const PROFIELEN = {
   organofosfaat: {
     categorie: "pesticiden",
     kort:
-      "Legt het zenuwstelsel lam — bij insecten in bedoelde dosis, bij mens en vis bij hoge blootstelling; niet meer toegelaten.",
+      "Legt het zenuwstelsel lam, bij insecten in bedoelde dosis, bij mens en vis bij hoge blootstelling; niet meer toegelaten.",
     wat: "Organofosfaat-insecticiden zoals triazofos.",
     herkomst: "Insectenbestrijding in land- en tuinbouw. Niet meer toegelaten in de Europese Unie.",
     risico:
@@ -1367,7 +1367,7 @@ const PROFIELEN = {
   pesticiden: {
     categorie: "pesticiden",
     kort:
-      "Bestrijdingsmiddelen horen niet in drinkwater thuis — de norm van 0,1 µg/L is daarop gebaseerd en niet op een gezondheidsgrens per stof.",
+      "Bestrijdingsmiddelen horen niet in drinkwater thuis, de norm van 0,1 µg/L is daarop gebaseerd en niet op een gezondheidsgrens per stof.",
     wat: "Stoffen om onkruid, insecten of schimmels te bestrijden, en de resten waarin ze in de bodem uiteenvallen.",
     herkomst:
       "Landbouw, en daarnaast openbaar groen, spoorwegen en particuliere tuinen. Metabolieten kunnen nog jaren opduiken nadat een middel verboden is.",
@@ -1705,7 +1705,7 @@ const SLEUTELS: Readonly<Record<string, ProfielId>> = {
 /**
  * De metalen van de VMM dragen een achtervoegsel voor de fractie: " t" voor het
  * totaalgehalte en " o" voor het opgeloste deel. Voor de duiding maakt dat niet
- * uit — arseen blijft arseen — dus die staart gaat eraf vóór het opzoeken.
+ * uit, arseen blijft arseen, dus die staart gaat eraf vóór het opzoeken.
  */
 const METAALSTAM: Readonly<Record<string, ProfielId>> = {
   As: "arseen",
@@ -1742,7 +1742,7 @@ const METAALSTAM: Readonly<Record<string, ProfielId>> = {
  *
  * "T" is bij IRCELINE de luchttemperatuur en bij de VMM de watertemperatuur.
  * Op één sleutel zetten zou bij het ene meetpunt stilzwijgend de verkeerde
- * uitleg tonen — een fout die niemand opmerkt, want er staat gewoon een
+ * uitleg tonen, een fout die niemand opmerkt, want er staat gewoon een
  * verhaal over temperatuur.
  */
 const PER_LAAG: Readonly<Record<LaagId, Readonly<Record<string, ProfielId>>>> = {
@@ -1768,7 +1768,7 @@ const GROEPEN: Readonly<Record<string, ProfielId>> = {
  * DOV verzint per metaboliet een eigen schrijfwijze: "Metazachloor ESA
  * (479M08)", "metolachlor-OA", "Dimethenamid-ESA". Die allemaal opsommen is
  * dweilen; het patroon erachter is stabiel. Wat hier niet in past, valt terug
- * op de tekst van zijn parametergroep — dat blijft de vangnetlaag.
+ * op de tekst van zijn parametergroep, dat blijft de vangnetlaag.
  */
 const PESTICIDE_PATRONEN: readonly (readonly [RegExp, ProfielId])[] = [
   // De ESA- en OA-metabolieten van de chlooracetaniliden.
@@ -1811,7 +1811,7 @@ const PFAS_NAAM = /(perfluor|polyfluor|fluortelomeer|fluoroctaan|fluorbutaan)/i;
  *
  * Niets teruggeven is hier het juiste antwoord. Een vage tekst die op elke stof
  * zou passen, wekt de indruk dat er iets uitgelegd is terwijl de lezer niets
- * wijzer wordt — en bij gezondheidsinformatie is dat erger dan zwijgen.
+ * wijzer wordt, en bij gezondheidsinformatie is dat erger dan zwijgen.
  */
 /**
  * Haalt de variantaanduiding van een PFAS-symbool af.
@@ -1822,7 +1822,7 @@ const PFAS_NAAM = /(perfluor|polyfluor|fluortelomeer|fluoroctaan|fluorbutaan)/i;
  * gaat telkens om perfluoroctaansulfonzuur, dus om dezelfde uitleg.
  *
  * Zonder dit zou alleen de kale vorm zijn eigen tekst krijgen en zouden de
- * varianten terugvallen op het familieverhaal — zonder dat iemand ziet dat er
+ * varianten terugvallen op het familieverhaal, zonder dat iemand ziet dat er
  * een preciezere tekst bestond.
  */
 export function pfasStam(symbool: string): string {
@@ -1838,7 +1838,7 @@ export function pfasStam(symbool: string): string {
  *
  * Zonder eigen `kort` valt hij terug op de eerste zin van `risico`. Dat gaat
  * over het risico en is dus nooit naast de kwestie, maar het is een terugval en
- * geen ontwerp — vandaar dat de stoffen die in de praktijk overschrijden hun
+ * geen ontwerp: vandaar dat de stoffen die in de praktijk overschrijden hun
  * eigen zin dragen.
  */
 export function korteRisicozin(profiel: Stofprofiel): string | undefined {
@@ -1858,7 +1858,7 @@ export function stofprofiel(
   if (direct) return PROFIELEN[direct];
 
   // DOV schrijft "Atrazine (Atraz)": naam plus eigen code. Wie een stof onder
-  // haar gewone naam opneemt, moet niet eerst die code achterhalen — anders
+  // haar gewone naam opneemt, moet niet eerst die code achterhalen, anders
   // valt de tekst stil terug op de groep en merkt niemand dat de eigen,
   // preciezere uitleg nooit verschijnt.
   const zonderCode = parameter.symbool.replace(/\s*\([^()]*\)\s*$/, "");
@@ -1871,8 +1871,8 @@ export function stofprofiel(
   if (opPfasVorm) return PROFIELEN[opPfasVorm];
 
   // Laatste redmiddel: de code tussen de haakjes achteraan. DOV's namen zijn
-  // niet altijd netjes — "…(DONA)) (DONA)" heeft een haakje te veel en
-  // "(EtPFOSAbranchedl) (EtPFOSAbranched)" een letter — waardoor het symbool
+  // niet altijd netjes, "…(DONA)) (DONA)" heeft een haakje te veel en
+  // "(EtPFOSAbranchedl) (EtPFOSAbranched)" een letter: waardoor het symbool
   // de hele naam blijft. De code zelf klopt dan nog wel.
   const code = parameter.symbool.match(/\(([^()]+)\)\s*$/)?.[1]?.trim();
   const opCode = code ? (SLEUTELS[code] ?? SLEUTELS[pfasStam(code)]) : undefined;

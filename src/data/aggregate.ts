@@ -3,7 +3,7 @@ import type { Meting, ParameterSamenvatting } from "./types.js";
 /** Hoe metingen over perioden verdeeld worden. */
 export type Bucket = (meting: Meting) => string;
 
-/** Per meetjaar — de indeling voor oppervlaktewater en grondwater. */
+/** Per meetjaar: de indeling voor oppervlaktewater en grondwater. */
 export const PER_JAAR: Bucket = (meting) => String(meting.jaar);
 
 /**

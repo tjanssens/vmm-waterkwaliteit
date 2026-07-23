@@ -210,7 +210,7 @@ export function normaliseerEenheid(eenheid: string): string {
  *
  * Bij de gewone parameters is de naam "Arseen (As)" en is er niets te splitsen.
  * Bij PFAS herhaalt DOV de code achteraan: "perfluoroctaansulfonzuur (PFOS)
- * (PFOS)". Alleen die dubbeling halen we weg — staat de code er één keer, dan
+ * (PFOS)". Alleen die dubbeling halen we weg, staat de code er één keer, dan
  * blijft de naam zoals hij is, want daar zijn de normen op gesleuteld.
  */
 export function splitsParameternaam(naam: string): { omschrijving: string; symbool: string } {

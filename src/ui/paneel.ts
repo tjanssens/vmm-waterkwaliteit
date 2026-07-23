@@ -201,7 +201,7 @@ export class Paneel {
   /**
    * De normenkeuze wordt per laag onthouden. Globaal onthouden zou betekenen
    * dat wie bij water op "drinkwater" staat en even een luchtstation opent,
-   * daarna terugvalt op de standaard — de keuze bestaat immers niet bij lucht.
+   * daarna terugvalt op de standaard; die keuze bestaat immers niet bij lucht.
    */
   private behoudNormenset(profiel: Laagprofiel): Normenset {
     return kiesNormenset(
@@ -558,7 +558,7 @@ export class Paneel {
     const verloop = toen ? this.verloopHtml(parameter, toen, oordeel) : "";
     const norm = normVoor(parameter, set);
     const normregel = norm
-      ? `<span class="parameter__norm" title="${escape(norm.toets)} — ${escape(BRONNEN[norm.bron].naam)}">norm ${escape(norm.label)}</span>`
+      ? `<span class="parameter__norm" title="${escape(norm.toets)}, ${escape(BRONNEN[norm.bron].naam)}">norm ${escape(norm.label)}</span>`
       : "";
 
     return `
@@ -646,7 +646,7 @@ export class Paneel {
         <h3>Bron van deze cijfers</h3>
         <p>
           <a href="${escape(bron.url)}" target="_blank" rel="noopener">${escape(bron.tekst)}</a>
-          — ${escape(bron.uitleg)}${context}
+         , ${escape(bron.uitleg)}${context}
         </p>
 
         <h3>Normen</h3>

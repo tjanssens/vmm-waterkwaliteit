@@ -102,7 +102,7 @@ export const OPPERVLAKTEWATER: Laagprofiel<Meetplaats> = {
 
   toelichting: (periode: Periode) =>
     `Per parameter tonen we het gemiddelde over ${periode.label} en de laagste en hoogste ` +
-    "gemeten waarde — niet elke afzonderlijke staalname.",
+    "gemeten waarde, niet elke afzonderlijke staalname.",
 
   leegHint: "Meetplaatsen blijven op de kaart staan nadat ze uit een meetnet zijn gehaald.",
 

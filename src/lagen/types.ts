@@ -6,8 +6,8 @@ export type LaagId = "oppervlaktewater" | "lucht" | "grondwater";
 
 /**
  * Wat elk meetpunt gemeen heeft, ongeacht de bron. Lagen breiden dit uit met
- * hun eigen velden — een meetplaats draagt een matrix, een grondwaterfilter
- * een diepte — maar de kaart en de zoeklijst kennen alleen dit.
+ * hun eigen velden, een meetplaats draagt een matrix, een grondwaterfilter
+ * een diepte, maar de kaart en de zoeklijst kennen alleen dit.
  */
 export interface Meetpunt {
   laag: LaagId;
@@ -49,7 +49,7 @@ export interface Periode {
   label: string;
   /**
    * Hoeveel dagen de periode beslaat. Bepaalt of een norm met een
-   * middelingstijd hier überhaupt op toegepast mag worden — een
+   * middelingstijd hier überhaupt op toegepast mag worden, een
    * jaargrenswaarde zegt niets over een week metingen.
    */
   dagen?: number;
@@ -108,7 +108,7 @@ export type Tijdas<P extends Meetpunt> =
  * Een knop in de filterbalk die punten van deze laag weglaat. Wat er te
  * filteren valt, verschilt per bron: meetnetten bij oppervlaktewater,
  * aquifer bij grondwater, gemeten stof bij lucht. De schil hoeft daar niets
- * van te weten — anders staat er straks per laag een uitzondering in.
+ * van te weten, anders staat er straks per laag een uitzondering in.
  */
 export interface Puntfilter<P extends Meetpunt = Meetpunt> {
   id: string;
@@ -118,7 +118,7 @@ export interface Puntfilter<P extends Meetpunt = Meetpunt> {
 
 /**
  * Alles wat één databron eigen is, achter één interface. Kaart en paneel
- * praten hiertegen en niet tegen Cognos, IRCELINE of DOV rechtstreeks — een
+ * praten hiertegen en niet tegen Cognos, IRCELINE of DOV rechtstreeks, een
  * vierde laag toevoegen hoort daarom één bestand te kosten.
  */
 export interface Laagprofiel<P extends Meetpunt = Meetpunt> {

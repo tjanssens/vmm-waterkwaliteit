@@ -131,7 +131,7 @@ export function formatteerAfstand(meter: number): string {
 }
 
 /**
- * Zoekt op nummer, omschrijving en gemeente tegelijk — de gebruiker hoeft niet
+ * Zoekt op nummer, omschrijving en gemeente tegelijk, de gebruiker hoeft niet
  * te weten welk van de drie hij in handen heeft. Met een positie erbij komen de
  * dichtstbijzijnde punten eerst.
  */
@@ -151,7 +151,7 @@ export function zoek<T extends Meetpunt>(
   } else {
     // Zonder positie: exacte treffers eerst, dan op nummer. Sorteren gebeurt
     // op `id` en niet op de code, want het nummer uit de prefix terugrekenen
-    // gaat mis bij codes als "OWTimbers 15" — daar blijft " 15" over, en een
+    // gaat mis bij codes als "OWTimbers 15", daar blijft " 15" over, en een
     // spatie sorteert vóór elk cijfer.
     treffers.sort((a, b) => {
       const exactA = a.id.toLowerCase() === genormaliseerd ? 0 : 1;

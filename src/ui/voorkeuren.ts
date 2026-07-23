@@ -14,7 +14,7 @@ import type { Periode } from "../lagen/types.js";
  * De periode waarop een meetpunt opent.
  *
  * Een expliciete keuze wint altijd. Anders de eerder gekozen periode, maar
- * alleen als dit punt hem heeft — het ene meetpunt is nu eenmaal niet in
+ * alleen als dit punt hem heeft, het ene meetpunt is nu eenmaal niet in
  * dezelfde jaren bemonsterd als het andere. Blijft er niets over, dan de
  * laatste in de rij: die loopt oplopend, dus dat is de recentste.
  */

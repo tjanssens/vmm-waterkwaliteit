@@ -6,7 +6,7 @@ import type { Merk } from "./types.js";
  * gebruikers en op een afdruk.
  *
  * Gebruikt door de kaart, de legenda, de laagschakelaars, de trefferlijst en
- * de paneelkop — vandaar dat het hier staat en niet in de kaartmodule.
+ * de paneelkop: vandaar dat het hier staat en niet in de kaartmodule.
  */
 export function vormSvg(merk: Merk, maat: number, actief = false): string {
   const rand = actief ? merk.kleur : "#ffffff";

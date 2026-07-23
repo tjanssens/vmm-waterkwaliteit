@@ -163,7 +163,7 @@ export class Kaart {
   }
 
   /**
-   * Cirkels gaan via canvas — dat is wat 7.534 punten vloeiend houdt. De
+   * Cirkels gaan via canvas, dat is wat 7.534 punten vloeiend houdt. De
    * andere vormen kan canvas niet tekenen, en die lagen zijn klein genoeg om
    * als DOM-element te bestaan.
    */

@@ -25,7 +25,7 @@ const MINIMUM_ZOOM = 11;
  * De indeling is niet cosmetisch. Een ondiepe filter meet water dat kort
  * geleden is ingesijpeld en volgt wat er vandaag op het maaiveld gebeurt; op
  * vijftig meter kan het water tientallen jaren oud zijn. Nitraat en pesticiden
- * uit dezelfde akker duiken daar pas veel later op — wie beide door elkaar
+ * uit dezelfde akker duiken daar pas veel later op; wie beide door elkaar
  * bekijkt, vergelijkt twee verschillende tijdvakken.
  *
  * Filters zonder diepte krijgen een eigen knop in plaats van stil weg te
@@ -110,8 +110,8 @@ function alsPunt(filter: Grondwaterfilter): Grondwaterpunt {
  * CORS toestaat en server-side op een venster kan filteren.
  *
  * Het meetpunt is de *filter*, niet de put. Eén put kan meerdere filters op
- * verschillende dieptes hebben, elk met eigen metingen — en op 3 meter staat
- * heel ander water dan op 80 meter.
+ * verschillende dieptes hebben, elk met eigen metingen. Op 3 meter staat heel
+ * ander water dan op 80 meter.
  */
 export const GRONDWATER: Laagprofiel<Grondwaterfilter> = {
   id: "grondwater",
@@ -191,7 +191,7 @@ export const GRONDWATER: Laagprofiel<Grondwaterfilter> = {
     tekst:
       "Metalen worden bij de staalname ter plaatse over een filter van 0,45 µm geleid, om bodemdeeltjes en wat daaraan kleeft te verwijderen. Wat hier staat is dus de opgeloste fractie en niet het volledige gehalte. Voor de toetsing betekent dat: een overschrijding telt zeker, want het opgeloste deel alleen haalt de norm al niet; blijft een metaal eronder, dan zegt dat niets over de deeltjes die eruit gefilterd zijn. Kwik kan bovendien onderschat zijn, doordat het aan het filtermembraan blijft kleven. Voorgeschreven in",
     bron: {
-      naam: "WAC/I/A/005, §5.4.4.1 — Compendium voor de monsterneming, meting en analyse van water",
+      naam: "WAC/I/A/005, §5.4.4.1, Compendium voor de monsterneming, meting en analyse van water",
       url: "https://reflabos.vito.be/2020/WAC_I_A_005.pdf",
     },
   },

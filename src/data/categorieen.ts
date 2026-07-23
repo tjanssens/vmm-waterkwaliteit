@@ -159,7 +159,7 @@ const VAST: Readonly<Record<string, CategorieId>> = {
 };
 
 /**
- * PFAS zijn te talrijk om op te sommen — DOV alleen al rapporteert er 62 — maar
+ * PFAS zijn te talrijk om op te sommen, DOV alleen al rapporteert er 62, maar
  * ze delen een vorm in hun code en een woordstam in hun naam.
  */
 const PFAS_SYMBOOL =
@@ -176,7 +176,7 @@ const PFAS_NAAM = /(perfluor|polyfluor|fluortelomeer|fluoroctaan|fluorbutaan)/i;
  * allemaal in een lijst krijgen.
  *
  * De twaalf groepen zijn exact opgehaald bij DOV. Een referentie-endpoint
- * bestaat er niet — `parametergroep` is in het WFS-schema een vrije string —
+ * bestaat er niet, `parametergroep` is in het WFS-schema een vrije string,
  * dus dat ging door de waarden alfabetisch af te lopen. Een steekproef van
  * 10.000 observaties miste er drie, waaronder PFAS.
  */

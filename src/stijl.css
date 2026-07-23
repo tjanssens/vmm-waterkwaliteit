@@ -51,7 +51,7 @@
     --geen-norm: #8b9a93;
     --geen-norm-bg: #1d2826;
 
-    /* Eigen stappen voor donker, apart gevalideerd — geen omgekeerde licht. */
+    /* Eigen stappen voor donker, apart gevalideerd, geen omgekeerde licht. */
     --reeks: #2aa6b6;
     --normlijn: #d9705d;
   }
@@ -1353,7 +1353,7 @@ body.is-rapport .app {
   }
 
   /* De normenkeuze zelf verdwijnt, maar wélke set gebruikt is moet op papier
-     blijven staan — anders weet de lezer niet waartegen getoetst is. */
+     blijven staan, anders weet de lezer niet waartegen getoetst is. */
   .gereedschap {
     padding-left: 0;
     padding-right: 0;
@@ -1456,7 +1456,7 @@ body.is-rapport .app {
     font-weight: 700;
   }
 
-  /* Op papier is een link zonder adres waardeloos — de bronvermelding
+  /* Op papier is een link zonder adres waardeloos, de bronvermelding
      moet naleesbaar blijven. */
   .paneel__voet a[href]::after {
     content: " (" attr(href) ")";

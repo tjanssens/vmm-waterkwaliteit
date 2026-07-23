@@ -6,11 +6,11 @@ import type { Oordeel, ParameterSamenvatting } from "./types.js";
  */
 export const BRONNEN = {
   vlarem: {
-    naam: "VLAREM II, bijlage 2.3.1 — basismilieukwaliteitsnormen oppervlaktewater",
+    naam: "VLAREM II, bijlage 2.3.1, basismilieukwaliteitsnormen oppervlaktewater",
     url: "https://navigator.emis.vito.be/detail?woId=10071",
   },
   vlaremGevaarlijk: {
-    naam: "VLAREM II, bijlage 2.3.1 — milieukwaliteitsnormen gevaarlijke stoffen",
+    naam: "VLAREM II, bijlage 2.3.1, milieukwaliteitsnormen gevaarlijke stoffen",
     url: "https://navigator.emis.vito.be/detail?woId=10071",
   },
   drinkwater: {
@@ -19,25 +19,25 @@ export const BRONNEN = {
   },
   luchtEu: {
     naam:
-      "Richtlijn 2008/50/EG betreffende de luchtkwaliteit en schonere lucht voor Europa — bijlagen VII, XI en XIV",
+      "Richtlijn 2008/50/EG betreffende de luchtkwaliteit en schonere lucht voor Europa, bijlagen VII, XI en XIV",
     url: "https://eur-lex.europa.eu/legal-content/NL/TXT/HTML/?uri=CELEX:32008L0050",
   },
   luchtWho: {
-    naam: "WHO global air quality guidelines (2021) — tabel 0.1, aanbevolen AQG-waarden",
+    naam: "WHO global air quality guidelines (2021): tabel 0.1, aanbevolen AQG-waarden",
     url: "https://www.who.int/publications/i/item/9789240034228",
   },
   vlaremGrondwater: {
-    naam: "VLAREM II, bijlage 2.4.1 — milieukwaliteitsnormen voor grondwater",
+    naam: "VLAREM II, bijlage 2.4.1, milieukwaliteitsnormen voor grondwater",
     url: "https://navigator.emis.vito.be/mijn-navigator?woId=10076",
   },
   wac: {
     naam:
-      "WAC/I/A/005 — Monstername van water via een peilput (Compendium voor de monsterneming, meting en analyse van water, versie mei 2019), §5.4.4.1",
+      "WAC/I/A/005, Monstername van water via een peilput (Compendium voor de monsterneming, meting en analyse van water, versie mei 2019), §5.4.4.1",
     url: "https://reflabos.vito.be/2020/WAC_I_A_005.pdf",
   },
   drinkwaterVlaanderen: {
     naam:
-      "Kwaliteitseisen van het drinkwater (VMM, oktober 2024) — bijlage I van het Vlaamse drinkwaterbesluit van 20 januari 2023",
+      "Kwaliteitseisen van het drinkwater (VMM, oktober 2024), bijlage I van het Vlaamse drinkwaterbesluit van 20 januari 2023",
     url: "https://vmm.vlaanderen.be/beleid/waterbeleid/drinkwater/kwaliteit",
   },
 } as const;
@@ -94,7 +94,7 @@ export const NORMENSETTEN: Readonly<Record<Normenset, { naam: string; uitleg: st
   drinkwater: {
     naam: "Drinkwater",
     uitleg:
-      "De normen voor kraantjeswater, ter vergelijking. Let op: deze gelden voor water aan de kraan, ná zuivering. Een waterloop is geen drinkwater en hoeft hier niet aan te voldoen — de vergelijking geeft alleen een gevoel voor de grootte-orde.",
+      "De normen voor kraantjeswater, ter vergelijking. Let op: deze gelden voor water aan de kraan, ná zuivering. Een waterloop is geen drinkwater en hoeft hier niet aan te voldoen, de vergelijking geeft alleen een gevoel voor de grootte-orde.",
   },
 };
 
@@ -371,7 +371,7 @@ const DRINKWATER: Readonly<Record<string, Norm>> = {
  * Twee dingen om in de gaten te houden. Ten eerste dragen deze normen een
  * middelingstijd: de jaargrenswaarde voor NO₂ zegt niets over een week
  * metingen. Ten tweede zijn de dag- en uurgrenswaarden geen drempel op een
- * gemiddelde maar een telling met een toegestaan aantal overschrijdingen —
+ * gemiddelde maar een telling met een toegestaan aantal overschrijdingen,
  * die tonen we wel, maar we vellen er geen oordeel over.
  *
  * Richtlijn (EU) 2024/2881 verstrengt deze waarden, maar die gelden pas vanaf
@@ -440,8 +440,8 @@ const LUCHT_EU: Readonly<Record<string, Norm>> = {
 
 /**
  * De advieswaarden van de Wereldgezondheidsorganisatie uit 2021, tabel 0.1.
- * Ze zijn fors strenger dan de Europese grenswaarden — PM2,5 mag jaarlijks
- * 5 in plaats van 25 µg/m³ — en juist dat verschil maakt zichtbaar dat
+ * Ze zijn fors strenger dan de Europese grenswaarden, PM2,5 mag jaarlijks
+ * 5 in plaats van 25 µg/m³, en juist dat verschil maakt zichtbaar dat
  * "voldoet aan de EU-norm" niet hetzelfde is als "gezond".
  *
  * Dit zijn advieswaarden en geen wetgeving; niemand is ze verplicht te halen.
@@ -508,7 +508,7 @@ const LUCHT_WHO: Readonly<Record<string, Norm>> = {
  * Grondwater getoetst aan de drinkwaternormen.
  *
  * Dat is hier een zinniger vergelijking dan bij een beek: wie een eigen put
- * heeft, drinkt dit water of geeft het aan zijn dieren. Streng blijft het wel —
+ * heeft, drinkt dit water of geeft het aan zijn dieren. Streng blijft het wel,
  * de norm geldt aan de kraan, ná zuivering, en onbehandeld grondwater hoeft er
  * niet aan te voldoen.
  *
@@ -521,7 +521,7 @@ const LUCHT_WHO: Readonly<Record<string, Norm>> = {
  *
  * De sleutels zijn de parameternamen van DOV, inclusief hun eigen schrijfwijze
  * ("Ijzer", "Chloriden"). Wijkt die af, dan sluit de norm niet aan en toont de
- * app "geen norm" — geen fout oordeel.
+ * app "geen norm", geen fout oordeel.
  */
 const GRONDWATER: Readonly<Record<string, Norm>> = {
   "Nitraat (NO3)": {
@@ -888,7 +888,7 @@ const GRONDWATER_VLAREM: Readonly<Record<string, Norm>> = {
 
 /**
  * Normen die niet op één stof slaan maar op een hele groep. VLAREM stelt voor
- * pesticiden 0,1 µg/L per afzonderlijke stof — dat zijn er honderden, en die
+ * pesticiden 0,1 µg/L per afzonderlijke stof, dat zijn er honderden, en die
  * gaan we niet stuk voor stuk opsommen.
  *
  * Niet-relevante metabolieten vallen er bewust buiten: die tellen ook in de
@@ -943,7 +943,7 @@ export function isTotaalgehalte(symbool: string): boolean {
 
 /**
  * De norm die op deze parameter van toepassing is: eerst die voor de stof
- * zelf, anders die van haar groep — zoals de ene pesticidennorm die voor
+ * zelf, anders die van haar groep: zoals de ene pesticidennorm die voor
  * honderden stoffen tegelijk geldt.
  *
  * Zowel het oordeel als het normlabel in de tabel gebruiken deze functie, want
@@ -1038,7 +1038,7 @@ export function beoordeel(
     };
   }
 
-  // Een jaargemiddelde kan conform zijn terwijl er tussentijds dips waren —
+  // Een jaargemiddelde kan conform zijn terwijl er tussentijds dips waren,
   // bij zuurstof is precies dát wat vissen doodt.
   if (norm.ondergrens !== undefined && minimum < norm.ondergrens) {
     return { klasse: "op-grens", label: "dipt onder" };
@@ -1051,7 +1051,7 @@ export function beoordeel(
 }
 
 /**
- * Bronnen die bij een set horen zonder aan één norm te hangen — de Vlaamse
+ * Bronnen die bij een set horen zonder aan één norm te hangen, de Vlaamse
  * omzetting bijvoorbeeld, die de Europese waarden overneemt.
  */
 const EXTRA_BRONNEN: Readonly<Record<Normenset, BronId[]>> = {

@@ -47,7 +47,7 @@ export class EvolutieVenster {
     document.body.appendChild(this.dialoog);
 
     // Klikken op de achtergrond sluit; klikken in de inhoud niet. We eisen dat
-    // de klik óók op de achtergrond begón — anders sluit de klik waarmee je het
+    // de klik óók op de achtergrond begón, anders sluit de klik waarmee je het
     // venster opent het meteen weer, omdat die klik nog doorloopt naar de
     // zojuist getoonde dialoog.
     let begonOpAchtergrond = false;
@@ -248,7 +248,7 @@ export class EvolutieVenster {
 
   /**
    * Labels langs de tijdas. Over meerdere jaren is het jaartal het duidelijkst,
-   * maar een luchtstation levert 168 metingen binnen één week — dan zou er één
+   * maar een luchtstation levert 168 metingen binnen één week, dan zou er één
    * label "2026" staan en verder niets.
    */
   private tijdTicks(metingen: Meting[], x: { naar(w: number): number }) {
@@ -309,7 +309,7 @@ export class EvolutieVenster {
     const items = [
       '<span class="legende__item"><span class="legende__punt"></span>gemeten waarde</span>',
       heeftLimiet
-        ? '<span class="legende__item"><span class="legende__punt legende__punt--limiet"></span>onder detectielimiet — de waarde is de limiet, niet de concentratie</span>'
+        ? '<span class="legende__item"><span class="legende__punt legende__punt--limiet"></span>onder detectielimiet, de waarde is de limiet, niet de concentratie</span>'
         : "",
       norm ? `<span class="legende__item"><span class="legende__streep"></span>norm ${escape(norm.label)}</span>` : "",
     ].filter(Boolean);
@@ -345,7 +345,7 @@ export class EvolutieVenster {
 
 
 /**
- * Wat deze stof is, waar ze vandaan komt en wat ze doet — met de bron erbij.
+ * Wat deze stof is, waar ze vandaan komt en wat ze doet, met de bron erbij.
  *
  * Staat er bewust ook als er niets overschreden is: wie een vinkje ziet, mag
  * evengoed weten wat er dan precies binnen de norm blijft. Kennen we de stof
