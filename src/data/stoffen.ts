@@ -51,6 +51,14 @@ export const STOFBRONNEN = {
     naam: "ECHA — kandidaatslijst van zeer zorgwekkende stoffen",
     url: "https://echa.europa.eu/candidate-list-table",
   },
+  iarcPfas: {
+    naam: "IARC — evaluatie van de kankerverwekkendheid van PFOA en PFOS (2023)",
+    url: "https://www.iarc.who.int/news-events/iarc-monographs-evaluate-the-carcinogenicity-of-perfluorooctanoic-acid-pfoa-and-perfluorooctanesulfonic-acid-pfos/",
+  },
+  vlaanderenPfas: {
+    naam: "Vlaanderen — blootstelling aan PFAS beperken",
+    url: "https://www.vlaanderen.be/pfas-vervuiling/blootstelling-aan-pfas-beperken",
+  },
   iarc: {
     naam: "IARC Monographs — lijst van geclassificeerde stoffen",
     url: "https://monographs.iarc.who.int/list-of-classifications",
@@ -696,185 +704,202 @@ const PROFIELEN = {
   // De familie deelt haar gedrag, maar niet haar herkomst: PFOS komt uit
   // blusschuim en PFBS is de vervanger die daarvoor in de plaats kwam. Wie
   // overal dezelfde tekst leest, kan een meting niet plaatsen.
+  //
+  // "Waarom het uitmaakt" noemt telkens een gevolg voor mens of natuur, niet
+  // enkel het gedrag van de stof. Dat een stof mobiel is, zegt een lezer niets;
+  // dat het putwater erdoor afgeraden wordt, wel. Waar het gevolg niet vaststaat,
+  // staat dat er met zoveel woorden bij.
   pfos: {
     kort:
-      "Wereldwijd aan banden gelegd en toch nog overal aanwezig; hoopt zich op in bloed en lever en verlaat het lichaam pas na jaren.",
+      "Verzwakt de reactie op vaccinatie en hoopt zich jarenlang op in het bloed; in vervuilde zones geldt daarom het advies van hoogstens twee eigen eieren per week.",
     wat: "Perfluoroctaansulfonzuur, de PFAS waar de bezorgdheid mee begon en waarnaar het meest gemeten wordt.",
     herkomst:
       "Blusschuim op brandweeroefenterreinen en luchthavens, impregneermiddel voor textiel en tapijt, en het verchromen van metaal. In Vlaanderen is het de stof achter de vervuiling rond de 3M-site in Zwijndrecht.",
     risico:
-      "Opgenomen in bijlage B van het Verdrag van Stockholm, dat productie en gebruik wereldwijd aan banden legt. PFOS hoopt zich op in bloed en lever, en het is een van de vier stoffen waarop EFSA haar tolereerbare inname baseerde — met een verzwakte reactie op vaccinatie als doorslaggevend effect.",
-    bronnen: ["stockholm", "efsaPfas"],
+      "Opgenomen in bijlage B van het Verdrag van Stockholm, dat productie en gebruik wereldwijd aan banden legt. PFOS hoopt zich jarenlang op in bloed en lever; EFSA wees als doorslaggevend effect aan dat het afweersysteem minder goed reageert op vaccinatie. Het IARC deelde PFOS in 2023 in als mogelijk kankerverwekkend voor de mens. In vervuilde zones vertaalt dat zich in concrete adviezen: hoogstens twee eigen eieren per week, en geen putwater om te drinken of te koken.",
+    bronnen: ["stockholm", "efsaPfas", "iarcPfas", "vlaanderenPfas"],
   },
   pfoa: {
     kort:
-      "Wereldwijd verboden zonder uitzonderingen; stapelt zich op in het lichaam en werkt in op lever en afweersysteem.",
+      "Door het IARC ingedeeld als kankerverwekkend voor de mens, met nierkanker en teelbalkanker als aangetoonde gevolgen.",
     wat: "Perfluoroctaanzuur, jarenlang de hulpstof bij het maken van antiaanbaklagen.",
     herkomst:
       "Productie van fluorpolymeren zoals teflon, waterafstotende kleding, en ouder blusschuim. Niet de coating in je pan zelf, maar wat er bij het maken ervan vrijkwam.",
     risico:
-      "Opgenomen in bijlage A van het Verdrag van Stockholm, zonder uitzonderingen — strenger dus dan PFOS. Ook een van de vier stoffen achter de EFSA-norm.",
-    bronnen: ["stockholm", "efsaPfas"],
+      "Het IARC deelde PFOA in 2023 in groep 1 in: kankerverwekkend voor de mens, met nierkanker en teelbalkanker. Daarmee is het de zwaarst ingedeelde PFAS. Het staat in bijlage A van het Verdrag van Stockholm, zonder uitzonderingen, en het is een van de vier stoffen achter de EFSA-norm voor het afweersysteem.",
+    bronnen: ["iarcPfas", "stockholm", "efsaPfas"],
   },
   pfhxs: {
     kort:
-      "Wereldwijd verboden, en van de vier EFSA-stoffen degene die het langst in het lichaam blijft.",
+      "Blijft van de vier EFSA-stoffen het langst in het lichaam en draagt zo het meeste bij aan de verzwakte reactie op vaccinatie.",
     wat: "Perfluorhexaansulfonzuur, een kortere neef van PFOS met zes koolstofatomen.",
     herkomst: "Blusschuim en impregneermiddelen; kwam vaak mee als bijproduct van PFOS.",
     risico:
-      "Opgenomen in bijlage A van het Verdrag van Stockholm, zonder uitzonderingen. Van de vier stoffen waarop EFSA haar norm baseerde, is dit degene die het traagst uit het lichaam verdwijnt.",
+      "Opgenomen in bijlage A van het Verdrag van Stockholm, zonder uitzonderingen. Van de vier stoffen waarop EFSA haar norm baseerde, verdwijnt deze het traagst uit het lichaam: wie er eenmaal aan blootgesteld is, draagt het jaren mee. Het effect waarop die norm rust, is een verzwakte reactie op vaccinatie.",
     bronnen: ["stockholm", "efsaPfas"],
   },
   pfna: {
-    kort: "Een van de vier stoffen waarop de Europese tolereerbare inname is gebaseerd.",
+    kort:
+      "Telt mee in de EFSA-norm voor het afweersysteem, en klimt via vis op in de voedselketen.",
     wat: "Perfluornonaanzuur, een lange keten met negen koolstofatomen.",
     herkomst:
       "Productie van fluorpolymeren, en daarnaast het afbraakproduct van fluortelomeren uit coatings en verpakkingen.",
     risico:
-      "De vierde stof achter de EFSA-norm. Lange ketens verlaten het lichaam trager dan korte en stapelen zich sterker op in de voedselketen.",
+      "De vierde stof achter de EFSA-norm, en dus mede verantwoordelijk voor het effect waarop die rust: een verzwakte reactie op vaccinatie. Lange ketens hechten aan eiwit, klimmen op in de voedselketen en komen zo via vis en eieren bij de mens terecht.",
     bronnen: ["efsaPfas"],
   },
   pfbs: {
     kort:
-      "De vervanger van PFOS: verdwijnt sneller uit het lichaam, maar is juist mobieler in de bodem.",
+      "Zakt door tot in het grondwater en is er nauwelijks uit te zuiveren; in vervuilde zones wordt putwater als drinkwater daarom afgeraden.",
     wat: "Perfluorbutaansulfonzuur, met vier koolstofatomen de korte vervanger van PFOS.",
     herkomst:
       "Ingevoerd toen PFOS werd uitgefaseerd, onder meer in impregneermiddelen voor textiel.",
     risico:
-      "Korte ketens hopen zich minder op en verlaten het lichaam sneller. Dat maakt ze niet onschuldig: ze hechten slecht aan bodemdeeltjes, komen daardoor makkelijker in grondwater terecht en zijn met de gangbare zuivering slechter tegen te houden.",
-    bronnen: ["whoDrinkwater", "efsaPfas"],
+      "Korte ketens hopen zich minder op in het lichaam dan PFOS. Het gevolg verschuift daardoor van de mens naar zijn watervoorziening: PFBS hecht slecht aan bodemdeeltjes, zakt door tot in het grondwater en is met de gangbare zuivering nauwelijks tegen te houden. Daarom raadt Vlaanderen in vervuilde zones af om putwater te drinken of ermee te koken. Over de gezondheidseffecten van de korte ketens is veel minder bekend dan over PFOS en PFOA — dat is een kennisleemte en geen vrijspraak.",
+    bronnen: ["vlaanderenPfas", "efsaPfas"],
   },
   pfba: {
     kort:
-      "Zeer mobiel in de bodem en moeilijk uit water te zuiveren; duikt daardoor breed op in grondwater.",
+      "Een van de meest aangetroffen PFAS in grondwater, en met de gangbare zuivering nauwelijks te verwijderen.",
     wat: "Perfluorbutaanzuur, met vier koolstofatomen een van de kortste PFAS die routinematig gemeten worden.",
     herkomst:
       "Deels rechtstreeks gebruikt, maar vooral het eindproduct waarin langere PFAS en fluortelomeren uiteenvallen.",
     risico:
-      "Stapelt zich veel minder op dan PFOS of PFOA, maar spoelt juist daardoor ver mee met het water. In grondwater is het een van de meest aangetroffen PFAS.",
-    bronnen: ["whoDrinkwater"],
+      "Stapelt zich veel minder op in het lichaam dan PFOS of PFOA, maar spoelt juist daardoor ver mee met het water. Het is een van de meest aangetroffen PFAS in grondwater, en dat raakt de drinkwatervoorziening: zulke korte ketens zijn met actieve kool nauwelijks tegen te houden, waardoor vervuilde winningen moeilijk te herstellen zijn. Waar de bodem vervuild is, wordt putwater als drinkwater afgeraden.",
+    bronnen: ["vlaanderenPfas", "whoDrinkwater"],
   },
   genx: {
     kort:
-      "De vervanger van PFOA, sinds juni 2019 door Europa aangemerkt als zeer zorgwekkende stof.",
+      "Ingevoerd als het veiligere alternatief, maar erkend als zeer zorgwekkende stof: proefdieren tonen effecten op de lever en aanwijzingen voor kankerverwekkendheid.",
     wat: "HFPO-DA, beter bekend als GenX: de stof achter de techniek die PFOA verving.",
     herkomst:
       "Sinds 2012 in gebruik bij de productie van fluorpolymeercoatings, onder meer bij Chemours in Dordrecht.",
     risico:
-      "Ingevoerd als het veiligere alternatief, maar Europa nam GenX in juni 2019 op als zeer zorgwekkende stof. Proefdiergegevens wijzen op effecten op de lever en op mogelijke kankerverwekkendheid. Minder schadelijk voor de voortplanting dan PFOA, maar daarmee niet onschadelijk.",
+      "Ingevoerd als het veiligere alternatief, maar Europa nam GenX in juni 2019 op als zeer zorgwekkende stof. In proefdieren tast het de lever aan en zijn er aanwijzingen voor kankerverwekkendheid; het is minder schadelijk voor de voortplanting dan PFOA, maar daarmee niet onschadelijk. Net als PFOA breekt het niet af, dus wat in het grondwater zit, blijft er.",
     bronnen: ["rivmGenx", "echa"],
   },
   dona: {
-    kort: "Een vervanger voor PFOA; net als GenX ingevoerd als alternatief en niet als oplossing.",
+    kort:
+      "Een PFOA-vervanger waarvan de gevolgen nog niet vaststaan, terwijl ze net als PFOA niet meer uit het water verdwijnt.",
     wat: "DONA of ADONA, een etherverbinding die als alternatief voor PFOA werd ontwikkeld.",
     herkomst: "Productie van fluorpolymeren, als vervanger van PFOA.",
     risico:
-      "Over deze vervangers is veel minder bekend dan over de stoffen die ze vervingen. Ze breken evenmin af, en dat is de kern van het PFAS-probleem.",
-    bronnen: ["whoDrinkwater"],
+      "Wat deze vervanger met de gezondheid doet, is veel minder onderzocht dan bij de stof die ze verving; er is geen norm en geen vastgesteld effect. Wat wél vaststaat is de persistentie: DONA breekt niet af, dus elke hoeveelheid die in het grondwater terechtkomt, blijft daar op menselijke tijdschaal. Onbekend gevolg plus onomkeerbaarheid is precies de combinatie waar het PFAS-dossier op stukliep.",
+    bronnen: ["echa", "whoDrinkwater"],
   },
   fts: {
     kort:
-      "Zit in het blusschuim dat na het PFOS-verbod in gebruik kwam, en valt in het milieu uiteen tot PFAS die niet meer afbreken.",
+      "Valt in het milieu uiteen tot PFOA en verwanten — en díe zijn kankerverwekkend en niet meer af te breken.",
     wat: "Fluortelomeersulfonzuren, aangeduid met twee getallen zoals 6:2 of 8:2 — die staan voor het aantal gefluoreerde en gewone koolstofatomen.",
     herkomst:
       "Het blusschuim dat na het verbod op PFOS in gebruik kwam, en coatings voor textiel en papier.",
     risico:
-      "Ze werden gekozen omdat ze wél afbreken. Alleen: waar ze in uiteenvallen zijn perfluorcarbonzuren zoals PFOA en PFHxA, en díe breken niet meer af. Een vondst wijst daarom vaak op recenter gebruik van blusschuim.",
-    bronnen: ["whoDrinkwater", "efsaPfas"],
+      "Ze werden gekozen omdat ze wél afbreken. Alleen: waar ze in uiteenvallen zijn perfluorcarbonzuren zoals PFOA, dat het IARC als kankerverwekkend voor de mens indeelde, en PFHxA, dat doorzakt naar het grondwater. Een meting hier betekent dus dat er later elders een blijvende stof bij komt. Een vondst wijst meestal op recenter gebruik van blusschuim.",
+    bronnen: ["iarcPfas", "efsaPfas"],
   },
   dipap: {
-    kort: "Uit vetwerende voedselverpakking; valt in het milieu uiteen tot PFAS die blijven.",
+    kort:
+      "Komt via vetwerende voedselverpakking mee met het eten en valt daarna uiteen tot PFAS die het lichaam niet meer kwijtraakt.",
     wat: "Fluortelomeerfosfaatdiesters, een vetwerende coating.",
     herkomst:
       "Papier en karton dat vet en vocht moet tegenhouden: pizzadozen, popcornzakken, fastfoodverpakking. Ook in sommige cosmetica.",
     risico:
-      "Op zichzelf weinig onderzocht, maar het zijn voorlopers: in het milieu en in het lichaam vallen ze uiteen in perfluorcarbonzuren die niet meer afbreken.",
-    bronnen: ["whoDrinkwater"],
+      "De blootstelling loopt hier via het bord: de coating komt in het voedsel terecht. In het milieu en in het lichaam vallen deze stoffen uiteen in perfluorcarbonzuren zoals PFOA, die niet meer afbreken en die het IARC als kankerverwekkend voor de mens indeelde. Vlaanderen raadt daarom aan verse, onbewerkte producten te verkiezen boven verpakte.",
+    bronnen: ["iarcPfas", "vlaanderenPfas"],
   },
   sulfonamiden: {
-    kort: "Een voorloper die in het milieu alsnog uiteenvalt tot PFOS of PFBS.",
+    kort:
+      "Verandert in het milieu alsnog in PFOS, met de opstapeling en het effect op het afweersysteem die daarbij horen.",
     wat: "Perfluorsulfonamiden: verbindingen die geen PFOS zijn, maar er wel in veranderen.",
     herkomst:
       "Grondstof en bijproduct bij het maken van impregneermiddelen en blusschuim. Ze zaten mee in de producten die met PFOS gemaakt werden.",
     risico:
-      "Deze meting telt dubbel: wat vandaag als voorloper in het water zit, wordt op termijn PFOS of PFBS. Wie alleen naar PFOS kijkt, onderschat daardoor wat er uiteindelijk komt.",
-    bronnen: ["whoDrinkwater", "stockholm"],
+      "Deze meting telt dubbel: wat vandaag als voorloper in het water zit, wordt op termijn PFOS of PFBS. De gevolgen zijn dus die van PFOS — opstapeling in bloed en lever, en een verzwakte reactie op vaccinatie — alleen later. Wie enkel naar PFOS kijkt, onderschat daardoor wat er uiteindelijk komt.",
+    bronnen: ["efsaPfas", "stockholm"],
   },
   pfcaKort: {
-    kort: "Kort en zeer mobiel: hoopt zich weinig op, maar spoelt ver mee tot in het grondwater.",
+    kort:
+      "Zakt door tot in het grondwater en is er nauwelijks uit te zuiveren; daarom wordt putwater in vervuilde zones afgeraden.",
     wat: "Perfluorcarbonzuren met een korte keten, vijf tot zeven koolstofatomen.",
     herkomst:
       "Deels rechtstreeks gebruikt als vervanger van de lange ketens, deels het afbraakproduct van fluortelomeren uit coatings en blusschuim.",
     risico:
-      "Ze verlaten het lichaam sneller dan PFOS of PFOA en stapelen zich minder op. Daar staat tegenover dat ze slecht aan bodemdeeltjes hechten: ze spoelen ver mee, komen makkelijk in grondwater en zijn met de gangbare zuivering nauwelijks tegen te houden.",
-    bronnen: ["whoDrinkwater"],
+      "Ze verlaten het lichaam sneller dan PFOS of PFOA en stapelen zich minder op. Het gevolg verschuift daarmee naar het water: ze hechten slecht aan bodemdeeltjes, zakken door tot in het grondwater en zijn met actieve kool nauwelijks tegen te houden. Een winning die zo vervuild raakt, is niet zomaar te herstellen; waar de bodem belast is, raadt Vlaanderen putwater als drinkwater af. Over hun gezondheidseffecten is veel minder bekend dan over de lange ketens — een kennisleemte, geen vrijspraak.",
+    bronnen: ["vlaanderenPfas", "whoDrinkwater"],
   },
   pfcaLang: {
-    kort: "Lange keten: hecht aan slib en eiwit, en stapelt zich op in vis en in de mens.",
+    kort:
+      "Klimt op in de voedselketen en belandt via vis en eieren bij de mens; vandaar het advies over zelfgeteeld voedsel.",
     wat: "Perfluorcarbonzuren met een lange keten, tien koolstofatomen of meer.",
     herkomst:
       "Productie van fluorpolymeren, impregneermiddelen, en het afbraakproduct van langere fluortelomeren.",
     risico:
-      "Hoe langer de keten, hoe sterker de stof zich bindt aan eiwit en slib en hoe verder ze opklimt in de voedselketen. In het water blijven de gehalten daardoor vaak laag terwijl ze in vis en in bloed juist oplopen.",
-    bronnen: ["efsaPfas", "whoDrinkwater"],
+      "Hoe langer de keten, hoe sterker de stof zich bindt aan eiwit en slib en hoe verder ze opklimt in de voedselketen. Het gevolg zie je daarom niet in het water maar op het bord: in vis en in eieren van eigen kippen lopen de gehalten op, en in vervuilde zones geldt het advies van hoogstens twee eigen eieren per week. Hun bekendste verwant, PFOA, is door het IARC als kankerverwekkend voor de mens ingedeeld.",
+    bronnen: ["vlaanderenPfas", "iarcPfas"],
   },
   pfsaOverig: {
-    kort: "Familie van PFOS; hoe langer de keten, hoe langer ze blijven hangen in mens en milieu.",
+    kort:
+      "Zelfde familie als PFOS: de langere hopen zich op in vis en in de mens, met dezelfde effecten op het afweersysteem.",
     wat: "Perfluorsulfonzuren van andere ketenlengte dan PFOS, PFHxS en PFBS.",
     herkomst: "Bijproducten en nevenbestanddelen van blusschuim en impregneermiddelen.",
     risico:
-      "Ze horen tot dezelfde familie als PFOS en gedragen zich navenant: hoe langer de keten, hoe sterker de opstapeling. Voor de meeste bestaat geen aparte norm, maar ze tellen wel mee in de som van twintig PFAS uit de drinkwaterrichtlijn.",
-    bronnen: ["whoDrinkwater"],
+      "Ze horen tot dezelfde familie als PFOS en gedragen zich navenant: hoe langer de keten, hoe sterker de opstapeling in vis en in de mens, en hoe meer ze bijdragen aan het effect waarop de EFSA-norm rust — een verzwakte reactie op vaccinatie. Voor de meeste bestaat geen aparte norm, maar ze tellen wel mee in de som van twintig PFAS uit de drinkwaterrichtlijn.",
+    bronnen: ["efsaPfas", "whoDrinkwater"],
   },
   pfechs: {
-    kort: "Uit hydraulische vloeistof van vliegtuigen; wijst meestal naar luchtvaart of verchromen.",
+    kort:
+      "Wijst op vervuiling door luchtvaart of verchromen; over de gevolgen voor de gezondheid is nog te weinig bekend om iets te beweren.",
     wat: "Perfluor-4-ethylcyclohexaansulfonzuur, een PFAS met een ringvorm in plaats van een rechte keten.",
     herkomst: "Hydraulische vloeistoffen in de luchtvaart, en verchroombaden.",
     risico:
-      "Weinig onderzocht en zonder eigen norm. Het wordt gemeten omdat het een bruikbare vingerafdruk is: waar het opduikt, wijst het meestal naar luchtvaart of naar oppervlaktebehandeling van metaal.",
+      "Hier past terughoudendheid: er is geen norm en er zijn te weinig gegevens om een gezondheidseffect te benoemen. Wat het wél doet, is de bron aanwijzen — waar PFECHS opduikt, wijst het meestal naar luchtvaart of naar oppervlaktebehandeling van metaal, en dus naar de plek waar ook de beter onderzochte PFAS vandaan komen.",
     bronnen: ["whoDrinkwater"],
   },
   clPfesa: {
-    kort: "Vervanger van PFOS bij het verchromen; even persistent als wat het verving.",
+    kort:
+      "Even persistent als PFOS en met dezelfde opstapeling in het lichaam; de vervanger verplaatste het probleem in plaats van het op te lossen.",
     wat: "Chloorpolyfluorether-sulfonzuren, samen bekend als F-53B.",
     herkomst:
       "Bij het verchromen van metaal gebruikt als vervanger van PFOS, vooral buiten Europa.",
     risico:
-      "Even persistent als PFOS en met een vergelijkbare opstapeling in het lichaam. Een van de duidelijkste voorbeelden van een vervanger die het probleem verplaatst in plaats van oplost.",
-    bronnen: ["whoDrinkwater", "stockholm"],
+      "Even persistent als PFOS, en met een vergelijkbare opstapeling in bloed en lever. Daarmee horen er dezelfde zorgen bij als bij de stof die het verving, terwijl de regels van het Verdrag van Stockholm er niet op slaan. Een van de duidelijkste voorbeelden van een vervanger die het probleem verplaatst in plaats van oplost.",
+    bronnen: ["stockholm", "whoDrinkwater"],
   },
   tfa: {
     kort:
-      "De kortste en meest mobiele PFAS; met de gangbare zuivering nauwelijks uit water te halen.",
+      "Regent overal uit en is met geen enkele gangbare zuivering uit drinkwater te halen; de gehalten stijgen daardoor gestaag.",
     wat: "Trifluorazijnzuur, met twee koolstofatomen de kortste PFAS die gemeten wordt.",
     herkomst:
       "Grotendeels een afbraakproduct: koelmiddelen en drijfgassen vallen in de atmosfeer uiteen tot TFA, en ook een aantal gefluoreerde bestrijdingsmiddelen en geneesmiddelen eindigen zo. Het regent vervolgens uit.",
     risico:
-      "Hoopt zich niet op in het lichaam en is veel minder giftig dan PFOS. Het probleem is de mobiliteit: TFA lost volledig op, hecht nergens aan en is met actieve kool of omgekeerde osmose nauwelijks tegen te houden. Het is daardoor de PFAS die het breedst in grond- en oppervlaktewater voorkomt.",
-    bronnen: ["whoDrinkwater"],
+      "TFA hoopt zich niet op in het lichaam en is veel minder giftig dan PFOS; een acuut gezondheidsrisico is er bij deze gehalten niet. Het gevolg zit in de onomkeerbaarheid: het lost volledig op, hecht nergens aan en is met actieve kool of omgekeerde osmose niet tegen te houden. Wat in het grondwater komt, gaat er niet meer uit, en omdat de bronnen nog in gebruik zijn, lopen de gehalten in drink- en oppervlaktewater gestaag op.",
+    bronnen: ["whoDrinkwater", "echa"],
   },
   somEfsa4: {
-    kort: "De som waarop de Europese tolereerbare inname van 4,4 ng per kilo per week slaat.",
+    kort:
+      "De som waarop de Europese tolereerbare inname slaat: 4,4 ng per kilo per week, gebaseerd op een verzwakte reactie op vaccinatie.",
     wat: "De som van vier PFAS: PFOA, PFNA, PFHxS en PFOS.",
     herkomst: "Een rekensom van het labo, geen stof op zich.",
     risico:
-      "EFSA stelde in 2020 vast dat deze vier samen beoordeeld moeten worden en kwam op een tolereerbare inname van 4,4 nanogram per kilo lichaamsgewicht per week. Doorslaggevend was niet kanker of cholesterol, maar dat het afweersysteem minder goed op vaccinatie reageert.",
+      "EFSA stelde in 2020 vast dat deze vier samen beoordeeld moeten worden en kwam op een tolereerbare inname van 4,4 nanogram per kilo lichaamsgewicht per week. Doorslaggevend was niet kanker of cholesterol, maar dat het afweersysteem van kinderen minder goed reageert op vaccinatie. Voor een volwassene van 70 kilo komt die norm neer op ongeveer 300 nanogram per week — uit álle voeding samen.",
     bronnen: ["efsaPfas"],
   },
   somPfas43: {
-    kort: "De optelsom van alle PFAS die op dit punt afzonderlijk gemeten zijn.",
+    kort:
+      "De optelsom van alle afzonderlijk gemeten PFAS; bruikbaar om punten te vergelijken, maar er hangt geen norm aan.",
     wat: "De som van de 43 PFAS die de VMM in oppervlaktewater afzonderlijk bepaalt.",
     herkomst: "Een rekensom van het labo, geen stof op zich.",
     risico:
-      "Handig om punten te vergelijken, maar de som zegt niets over welke stoffen erin zitten — en dat verschilt sterk. Er hangt geen norm aan: de milieukwaliteitsnorm voor oppervlaktewater geldt voor PFOS afzonderlijk.",
+      "Handig om meetpunten te vergelijken, maar de som zegt niets over wélke stoffen erin zitten — en dat maakt uit, want PFOA en TFA hebben heel verschillende gevolgen. Er hangt geen norm aan: de milieukwaliteitsnorm voor oppervlaktewater geldt voor PFOS afzonderlijk.",
     bronnen: ["vmmWater"],
   },
   somDwrl20: {
-    kort: "De som van twintig PFAS waarop de Europese drinkwaternorm van 100 ng/L slaat.",
+    kort:
+      "De som waarop de Europese drinkwaternorm van 100 ng/L slaat; erboven is het water niet geschikt om te drinken.",
     wat: "De som van de twintig PFAS die de Europese drinkwaterrichtlijn samen beoordeelt.",
     herkomst: "Een rekensom van het labo, geen stof op zich.",
     risico:
-      "De richtlijn zet geen norm per stof maar op deze som: 0,1 µg/L, oftewel 100 nanogram per liter. Zo wordt vermeden dat twintig stoffen die elk net onder een drempel blijven, samen alsnog een probleem vormen.",
+      "De richtlijn zet geen norm per stof maar op deze som: 0,1 µg/L, oftewel 100 nanogram per liter. Zo wordt vermeden dat twintig stoffen die elk net onder een drempel blijven, samen alsnog een probleem vormen. Boven die waarde is water niet geschikt om als drinkwater geleverd te worden; bij grondwater betekent een overschrijding dat de winning eerst gezuiverd moet worden.",
     bronnen: ["whoDrinkwater"],
   },
 
@@ -885,8 +910,8 @@ const PROFIELEN = {
     herkomst:
       "Antiaanbaklagen, waterafstotende kleding, verpakkingen, en vooral blusschuim — dat laatste is de oorzaak van de bekendste vervuilingen in Vlaanderen.",
     risico:
-      "EFSA stelde in 2020 een gezamenlijke tolereerbare inname vast van 4,4 nanogram per kilogram lichaamsgewicht per week voor vier PFAS samen. Doorslaggevend daarbij was niet kanker of cholesterol, maar dat het afweersysteem minder goed reageert op vaccinatie. PFAS stapelen zich op in het lichaam en verlaten het maar traag.",
-    bronnen: ["efsaPfas", "whoDrinkwater"],
+      "EFSA stelde in 2020 een gezamenlijke tolereerbare inname vast van 4,4 nanogram per kilogram lichaamsgewicht per week voor vier PFAS samen. Doorslaggevend daarbij was niet kanker of cholesterol, maar dat het afweersysteem minder goed reageert op vaccinatie. Van de best onderzochte stof, PFOA, stelde het IARC in 2023 vast dat ze kankerverwekkend is voor de mens. PFAS stapelen zich op in het lichaam en verlaten het maar traag; in vervuilde zones vertaalt dat zich in adviezen over zelfgeteeld voedsel en putwater.",
+    bronnen: ["efsaPfas", "iarcPfas", "vlaanderenPfas"],
   },
   pesticiden: {
     kort:
