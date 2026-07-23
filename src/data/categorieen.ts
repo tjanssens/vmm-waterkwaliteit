@@ -1,6 +1,7 @@
 import type { ParameterSamenvatting } from "./types.js";
 import { isTotaalgehalte } from "./normen.js";
 import { stofprofiel } from "./stoffen.js";
+import { lijktOpPfas } from "./pfas.js";
 
 export interface Categorie {
   id: string;
@@ -159,18 +160,6 @@ const VAST: Readonly<Record<string, CategorieId>> = {
 };
 
 /**
- * PFAS zijn te talrijk om op te sommen, DOV alleen al rapporteert er 62, maar
- * ze delen een vorm in hun code en een woordstam in hun naam.
- */
-const PFAS_SYMBOOL =
-  /^(PF[A-Z]|\d+:\d+[\s/]|[A-Za-z]*PFOS|[A-Za-z]*PFOA|HFPO|DONA|\d*Cl-PF|\d+H-PF|P\d+DMOA|Me?PF|Et?PF)/;
-/**
- * "Fluoride" mag hier niet in trappen, vandaar de stam en niet enkel "fluor":
- * per-, poly- en fluortelomeerverbindingen zijn PFAS, fluoride is dat niet.
- */
-const PFAS_NAAM = /(perfluor|polyfluor|fluortelomeer|fluoroctaan|fluorbutaan)/i;
-
-/**
  * Indeling zoals de bron die zelf geeft. Betrouwbaarder dan namen opsommen:
  * DOV kent 998 parameters, waaronder honderden pesticiden die we nooit
  * allemaal in een lijst krijgen.
@@ -201,7 +190,7 @@ export function categorieVan(parameter: ParameterSamenvatting): CategorieId {
   // hoort bij de nutriënten en niet bij "algemeen fysisch-chemisch".
   const vast = VAST[parameter.symbool];
   if (vast) return vast;
-  if (PFAS_SYMBOOL.test(parameter.symbool) || PFAS_NAAM.test(parameter.omschrijving)) return "pfas";
+  if (lijktOpPfas(parameter.symbool, parameter.omschrijving)) return "pfas";
 
   const uitGroep = parameter.groep ? GROEPEN[parameter.groep] : undefined;
   if (uitGroep) return uitGroep;
@@ -218,10 +207,19 @@ export function categorieVan(parameter: ParameterSamenvatting): CategorieId {
 
 /** Deelt de parameters in, en laat lege categorieën weg. */
 export function deelIn(parameters: ParameterSamenvatting[]): IngedeeldeCategorie[] {
-  return CATEGORIEEN.map((categorie) => ({
+  // In een doorloop indelen, niet een keer per categorie: dat scheelde bij 150
+  // parameters 2.100 aanroepen van categorieVan. Sorteren doen we hier niet;
+  // de aanroeper sorteert toch opnieuw, eerst op oordeel en dan pas op naam.
+  const perCategorie = new Map<CategorieId, ParameterSamenvatting[]>();
+  for (const parameter of parameters) {
+    const id = categorieVan(parameter);
+    const lijst = perCategorie.get(id);
+    if (lijst) lijst.push(parameter);
+    else perCategorie.set(id, [parameter]);
+  }
+
+  return CATEGORIEEN.filter((categorie) => perCategorie.has(categorie.id)).map((categorie) => ({
     ...categorie,
-    parameters: parameters
-      .filter((p) => categorieVan(p) === categorie.id)
-      .sort((a, b) => a.omschrijving.localeCompare(b.omschrijving, "nl")),
-  })).filter((categorie) => categorie.parameters.length > 0);
+    parameters: perCategorie.get(categorie.id)!,
+  }));
 }

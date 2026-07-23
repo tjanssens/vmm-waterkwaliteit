@@ -1,6 +1,7 @@
 import type { ParameterSamenvatting } from "./types.js";
 import type { LaagId } from "../lagen/types.js";
 import type { CategorieId } from "./categorieen.js";
+import { lijktOpPfas, pfasStam } from "./pfas.js";
 
 /**
  * Duiding bij de stoffen: wat is dit, waar komt het vandaan, wat doet het.
@@ -1745,10 +1746,9 @@ const METAALSTAM: Readonly<Record<string, ProfielId>> = {
  * uitleg tonen, een fout die niemand opmerkt, want er staat gewoon een
  * verhaal over temperatuur.
  */
-const PER_LAAG: Readonly<Record<LaagId, Readonly<Record<string, ProfielId>>>> = {
+const PER_LAAG: Readonly<Partial<Record<LaagId, Readonly<Record<string, ProfielId>>>>> = {
   lucht: { T: "temperatuurLucht" },
   oppervlaktewater: { T: "temperatuurWater" },
-  grondwater: {},
 };
 
 /** Duiding die voor een hele parametergroep van DOV opgaat. */
@@ -1799,40 +1799,6 @@ const PESTICIDE_PATRONEN: readonly (readonly [RegExp, ProfielId])[] = [
 ];
 
 /**
- * PFAS zijn met duizenden en krijgen geen tekst per stof. Dezelfde vorm als in
- * `categorieen.ts`: de code verraadt de familie.
- */
-const PFAS_SYMBOOL =
-  /^(PF[A-Z]|\d+:\d+[\s/]|[A-Za-z]*PFOS|[A-Za-z]*PFOA|HFPO|DONA|\d*Cl-PF|\d+H-PF|P\d+DMOA|Me?PF|Et?PF)/;
-const PFAS_NAAM = /(perfluor|polyfluor|fluortelomeer|fluoroctaan|fluorbutaan)/i;
-
-/**
- * De duiding bij een parameter, of niets wanneer we ze niet kennen.
- *
- * Niets teruggeven is hier het juiste antwoord. Een vage tekst die op elke stof
- * zou passen, wekt de indruk dat er iets uitgelegd is terwijl de lezer niets
- * wijzer wordt, en bij gezondheidsinformatie is dat erger dan zwijgen.
- */
-/**
- * Haalt de variantaanduiding van een PFAS-symbool af.
- *
- * Dezelfde stof komt in vier gedaanten binnen. De VMM schrijft "PFOS totaal"
- * en "PFOS vertakt"; DOV plakt het aan elkaar tot "PFOStotal" en
- * "PFOSbranched", met in twee gevallen een tikfout ("PFHxSbranchedl"). Het
- * gaat telkens om perfluoroctaansulfonzuur, dus om dezelfde uitleg.
- *
- * Zonder dit zou alleen de kale vorm zijn eigen tekst krijgen en zouden de
- * varianten terugvallen op het familieverhaal, zonder dat iemand ziet dat er
- * een preciezere tekst bestond.
- */
-export function pfasStam(symbool: string): string {
-  return symbool
-    .replace(/\s+(totaal|vertakt|lineair)$/i, "")
-    .replace(/(total|branchedl?|linear)$/, "")
-    .trim();
-}
-
-/**
  * De ene zin die bij een overschrijding in de tabel komt: wat er misgaat, niet
  * wat de stof is. Wie hier leest, weet al dát de norm overschreden is.
  *
@@ -1847,44 +1813,44 @@ export function korteRisicozin(profiel: Stofprofiel): string | undefined {
   return eerste ?? profiel.risico;
 }
 
+/**
+ * De duiding bij een parameter, of niets wanneer we ze niet kennen.
+ *
+ * Niets teruggeven is hier het juiste antwoord. Een vage tekst die op elke stof
+ * zou passen, wekt de indruk dat er iets uitgelegd is terwijl de lezer niets
+ * wijzer wordt, en bij gezondheidsinformatie is dat erger dan zwijgen.
+ */
 export function stofprofiel(
   parameter: Pick<ParameterSamenvatting, "symbool" | "omschrijving"> & { groep?: string },
   laag?: LaagId,
 ): Stofprofiel | undefined {
-  const perLaag = laag ? PER_LAAG[laag][parameter.symbool] : undefined;
+  const perLaag = laag ? PER_LAAG[laag]?.[parameter.symbool] : undefined;
   if (perLaag) return PROFIELEN[perLaag];
 
-  const direct = SLEUTELS[parameter.symbool];
-  if (direct) return PROFIELEN[direct];
-
-  // DOV schrijft "Atrazine (Atraz)": naam plus eigen code. Wie een stof onder
-  // haar gewone naam opneemt, moet niet eerst die code achterhalen, anders
-  // valt de tekst stil terug op de groep en merkt niemand dat de eigen,
-  // preciezere uitleg nooit verschijnt.
-  const zonderCode = parameter.symbool.replace(/\s*\([^()]*\)\s*$/, "");
-  const opNaam = zonderCode === parameter.symbool ? undefined : SLEUTELS[zonderCode];
-  if (opNaam) return PROFIELEN[opNaam];
-
-  // "PFOS totaal" en "PFOSbranched" zijn allebei PFOS.
-  const pfasVorm = pfasStam(parameter.symbool);
-  const opPfasVorm = pfasVorm === parameter.symbool ? undefined : SLEUTELS[pfasVorm];
-  if (opPfasVorm) return PROFIELEN[opPfasVorm];
-
-  // Laatste redmiddel: de code tussen de haakjes achteraan. DOV's namen zijn
-  // niet altijd netjes, "…(DONA)) (DONA)" heeft een haakje te veel en
-  // "(EtPFOSAbranchedl) (EtPFOSAbranched)" een letter: waardoor het symbool
-  // de hele naam blijft. De code zelf klopt dan nog wel.
+  // Elke bron schrijft dezelfde stof anders op. In plaats van per schrijfwijze
+  // een aparte tak: leid de kandidaten af en zoek ze in volgorde op.
+  //   - "Atrazine (Atraz)"  DOV zet zijn eigen code achter de naam
+  //   - "PFOS totaal"       de VMM zet de fractie erachter
+  //   - "…(DONA)) (DONA)"   DOV schrijft soms slordig, dan blijft de hele naam
+  //                         het symbool en klopt alleen de code nog
   const code = parameter.symbool.match(/\(([^()]+)\)\s*$/)?.[1]?.trim();
-  const opCode = code ? (SLEUTELS[code] ?? SLEUTELS[pfasStam(code)]) : undefined;
-  if (opCode) return PROFIELEN[opCode];
+  const kandidaten = [
+    parameter.symbool,
+    parameter.symbool.replace(/\s*\([^()]*\)\s*$/, ""),
+    pfasStam(parameter.symbool),
+    code,
+    code && pfasStam(code),
+  ];
+  for (const kandidaat of kandidaten) {
+    const id = kandidaat ? SLEUTELS[kandidaat] : undefined;
+    if (id) return PROFIELEN[id];
+  }
 
   const metaalstam = parameter.symbool.match(/^(.+?) [to]$/)?.[1];
   const metaal = metaalstam ? METAALSTAM[metaalstam] : undefined;
   if (metaal) return PROFIELEN[metaal];
 
-  if (PFAS_SYMBOOL.test(parameter.symbool) || PFAS_NAAM.test(parameter.omschrijving)) {
-    return PROFIELEN.pfas;
-  }
+  if (lijktOpPfas(parameter.symbool, parameter.omschrijving)) return PROFIELEN.pfas;
 
   for (const [patroon, id] of PESTICIDE_PATRONEN) {
     if (patroon.test(parameter.symbool) || patroon.test(parameter.omschrijving)) {

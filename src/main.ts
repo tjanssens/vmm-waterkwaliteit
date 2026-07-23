@@ -9,7 +9,7 @@ import { vormSvg } from "./lagen/merk.js";
 import { escape } from "./ui/format.js";
 import { Paneel } from "./ui/paneel.js";
 import { LAGEN, laagprofiel } from "./lagen/index.js";
-import type { LaagId, Meetpunt, Vak } from "./lagen/types.js";
+import type { Laagprofiel, LaagId, Meetpunt, Vak } from "./lagen/types.js";
 import { zoek, afstand, formatteerAfstand, type LatLon } from "./geo/meetplaatsen.js";
 
 const element = <T extends HTMLElement>(id: string): T => {
@@ -99,7 +99,7 @@ async function start(): Promise<void> {
     return;
   }
 
-  pasFiltersToe();
+  tekenAlleLagen();
 
   // ---- opbouw van de linkerkolom ----
 
@@ -127,7 +127,7 @@ async function start(): Promise<void> {
         kaart.toonLaag(id, aan);
         // De filterknoppen van een uitgeschakelde laag horen te verdwijnen.
         bouwPuntfilters();
-        pasFiltersToe();
+        tekenAlleLagen();
         // Een laag die per venster laadt, heeft nog geen punten als hij aangaat.
         if (aan && LAGEN.find((l) => l.id === id)?.perVenster) {
           const nu = kaart.huidigVenster();
@@ -170,21 +170,28 @@ async function start(): Promise<void> {
         if (actieveFilters.has(sleutel)) actieveFilters.delete(sleutel);
         else actieveFilters.add(sleutel);
         knop.setAttribute("aria-pressed", String(actieveFilters.has(sleutel)));
-        pasFiltersToe();
+        // Alleen de laag waarvan een filter wijzigde. Alles hertekenen zou bij
+        // een klik op een diepteknop 7.534 oppervlaktewatermarkers opnieuw
+        // opbouwen die niet veranderd zijn.
+        const profiel = LAGEN.find((l) => l.id === sleutel.split("/")[0]);
+        if (profiel) tekenLaag(profiel);
+        toonLijst();
       });
     });
   }
 
-  function pasFiltersToe(): void {
-    for (const profiel of LAGEN) tekenLaag(profiel.id, false);
+  /** Alle lagen opnieuw: bij het opstarten en als een laag aan- of uitgaat. */
+  function tekenAlleLagen(): void {
+    for (const profiel of LAGEN) tekenLaag(profiel);
     toonLijst();
   }
 
-  /** Past de puntfilters van één laag toe en tekent die opnieuw. */
-  function tekenLaag(laagId: LaagId, ookLijst = true): void {
-    const profiel = LAGEN.find((l) => l.id === laagId);
-    if (!profiel) return;
-
+  /**
+   * Past de puntfilters van een laag toe en tekent die opnieuw. De lijst
+   * eronder wordt hier niet ververst; dat doet de aanroeper, die weet of er
+   * meer dan een laag veranderde.
+   */
+  function tekenLaag(profiel: Laagprofiel): void {
     const alle = geladen.get(profiel.id) ?? [];
     const aan = (profiel.puntfilters ?? []).filter((f) =>
       actieveFilters.has(`${profiel.id}/${f.id}`),
@@ -197,7 +204,6 @@ async function start(): Promise<void> {
 
     const telling = laagbalk.querySelector(`[data-telling="${profiel.id}"]`);
     if (telling) telling.textContent = String(na.length);
-    if (ookLijst) toonLijst();
   }
 
   // ---- lagen die per kaartvenster laden ----
@@ -227,7 +233,8 @@ async function start(): Promise<void> {
         // Te ver uitgezoomd: liever niets tonen dan duizenden punten halen.
         lopendPerLaag.get(profiel.id)?.abort();
         geladen.set(profiel.id, []);
-        tekenLaag(profiel.id);
+        tekenLaag(profiel);
+        toonLijst();
         statusregel.textContent = `Zoom verder in om ${profiel.naam.toLowerCase()} te zien.`;
         continue;
       }
@@ -240,7 +247,8 @@ async function start(): Promise<void> {
         const punten = await profiel.laadPunten(venster, beheerser.signal);
         if (beheerser.signal.aborted) return;
         geladen.set(profiel.id, punten);
-        tekenLaag(profiel.id);
+        tekenLaag(profiel);
+        toonLijst();
       } catch (reden) {
         if (beheerser.signal.aborted) return;
         statusregel.textContent =

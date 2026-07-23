@@ -1,4 +1,5 @@
 import { parseAnalyseresultaten } from "./csv.js";
+import { DatabankFout, isAfgebroken } from "./fouten.js";
 import { rapportUrl } from "../../shared/cognos.js";
 import type { Meting } from "./types.js";
 
@@ -20,15 +21,9 @@ function proxyOntbreekt(): boolean {
   return PROXY === DEV_PAD && !["localhost", "127.0.0.1"].includes(location.hostname);
 }
 
-export class DatabankFout extends Error {
-  constructor(
-    boodschap: string,
-    readonly herstelbaar: boolean,
-  ) {
-    super(boodschap);
-    this.name = "DatabankFout";
-  }
-}
+// Blijft hier geëxporteerd zodat bestaande imports blijven werken; de
+// definitie staat in fouten.ts, naast de andere bronnen.
+export { DatabankFout } from "./fouten.js";
 
 /**
  * Waar de getoonde cijfers vandaan komen: het VMM-rapport voor dit meetpunt,
@@ -72,11 +67,13 @@ export async function haalResultaten(
   url.searchParams.set("matrix", matrix);
   url.searchParams.set("jaren", jaren.join(","));
 
+  // Niet via haalOp: deze proxy stuurt bij een fout een eigen boodschap mee in
+  // een JSON-body, en die is bruikbaarder dan de statuscode.
   let antwoord: Response;
   try {
     antwoord = await fetch(url, { signal: signaal });
   } catch (reden) {
-    if (reden instanceof DOMException && reden.name === "AbortError") throw reden;
+    if (isAfgebroken(reden)) throw reden;
     throw new DatabankFout(
       "Geen verbinding met de databank. Controleer je internetverbinding.",
       true,
@@ -84,8 +81,7 @@ export async function haalResultaten(
   }
 
   if (!antwoord.ok) {
-    const boodschap = await leesFout(antwoord);
-    throw new DatabankFout(boodschap, antwoord.status >= 500);
+    throw new DatabankFout(await leesFout(antwoord), antwoord.status >= 500);
   }
 
   return parseAnalyseresultaten(await antwoord.text());

@@ -102,12 +102,6 @@ export function bepaalMaxGat(metingen: readonly Meting[]): number {
   return Math.min(Math.max(midden * 20, uur), MAX_GAT_DAGEN * 86_400_000);
 }
 
-/** Aantal dagen tussen twee ISO-datums. */
-export function dagenTussen(vroeger: string, later: string): number {
-  const ms = Date.parse(later) - Date.parse(vroeger);
-  return ms / 86_400_000;
-}
-
 /**
  * Splitst de reeks in aaneengesloten stukken. Elk stuk wordt één lijn; tussen
  * de stukken blijft de grafiek leeg.

@@ -1,5 +1,5 @@
 import type { Meting } from "./types.js";
-import { DatabankFout } from "./client.js";
+import { haalOp } from "./fouten.js";
 
 /**
  * IRCELINE, het Belgische Interregionale Milieuagentschap, publiceert de
@@ -94,12 +94,7 @@ export async function haalLuchtmetingen(
   tot: Date,
   signaal?: AbortSignal,
 ): Promise<Meting[]> {
-  const reeksen = await haalJson<RuweReeks[]>(
-    // Zonder expanded=true komen de stofnaam en de eenheid niet mee, en
-    // heten de parameters naar hun interne reeksnummer.
-    `${BASIS}/timeseries?station=${encodeURIComponent(station.stationId)}&expanded=true&format=json`,
-    signaal,
-  );
+  const reeksen = await haalReeksen(station, signaal);
   if (reeksen.length === 0) return [];
 
   const perId = new Map(reeksen.map((r) => [String(r.id), r]));
@@ -144,38 +139,43 @@ export async function haalLuchtmetingen(
   return metingen;
 }
 
-/** De URL die exact deze cijfers teruggeeft; dat is de bronvermelding bij lucht. */
+/**
+ * De URL die exact deze cijfers teruggeeft; dat is de bronvermelding bij lucht.
+ *
+ * Zonder expanded=true komen de stofnaam en de eenheid niet mee en heten de
+ * parameters naar hun interne reeksnummer. Die val staat hier op een plek.
+ */
 export function luchtBronUrl(station: Luchtstation): string {
   return `${BASIS}/timeseries?station=${encodeURIComponent(station.stationId)}&expanded=true&format=json`;
 }
 
-async function haalJson<T>(url: string, signaal?: AbortSignal, body?: unknown): Promise<T> {
-  let antwoord: Response;
-  try {
-    antwoord = await fetch(url, {
-      signal: signaal,
-      ...(body === undefined
-        ? {}
-        : {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
-          }),
-    });
-  } catch (reden) {
-    if (reden instanceof DOMException && reden.name === "AbortError") throw reden;
-    throw new DatabankFout(
-      "Geen verbinding met het luchtmeetnet van IRCELINE. Controleer je internetverbinding.",
-      true,
-    );
-  }
+/**
+ * Welke reeksen dit station meet. Onthouden per station: die lijst hangt niet
+ * van het tijdvenster af, terwijl de bezoeker wel van 48 uur naar 7 dagen naar
+ * een jaar klikt. Zonder dit ging dezelfde aanroep bij elke klik opnieuw uit.
+ */
+const REEKSEN = new Map<string, RuweReeks[]>();
 
-  if (!antwoord.ok) {
-    throw new DatabankFout(
-      `Het luchtmeetnet gaf een onverwachte status (${antwoord.status}).`,
-      antwoord.status >= 500,
-    );
-  }
+async function haalReeksen(station: Luchtstation, signaal?: AbortSignal): Promise<RuweReeks[]> {
+  const onthouden = REEKSEN.get(station.stationId);
+  if (onthouden) return onthouden;
+
+  const reeksen = await haalJson<RuweReeks[]>(luchtBronUrl(station), signaal);
+  REEKSEN.set(station.stationId, reeksen);
+  return reeksen;
+}
+
+async function haalJson<T>(url: string, signaal?: AbortSignal, body?: unknown): Promise<T> {
+  const antwoord = await haalOp(url, "het luchtmeetnet van IRCELINE", {
+    signal: signaal,
+    ...(body === undefined
+      ? {}
+      : {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        }),
+  });
 
   return (await antwoord.json()) as T;
 }

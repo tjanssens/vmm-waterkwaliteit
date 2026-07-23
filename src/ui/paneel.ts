@@ -486,7 +486,11 @@ export class Paneel {
       return `<p class="paneel__leeg">${reden}</p>`;
     }
 
-    const vorige = this.vorigePeriode(toestand, alles);
+    // Als Map: rijHtml zocht per parameter lineair in deze lijst, wat bij 150
+    // parameters op 22.500 vergelijkingen per hertekening uitkwam.
+    const vorige = new Map(
+      this.vorigePeriode(toestand, alles).map((p) => [p.symbool, p] as const),
+    );
 
     return deelIn(zichtbaar)
       .map((categorie) => {
@@ -550,11 +554,11 @@ export class Paneel {
   private rijHtml(
     parameter: ParameterSamenvatting,
     oordeel: Oordeel,
-    vorige: ParameterSamenvatting[],
+    vorige: ReadonlyMap<string, ParameterSamenvatting>,
     set: Normenset,
     laag: LaagId,
   ): string {
-    const toen = vorige.find((p) => p.symbool === parameter.symbool);
+    const toen = vorige.get(parameter.symbool);
     const verloop = toen ? this.verloopHtml(parameter, toen, oordeel) : "";
     const norm = normVoor(parameter, set);
     const normregel = norm

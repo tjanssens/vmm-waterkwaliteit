@@ -52,7 +52,7 @@ export type Normenset = "oppervlaktewater" | "drinkwater" | "lucht-eu" | "lucht-
  * Bij water is dat altijd het meetjaar en staat het er niet bij; bij lucht is
  * het wezenlijk: een jaargrenswaarde zegt niets over een week metingen.
  */
-export type Middeling = "uur" | "8-uur" | "dag" | "jaar";
+export type Middeling = "8-uur" | "dag" | "jaar";
 
 /**
  * Hoeveel dagen het getoonde venster beslaat. Nodig om te bepalen of een
@@ -109,8 +109,6 @@ export interface Norm {
    * het type, dat wij niet kennen.
    */
   strengsteBovengrens?: number;
-  /** Idem voor een ondergrens die per type verschilt. */
-  soepelsteOndergrens?: number;
   /** Eenheid waarin de norm geldt, exact zoals de databank hem schrijft. */
   eenheid: string;
   /** Weergave in de normkolom. */
@@ -894,22 +892,19 @@ const GRONDWATER_VLAREM: Readonly<Record<string, Norm>> = {
  * Niet-relevante metabolieten vallen er bewust buiten: die tellen ook in de
  * drinkwaterwetgeving niet mee onder de pesticidennorm.
  */
+/** Eén norm voor honderden stoffen: dat is precies de bedoeling ervan. */
+const PESTICIDENORM: Norm = {
+  bovengrens: 0.1,
+  eenheid: "µg/L",
+  label: "≤ 0,1 µg/L per stof",
+  toets: "richtwaarde per afzonderlijke stof; voor alle pesticiden samen geldt 0,5 µg/L",
+  bron: "vlaremGrondwater",
+};
+
 const GROEPSNORMEN: Readonly<Partial<Record<Normenset, Readonly<Record<string, Norm>>>>> = {
   "grondwater-vlarem": {
-    "Pesticiden: actieve stoffen": {
-      bovengrens: 0.1,
-      eenheid: "µg/L",
-      label: "≤ 0,1 µg/L per stof",
-      toets: "richtwaarde per afzonderlijke stof; voor alle pesticiden samen geldt 0,5 µg/L",
-      bron: "vlaremGrondwater",
-    },
-    "Pesticiden: relevante metabolieten": {
-      bovengrens: 0.1,
-      eenheid: "µg/L",
-      label: "≤ 0,1 µg/L per stof",
-      toets: "richtwaarde per afzonderlijke stof; voor alle pesticiden samen geldt 0,5 µg/L",
-      bron: "vlaremGrondwater",
-    },
+    "Pesticiden: actieve stoffen": PESTICIDENORM,
+    "Pesticiden: relevante metabolieten": PESTICIDENORM,
   },
 };
 

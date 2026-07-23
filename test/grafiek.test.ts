@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import {
   bepaalMaxGat,
   bouwPad,
-  dagenTussen,
   kiesTicks,
   maakSchaal,
   opDatum,
@@ -89,12 +88,6 @@ describe("kiesTicks", () => {
 
   it("geeft één tick terug voor een leeg bereik", () => {
     expect(kiesTicks(5, 5)).toEqual([5]);
-  });
-});
-
-describe("dagenTussen", () => {
-  it("telt de dagen tussen twee datums", () => {
-    expect(dagenTussen("2024-01-01", "2024-01-31")).toBe(30);
   });
 });
 

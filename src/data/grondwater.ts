@@ -1,4 +1,4 @@
-import { DatabankFout } from "./client.js";
+import { DatabankFout, haalOp } from "./fouten.js";
 import type { Meting } from "./types.js";
 import type { Vak } from "../lagen/types.js";
 
@@ -236,11 +236,6 @@ export function splitsParameternaam(naam: string): { omschrijving: string; symbo
   return ongewijzigd;
 }
 
-/** De pagina bij DOV waar deze cijfers te raadplegen zijn. */
-export function grondwaterBron(punt: Grondwaterpunt): { fiche: string; rapport: string | null } {
-  return { fiche: punt.filterfiche, rapport: punt.analyserapport };
-}
-
 // ---- gereedschap ----
 
 /** Enkele aanhalingstekens zouden de CQL-expressie kunnen openbreken. */
@@ -286,23 +281,7 @@ async function haal<T>(
   url.searchParams.set("typeNames", laag);
   for (const [sleutel, waarde] of Object.entries(extra)) url.searchParams.set(sleutel, waarde);
 
-  let antwoord: Response;
-  try {
-    antwoord = await fetch(url, { signal: signaal });
-  } catch (reden) {
-    if (reden instanceof DOMException && reden.name === "AbortError") throw reden;
-    throw new DatabankFout(
-      "Geen verbinding met Databank Ondergrond Vlaanderen. Controleer je internetverbinding.",
-      true,
-    );
-  }
-
-  if (!antwoord.ok) {
-    throw new DatabankFout(
-      `Databank Ondergrond Vlaanderen gaf een onverwachte status (${antwoord.status}).`,
-      antwoord.status >= 500,
-    );
-  }
+  const antwoord = await haalOp(url, "Databank Ondergrond Vlaanderen", { signal: signaal });
 
   // Bij een fout antwoordt GeoServer met XML, ook als je JSON vraagt.
   const tekstinhoud = await antwoord.text();

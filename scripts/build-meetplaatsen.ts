@@ -11,6 +11,11 @@
 import { writeFileSync, mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
+// Uit de app geïmporteerd en niet overgetypt: de volgorde ís het
+// bestandsformaat. Het script schrijft bitvlaggen (net |= 1 << i) die de app
+// terugleest; herschikt iemand een van beide lijsten, dan wordt "Waterbodem"
+// stilzwijgend "Macrofyten" en faalt er geen enkele test.
+import { MEETNETTEN } from "../src/geo/meetplaatsen.js";
 
 const WFS = "https://geo.api.vlaanderen.be/MeetplOppervlwaterkwal/wfs";
 const GEMEENTEN_WFS = "https://geo.api.vlaanderen.be/VRBG/wfs";
@@ -53,18 +58,6 @@ interface Meetplaats {
   /** 1 als hier PFAS gemeten is. Ontbreekt bij de overige 7.255 punten. */
   pfas?: 1;
 }
-
-const MEETNETTEN = [
-  "FYSICOCHEM",
-  "BACTERIO",
-  "ZUURSTOF",
-  "WATBODEM",
-  "MACROINV",
-  "MACROFYT",
-  "FYTOBENT",
-  "FYTOPLANKT",
-  "MAP_MEETNT",
-] as const;
 
 async function haal<T>(basis: string, laag: string, extra: Record<string, string> = {}) {
   const url = new URL(basis);
@@ -122,13 +115,17 @@ function inRing(lon: number, lat: number, ring: number[][]): boolean {
 }
 
 async function main() {
-  console.log("Meetplaatsen ophalen…");
-  const punten = await haal<MeetplaatsEigenschappen>(WFS, "MeetplOppervlwaterkwal:Mtploppw");
+  // De drie ophalingen hangen niet van elkaar af; achter elkaar wachten zou
+  // de twee kortste er nodeloos bij optellen.
+  console.log("Meetplaatsen, gemeentegrenzen en PFAS-meetplaatsen ophalen…");
+  const [punten, gemeenten, pfas] = await Promise.all([
+    haal<MeetplaatsEigenschappen>(WFS, "MeetplOppervlwaterkwal:Mtploppw"),
+    haal<{ NAAM: string }>(GEMEENTEN_WFS, "VRBG:Refgem"),
+    haalPfasMeetplaatsen(),
+  ]);
   console.log(`  ${punten.features.length} meetplaatsen`);
-
-  console.log("Gemeentegrenzen ophalen…");
-  const gemeenten = await haal<{ NAAM: string }>(GEMEENTEN_WFS, "VRBG:Refgem");
   console.log(`  ${gemeenten.features.length} gemeenten`);
+  console.log(`  ${pfas.size} meetplaatsen met PFAS-metingen`);
 
   // Buitenste ring per gemeente, met omhullende doos als snelle voorselectie.
   const grenzen = gemeenten.features.map((gemeente) => {
@@ -145,10 +142,6 @@ async function main() {
       doos: [Math.min(...lons), Math.min(...lats), Math.max(...lons), Math.max(...lats)] as const,
     };
   });
-
-  console.log("PFAS-meetplaatsen ophalen bij DOV…");
-  const pfas = await haalPfasMeetplaatsen();
-  console.log(`  ${pfas.size} meetplaatsen met PFAS-metingen`);
 
   console.log("Gemeente per meetplaats bepalen…");
   const meetplaatsen: Meetplaats[] = punten.features.map((punt) => {
