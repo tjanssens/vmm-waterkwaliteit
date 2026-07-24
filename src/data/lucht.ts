@@ -161,7 +161,11 @@ async function haalReeksen(station: Luchtstation, signaal?: AbortSignal): Promis
   if (onthouden) return onthouden;
 
   const reeksen = await haalJson<RuweReeks[]>(luchtBronUrl(station), signaal);
-  REEKSEN.set(station.stationId, reeksen);
+  // Een lege lijst niet onthouden. Die komt bijna altijd van een tijdelijke
+  // hapering bij IRCELINE (HTTP 200 met []), en omdat een lege array truthy is,
+  // zou een gecachte [] het station de hele sessie "geen metingen" laten tonen,
+  // ook nadat de bron hersteld is. Alleen een echte reekslijst blijft hangen.
+  if (reeksen.length > 0) REEKSEN.set(station.stationId, reeksen);
   return reeksen;
 }
 

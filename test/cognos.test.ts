@@ -34,6 +34,18 @@ describe("leesAanvraag", () => {
     },
   );
 
+  // Bijna een kwart van de punten heeft een niet-numeriek nummer. Voor `\d+`
+  // wees de proxy die codes af en was dat deel van de kaart onbevraagbaar. De
+  // waarden komen hier al in hoofdletters binnen, zoals na normalisatie.
+  it.each(["OWGK057", "OWOV_BL_WAKA", "OWBB ASSE", "OWOPEX1&2", "OW365000.B"])(
+    "aanvaardt de niet-numerieke meetplaatscode %s",
+    (code) => {
+      expect(
+        leesAanvraag(vraag(`meetplaats=${encodeURIComponent(code)}&jaren=2024`), 2026).meetplaats,
+      ).toBe(code);
+    },
+  );
+
   describe("weigert alles wat geen geldige vraag is", () => {
     it.each([
       ["zonder meetplaats", "jaren=2024"],

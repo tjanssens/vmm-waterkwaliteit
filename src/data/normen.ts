@@ -113,8 +113,17 @@ export interface Norm {
   eenheid: string;
   /** Weergave in de normkolom. */
   label: string;
-  /** Op welke statistiek de norm slaat. */
+  /** Op welke statistiek de norm slaat. Weergavetekst, geen toetslogica. */
   toets: string;
+  /**
+   * Tegen welke steekproefwaarde de bovengrens getoetst wordt. Standaard het
+   * gemiddelde: dat is onze benadering voor de percentiel- en gemiddeldenormen,
+   * waarvan we het echte percentiel op een zelfgekozen venster toch niet
+   * kunnen berekenen. Een norm die een absoluut plafond is, de watertemperatuur
+   * mag 25 °C nooit overschrijden, toetst tegen het gemeten maximum: anders
+   * glipt een zomerpiek van 28 °C door een gematigd gemiddelde van 22 °C.
+   */
+  toetswaarde?: "maximum";
   bron: BronId;
   /**
    * Middelingstijd. Staat die op "jaar", dan is de norm alleen zinvol te
@@ -206,6 +215,7 @@ const OPPERVLAKTEWATER: Readonly<Record<string, Norm>> = {
     eenheid: "°C",
     label: "≤ 25 °C",
     toets: "maximum",
+    toetswaarde: "maximum",
     bron: "vlarem",
   },
   "EC 20": {
@@ -1015,8 +1025,12 @@ export function beoordeel(
   }
 
   const { gemiddelde, minimum } = parameter;
+  // Waartegen de bovengrens getoetst wordt: standaard het gemiddelde, maar bij
+  // een plafondnorm het gemeten maximum, anders glipt een piek door een
+  // gematigd gemiddelde (zie Norm.toetswaarde).
+  const bovenwaarde = norm.toetswaarde === "maximum" ? parameter.maximum : gemiddelde;
 
-  if (norm.bovengrens !== undefined && gemiddelde > norm.bovengrens) {
+  if (norm.bovengrens !== undefined && bovenwaarde > norm.bovengrens) {
     return { klasse: "buiten-norm", label: "boven norm" };
   }
   if (norm.ondergrens !== undefined && gemiddelde < norm.ondergrens) {
@@ -1025,7 +1039,7 @@ export function beoordeel(
 
   // Tussen het strengste en het soepelste eind van een typeafhankelijke norm
   // kunnen we niets besluiten zonder het waterlooptype te kennen.
-  if (norm.strengsteBovengrens !== undefined && gemiddelde > norm.strengsteBovengrens) {
+  if (norm.strengsteBovengrens !== undefined && bovenwaarde > norm.strengsteBovengrens) {
     return {
       klasse: "op-grens",
       label: "hangt van type af",
@@ -1038,7 +1052,7 @@ export function beoordeel(
   if (norm.ondergrens !== undefined && minimum < norm.ondergrens) {
     return { klasse: "op-grens", label: "dipt onder" };
   }
-  if (norm.bovengrens !== undefined && norm.bovengrens > 0 && gemiddelde > norm.bovengrens * (1 - GRENSMARGE)) {
+  if (norm.bovengrens !== undefined && norm.bovengrens > 0 && bovenwaarde > norm.bovengrens * (1 - GRENSMARGE)) {
     return { klasse: "op-grens", label: "grenswaarde" };
   }
 

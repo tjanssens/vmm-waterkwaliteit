@@ -9,8 +9,19 @@ export const RAPPORT_ID = "i1B4F72B440A747A3B2F9D6057DC16031";
 
 const COGNOS = `https://int-web.vmm.be/ibmcognos/bi/v1/disp/rds/reportData/report/${RAPPORT_ID}`;
 
-/** Meetplaatscode: matrixprefix plus nummer, bv. OW65000, WB124, OWBR12. */
-const MEETPLAATS = /^(OWBR|OWTR|OW|WB|BI|B)\d+$/;
+/**
+ * Meetplaatscode: matrixprefix plus nummer, bv. OW65000, WB124, OWBR12.
+ *
+ * Het nummer is lang niet altijd een getal: bijna een kwart van de punten
+ * draagt letters, een spatie, punt, liggend streepje of ampersand ("GK057",
+ * "BB Asse", "365000.B", "OPEX1&2"). Eiste dit `\d+`, dan wees de proxy die
+ * codes af met een 400 en bleef een kwart van de kaart onbevraagbaar. De
+ * validatie draait ná toUpperCase, dus kleine letters hoeven er niet in. Wat
+ * bewust buiten de klasse blijft, is alles waarmee je de vraag zou kunnen
+ * omleiden: `=` en `%` staan er niet in, zodat een ingesloten `&p_pSample…=`
+ * blijft stranden.
+ */
+const MEETPLAATS = /^(OWBR|OWTR|OW|WB|BI|B)[A-Z0-9 ._&]+$/;
 
 const MATRIX = new Set(["OW", "WB", "BI"]);
 const VROEGSTE_JAAR = 1980;

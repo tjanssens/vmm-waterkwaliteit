@@ -54,6 +54,32 @@ describe("beoordeel — oppervlaktewater", () => {
     );
   });
 
+  describe("plafondnormen toetsen tegen het maximum, niet het gemiddelde", () => {
+    it("noemt een zomerpiek boven 25 °C buiten norm, ook bij een gematigd gemiddelde", () => {
+      // De temperatuurnorm is een maximum: 22 °C gemiddeld maar pieken tot
+      // 28 °C is een echte overschrijding, geen conform meetpunt.
+      const oordeel = beoordeel(samenvatting({ symbool: "T", gemiddelde: 22, minimum: 16, maximum: 28 }));
+
+      expect(oordeel.klasse).toBe("buiten-norm");
+      expect(oordeel.label).toBe("boven norm");
+    });
+
+    it("noemt een reeks die ruim onder 25 °C blijft conform", () => {
+      expect(
+        beoordeel(samenvatting({ symbool: "T", gemiddelde: 15, minimum: 8, maximum: 20 })).klasse,
+      ).toBe("conform");
+    });
+
+    it("noemt een piek net onder 25 °C een grenswaarde", () => {
+      // 24 °C ligt binnen de grensmarge van de norm: geen overschrijding, maar
+      // ook niet zomaar conform.
+      const oordeel = beoordeel(samenvatting({ symbool: "T", gemiddelde: 19, minimum: 12, maximum: 24 }));
+
+      expect(oordeel.klasse).toBe("op-grens");
+      expect(oordeel.label).toBe("grenswaarde");
+    });
+  });
+
   describe("typeafhankelijke normen", () => {
     it("weigert te oordelen tussen de strengste en de soepelste grens", () => {
       // Nitraat: 5,65 tot 10 mgN/L naargelang het waterlooptype.
