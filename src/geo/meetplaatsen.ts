@@ -103,7 +103,9 @@ export async function laadMeetplaatsen(basis: string): Promise<Meetplaats[]> {
       lat: ruw.lat,
       meetnetten,
       meetPfas: ruw.pfas === 1,
-      zoeksleutel: `${ruw.nr} ${ruw.oms} ${ruw.gem ?? ""}`.toLowerCase(),
+      // De code staat erbij zodat "OW65000" evengoed matcht als het kale
+      // nummer, zonder dat de zoekfunctie een prefix hoeft weg te knippen.
+      zoeksleutel: `${code} ${ruw.nr} ${ruw.oms} ${ruw.gem ?? ""}`.toLowerCase(),
     };
   });
 }
@@ -148,7 +150,7 @@ export function zoek<T extends Meetpunt>(
   vanaf?: LatLon,
   maximum = 50,
 ): T[] {
-  const genormaliseerd = term.trim().toLowerCase().replace(/^ow|^wb/, "");
+  const genormaliseerd = term.trim().toLowerCase();
   const treffers = genormaliseerd
     ? punten.filter((m) => m.zoeksleutel.includes(genormaliseerd))
     : [...punten];
@@ -164,11 +166,11 @@ export function zoek<T extends Meetpunt>(
     // op `id` en niet op de code, want het nummer uit de prefix terugrekenen
     // gaat mis bij codes als "OWTimbers 15", daar blijft " 15" over, en een
     // spatie sorteert vóór elk cijfer.
-    treffers.sort((a, b) => {
-      const exactA = a.id.toLowerCase() === genormaliseerd ? 0 : 1;
-      const exactB = b.id.toLowerCase() === genormaliseerd ? 0 : 1;
-      return exactA - exactB || VOLGORDE.compare(a.id, b.id);
-    });
+    // Een exacte treffer op het kale nummer of op de volledige code (de
+    // gebruiker mag beide typen) komt eerst.
+    const exact = (m: T) =>
+      m.id.toLowerCase() === genormaliseerd || m.code.toLowerCase() === genormaliseerd ? 0 : 1;
+    treffers.sort((a, b) => exact(a) - exact(b) || VOLGORDE.compare(a.id, b.id));
   }
 
   return treffers.slice(0, maximum);

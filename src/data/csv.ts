@@ -1,4 +1,5 @@
 import type { Meting } from "./types.js";
+import { belgischeNotatie } from "./getal.js";
 
 /**
  * Het endpoint bij de VMM is ongedocumenteerd. Wanneer het formaat verandert
@@ -50,7 +51,7 @@ function leesRegel(regel: string, regelnummer: number): Meting {
     throw new FormaatFout(`regel ${regelnummer} heeft geen geldige datum ("${datum}")`);
   }
 
-  const waarde = Number(resultaat.trim().replace(",", "."));
+  const waarde = Number(belgischeNotatie(resultaat.trim()));
   if (resultaat.trim() === "" || Number.isNaN(waarde)) {
     throw new FormaatFout(`regel ${regelnummer} heeft een onleesbaar resultaat ("${resultaat}")`);
   }

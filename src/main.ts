@@ -12,6 +12,9 @@ import { LAGEN, laagprofiel } from "./lagen/index.js";
 import type { Laagprofiel, LaagId, Meetpunt, Vak } from "./lagen/types.js";
 import { zoek, afstand, formatteerAfstand, type LatLon } from "./geo/meetplaatsen.js";
 
+/** Hoeveel treffers de lijst toont; daarboven meldt de balk "meer dan zoveel". */
+const LIJST_MAX = 60;
+
 const element = <T extends HTMLElement>(id: string): T => {
   const gevonden = document.getElementById(id);
   if (!gevonden) throw new Error(`Element #${id} ontbreekt in de pagina.`);
@@ -127,7 +130,10 @@ async function start(): Promise<void> {
         kaart.toonLaag(id, aan);
         // De filterknoppen van een uitgeschakelde laag horen te verdwijnen.
         bouwPuntfilters();
-        tekenAlleLagen();
+        // Alleen de zichtbaarheid veranderde; de markers van de andere lagen
+        // staan er nog. Ze allemaal herbouwen zou bij elke toggle 7.534
+        // oppervlaktewatermarkers opnieuw opbouwen die niet wijzigden.
+        toonLijst();
         // Een laag die per venster laadt, heeft nog geen punten als hij aangaat.
         if (aan && LAGEN.find((l) => l.id === id)?.perVenster) {
           const nu = kaart.huidigVenster();
@@ -269,10 +275,14 @@ async function start(): Promise<void> {
   function toonLijst(): void {
     const punten = zichtbarePunten();
     const term = zoekveld.value;
-    const treffers = zoek(punten, term, positie, 60);
+    // Eén meer opvragen dan we tonen: zo weten we of er echt afgekapt is en
+    // meldt de balk pas "meer dan 60" bij een 61e treffer, niet al bij precies 60.
+    const gevonden = zoek(punten, term, positie, LIJST_MAX + 1);
+    const afgekapt = gevonden.length > LIJST_MAX;
+    const treffers = afgekapt ? gevonden.slice(0, LIJST_MAX) : gevonden;
 
     statusregel.textContent = term
-      ? `${treffers.length === 60 ? "meer dan 60" : treffers.length} van ${punten.length} meetpunten`
+      ? `${afgekapt ? `meer dan ${LIJST_MAX}` : treffers.length} van ${punten.length} meetpunten`
       : `${punten.length} meetpunten${positie ? ", dichtstbijzijnde eerst" : ""}`;
 
     if (treffers.length === 0) {
@@ -341,7 +351,20 @@ async function start(): Promise<void> {
   // Diepe link: ?laag=…&punt=… opent dat punt meteen.
   const gevraagd = leesDiepeLink(new URLSearchParams(location.search));
   if (gevraagd) {
-    const punt = (geladen.get(gevraagd.laag) ?? []).find((p) => p.id === gevraagd.punt);
+    let punt: Meetpunt | null | undefined = (geladen.get(gevraagd.laag) ?? []).find(
+      (p) => p.id === gevraagd.punt,
+    );
+    // Een laag die per venster laadt staat niet in `geladen`; die zoekt het punt
+    // op id op, net als de rapportweergave. Zonder dit opent een gedeelde
+    // grondwaterlink nooit het bedoelde punt.
+    const profiel = laagprofiel(gevraagd.laag);
+    if (!punt && profiel?.puntOpId) {
+      try {
+        punt = await profiel.puntOpId(gevraagd.punt);
+      } catch (reden) {
+        console.warn(`Kon gedeeld punt ${gevraagd.punt} niet ophalen:`, reden);
+      }
+    }
     if (punt) kaart.selecteer(punt, true);
   }
 }

@@ -1,4 +1,5 @@
 import { DatabankFout, haalOp } from "./fouten.js";
+import { belgischeNotatie } from "./getal.js";
 import type { Meting } from "./types.js";
 import type { Vak } from "../lagen/types.js";
 
@@ -250,7 +251,7 @@ function tekst(waarde: unknown): string | null {
 function getal(waarde: unknown): number | null {
   if (typeof waarde === "number") return Number.isFinite(waarde) ? waarde : null;
   if (typeof waarde !== "string") return null;
-  const n = Number.parseFloat(waarde.replace(",", "."));
+  const n = Number.parseFloat(belgischeNotatie(waarde));
   return Number.isFinite(n) ? n : null;
 }
 

@@ -65,6 +65,18 @@ export class Paneel {
   private readonly venster = new EvolutieVenster();
 
   /**
+   * Wat `teken` berekende, bewaard zodat de parameterzoek alleen de lijst hoeft
+   * te verversen. Die aggregatie hangt niet van de zoekterm af; ze bij elke
+   * toetsaanslag opnieuw uitvoeren liet het veld haperen op een station met een
+   * jaar uurmetingen.
+   */
+  private lijstgegevens: {
+    alles: ParameterSamenvatting[];
+    vanPeriode: ParameterSamenvatting[];
+    oordelen: Map<string, Oordeel>;
+  } | null = null;
+
+  /**
    * Keuzes die de bezoeker maakt, blijven staan als hij naar een ander punt
    * gaat. Wie 1 jaar kiest en dan drie stations vergelijkt, wil niet elke keer
    * opnieuw op 1 jaar klikken.
@@ -261,6 +273,8 @@ export class Paneel {
     const oordelen = new Map(
       vanPeriode.map((p) => [p.symbool, beoordeel(p, toestand.normenset, venster)] as const),
     );
+    // Bewaren voor de parameterzoek, die enkel de lijst hertekent.
+    this.lijstgegevens = { alles, vanPeriode, oordelen };
 
     const tellingen = new Map<OordeelKlasse, number>();
     for (const oordeel of oordelen.values()) {
@@ -277,7 +291,7 @@ export class Paneel {
       ${this.periodesHtml(toestand)}
       ${this.samenvattingHtml(toestand, vanPeriode, oordelen, tellingen, aanwezig, allesAan)}
       ${this.gereedschapHtml(toestand, vanPeriode)}
-      ${this.categorieenHtml(toestand, alles, vanPeriode, oordelen)}
+      <div data-categorielijst>${this.categorieenHtml(toestand, alles, vanPeriode, oordelen)}</div>
       ${this.voetHtml(toestand)}`;
 
     this.koppelSluiten();
@@ -735,12 +749,32 @@ export class Paneel {
 
     zoekveld.addEventListener("input", () => {
       toestand.zoekterm = zoekveld.value;
-      this.teken();
-      // Na hertekenen is het veld vervangen; zet de cursor terug.
-      const nieuw = this.houder.querySelector<HTMLInputElement>("[data-parameterzoek]");
-      nieuw?.focus();
-      nieuw?.setSelectionRange(nieuw.value.length, nieuw.value.length);
+      // Alleen de lijst verversen. Het zoekveld zelf blijft staan, dus de
+      // cursor hoeft niet meer teruggezet te worden.
+      this.tekenCategorieen(toestand);
     });
+  }
+
+  /**
+   * Herrendert enkel de parametertabel. De zoekterm filtert alleen die lijst;
+   * de kop, de samenvatting en de knoppen eromheen veranderen niet, en de zware
+   * aggregatie evenmin. Daarom lezen we die uit `lijstgegevens` in plaats van
+   * ze opnieuw te berekenen.
+   */
+  private tekenCategorieen(toestand: Toestand): void {
+    const houder = this.houder.querySelector<HTMLElement>("[data-categorielijst]");
+    const gegevens = this.lijstgegevens;
+    if (!houder || !gegevens) return;
+
+    houder.innerHTML = this.categorieenHtml(
+      toestand,
+      gegevens.alles,
+      gegevens.vanPeriode,
+      gegevens.oordelen,
+    );
+    // De knoppen in de lijst zijn vervangen en moeten opnieuw gekoppeld worden.
+    this.koppelCategorieen();
+    this.koppelEvolutie(toestand, gegevens.vanPeriode);
   }
 
   private koppelEvolutie(toestand: Toestand, parameters: ParameterSamenvatting[]): void {

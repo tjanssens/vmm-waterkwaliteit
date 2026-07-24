@@ -19,7 +19,8 @@ const punt = (over: Partial<Meetplaats> & Pick<Meetplaats, "nummer">): Meetplaat
   lat: 51,
   meetnetten: ["FYSICOCHEM"],
   meetPfas: false,
-  zoeksleutel: `${over.nummer} ${over.omschrijving ?? ""} ${over.gemeente ?? ""}`.toLowerCase(),
+  zoeksleutel:
+    `OW${over.nummer} ${over.nummer} ${over.omschrijving ?? ""} ${over.gemeente ?? ""}`.toLowerCase(),
   ...over,
 });
 
@@ -91,6 +92,16 @@ describe("zoek", () => {
   it("vindt ook wanneer de gebruiker de OW-prefix meetypt", () => {
     // Precies de verwarring die deze app moet wegnemen.
     expect(zoek(punten, "OW65000").map((m) => m.nummer)).toEqual(["65000"]);
+  });
+
+  it("kort een zoekterm die met ow of wb begint niet in", () => {
+    // De prefix-afkorting gold ooit voor codes, maar knipte "ow"/"wb" van élke
+    // term. "wbeek" werd zo "eek" en matchte dan ook een gewone "Beek".
+    const extra = [
+      punt({ nummer: "400", omschrijving: "Wbeekmonding" }),
+      punt({ nummer: "401", omschrijving: "Beekmonding" }),
+    ];
+    expect(zoek(extra, "wbeek").map((m) => m.nummer)).toEqual(["400"]);
   });
 
   it("vindt op gemeente", () => {

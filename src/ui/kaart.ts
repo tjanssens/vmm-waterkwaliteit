@@ -2,6 +2,7 @@ import L from "leaflet";
 import "leaflet.markercluster";
 import type { Laagprofiel, LaagId, Meetpunt, Merk, Vak } from "../lagen/types.js";
 import { vormSvg } from "../lagen/merk.js";
+import { escape } from "./format.js";
 
 /** Vlaanderen in beeld bij het openen. */
 const START = { midden: [51.05, 4.4] as [number, number], zoom: 9 };
@@ -78,7 +79,9 @@ export class Kaart {
 
     const markers = punten.map((punt) => {
       const marker = this.maakMarker(punt, laag.profiel.merk);
-      marker.bindTooltip(`<strong>${punt.code}</strong><br>${punt.omschrijving}`, {
+      // Leaflet zet de tooltip via innerHTML; zonder escape breekt een '&' of
+      // '<' in een omschrijving als "Balcaen & Cie" de weergave.
+      marker.bindTooltip(`<strong>${escape(punt.code)}</strong><br>${escape(punt.omschrijving)}`, {
         direction: "top",
       });
       marker.on("click", () => this.selecteer(punt));

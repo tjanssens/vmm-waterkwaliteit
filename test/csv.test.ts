@@ -34,6 +34,13 @@ describe("parseAnalyseresultaten", () => {
     expect(parseAnalyseresultaten(csv)[0]!.waarde).toBe(28.5);
   });
 
+  it("leest een waarde met een duizendtalpunt als één getal", () => {
+    // Zou Cognos ooit groeperen, dan is "1.234,5" gewoon 1234,5 en geen NaN
+    // die de hele meetplaats op een formaatfout doet stranden.
+    const csv = `${KOP}\nOW1\t2024-01-01\t1\t\tEC 20\tGeleidbaarheid\t=\t1.234,5\tµS/cm\n`;
+    expect(parseAnalyseresultaten(csv)[0]!.waarde).toBe(1234.5);
+  });
+
   it("markeert een '<'-resultaat als onder de detectielimiet", () => {
     const csv = `${KOP}\nOW1\t2024-01-01\t1\t\tCd t\tCadmium\t<\t0,1\tµg/L\n`;
     const meting = parseAnalyseresultaten(csv)[0]!;
